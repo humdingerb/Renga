@@ -30,27 +30,11 @@
 	#include <Messenger.h>
 #endif
 
-#ifndef _NETDB_H
-	#ifdef BONE
-		#include <bone/netdb.h>
-	#else
-		#include <netdb.h>
-	#endif	
-#endif
-
-#ifndef _SOCKET_H
-	#ifdef BONE
-//		#include <bone/oldsocket.h>
-		#include <bone/sys/socket.h>
-	#else
-		#include <sys/socket.h>
-	#endif	
-#endif
-
 #ifndef KEEP_ALIVE_H
 	#include "KeepAlive.h"
 #endif
 
+class JabberPlug;
 class KeepAlive;
 
 class PortTalker {
@@ -64,7 +48,7 @@ public:
 public:
 	 virtual           ~PortTalker();
 
-   	 bool               Connect(const char *hostname, const int port, bool keep_alive);
+   	 bool               Connect(const char *hostname, const int port, bool keep_alive,bool useSSL);
 	 bool               IsConnected() const;
 
 	 void               Disconnect();
@@ -91,13 +75,15 @@ private:
 	static const int   _MAX_BUFFER_SIZE = 1000;
 
 private:
-	int                _socket_token;
+	
 	BLooper           *_message_looper;
 	thread_id          _listener_thread_id;
 
 	KeepAlive         *_keep_alive;
+	JabberPlug		  *_plug;
 	void             (*_on_disconnect)(void *);
 	void              *_on_disconnect_argument;
 };
 
 #endif
+//--

@@ -188,7 +188,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			_login_full_view->Hide();
 
 			// connect with current username or register new account
-			JabberSpeak::Instance()->SendConnect(_login_username->Text(), _login_password->Text(), _login_realname->Text(), _login_new_account->Value());
+			JabberSpeak::Instance()->SendConnect(_login_username->Text(), _login_password->Text(), _login_realname->Text(), _ssl_enabled->Value(), _ssl_server->Text(), atoi(_ssl_port->Text()), _login_new_account->Value());
 
 			break;
 		}
@@ -212,7 +212,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_CONNECT: {
 			_status_view->SetMessage("connecting");
-			JabberSpeak::Instance()->SendConnect("", "", "", false, true);
+			JabberSpeak::Instance()->SendConnect("", "", "", "", 0, false,false, true);
 
 			break;
 		}
@@ -247,6 +247,9 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			BlabberSettings::Instance()->SetData("last-realname", _login_realname->Text());
 			BlabberSettings::Instance()->SetData("last-login", _login_username->Text());
 			BlabberSettings::Instance()->SetData("last-password", _login_password->Text());
+			BlabberSettings::Instance()->SetData("last-ssl_server", _ssl_server->Text());
+			BlabberSettings::Instance()->SetData("last-ssl_port", _ssl_port->Text());
+			BlabberSettings::Instance()->SetIntData("last-ssl_enabled", _ssl_enabled->Value());
 			BlabberSettings::Instance()->SetTag("auto-login", _login_auto_login->Value());
 			BlabberSettings::Instance()->WriteToFile();
 
@@ -934,7 +937,35 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_login_password->SetDivider(57.0);
 	_login_password->TextView()->HideTyping(true);
 	
-	rect.OffsetBy(59.0, 21.0);
+	// SSL Box
+	rect.OffsetBy(0.0, 21.0);
+	BRect crect(rect);
+	crect.bottom = crect.top+100;
+	_ssl_enabled =new BCheckBox(BRect(0,0,20,20), NULL, "SSL", NULL, B_FOLLOW_LEFT);
+	_ssl_enabled->ResizeToPreferred();
+	
+	BBox*		_ssl_box=new BBox(crect,"box",B_FOLLOW_LEFT_RIGHT);
+	_ssl_box->SetLabel(_ssl_enabled);
+	
+	BRect insideRect(_ssl_box->Bounds());
+	
+	insideRect.OffsetTo(2,_ssl_enabled->Frame().bottom+2);
+	insideRect.InsetBy(4,2);
+	BRect servRect(insideRect);
+	
+	_ssl_server = new BTextControl(servRect, NULL, "Server: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
+	_ssl_server->ResizeToPreferred();
+	
+	servRect.OffsetBy(0,_ssl_server->Bounds().Height()+1);
+	_ssl_port = new BTextControl(servRect, NULL, "Port: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
+	_ssl_port->ResizeToPreferred();
+	_ssl_box->AddChild(_ssl_server);
+	_ssl_box->AddChild(_ssl_port);
+	rect.top = crect.bottom;
+	rect.OffsetBy(59.0, 1.0);
+	
+	//end SSL Box
+	
 	rect.right = rect.left + 135.0;
 	rect.bottom = rect.top + 19.0;
 	_login_new_account = new BCheckBox(rect, NULL, "Create this account!", NULL, B_FOLLOW_LEFT);
@@ -979,6 +1010,9 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_login_full_view->AddChild(_login_realname);
 	_login_full_view->AddChild(_login_username);
 	_login_full_view->AddChild(_login_password);
+	//xeD
+	_login_full_view->AddChild(_ssl_box);
+	//
 	_login_full_view->AddChild(_login_new_account);
 	_login_full_view->AddChild(_login_auto_login);
 	_login_full_view->AddChild(_login_login);
@@ -1038,7 +1072,7 @@ bool BlabberMainWindow::ValidateLogin() {
 	// append default resource if missing
 	if (username.JabberResource().empty()) {
 		string handle     = username.Handle();
-		string resource   = "/beos";
+		string resource   = "/haiku";
 		string new_handle = handle + resource;
 
 		_login_username->SetText(new_handle.c_str());
@@ -1057,6 +1091,17 @@ bool BlabberMainWindow::ValidateLogin() {
 		_login_password->MakeFocus(true);
 
 		return false;
+	}
+
+	//TODO if ssl is enabled, check the server is not empty and the port is valid. (>0)
+	int port = 0;
+	if (_ssl_port->Text())
+		port = atoi(_ssl_port->Text());
+	
+	if (_ssl_enabled && (!strcmp(_ssl_server->Text(), "") || port <=0 ) )
+	{
+		ModalAlertFactory::Alert("You enabled SSL. Please specify a valid server name and port.", "Sorry!", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
+		return false;		
 	}
 
 	return true;

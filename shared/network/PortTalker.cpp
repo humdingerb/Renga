@@ -24,6 +24,9 @@
 	#endif
 #endif
 
+#include "JabberSSLPlug.h"
+#include "JabberSocketPlug.h"
+
 PortTalker *PortTalker::_instance = NULL;
 
 PortTalker *PortTalker::Instance() {
@@ -36,12 +39,12 @@ PortTalker *PortTalker::Instance() {
 
 PortTalker::PortTalker() {
 	// only initialized in beginning, not part of reset
-	_socket_token           = -1;
 	_listener_thread_id     = -1;
 	_on_disconnect          = NULL;
 	_on_disconnect_argument = NULL;
 	_message_looper         = NULL;
 	_keep_alive             = NULL;
+	_plug					= NULL;
 	
 	// initialize all other values
 	_Reset(false);
@@ -51,50 +54,28 @@ PortTalker::~PortTalker() {
 	_instance = NULL;
 }
 
-bool PortTalker::Connect(const char *hostname, const int port, bool keep_alive) {
+bool PortTalker::Connect(const char *hostname, const int port, bool keep_alive, bool useSSL) {
 	// connect to socket
-	_socket_token = socket(AF_INET, SOCK_STREAM, 0);
-
+	
+	//safety: if there is already a _plug defined, we delete it first.
+	if(_plug)
+		delete _plug;
+	
+	if(useSSL)
+		_plug	= new JabberSSLPlug();
+	else
+		_plug	= new JabberSocketPlug();
+		
+	int32 result= _plug->StartConnection(BString(hostname), port, NULL);
 	// connect to remote machine
-	if (_socket_token >= 0) {
-		struct sockaddr_in dest_addr;
-
-		// use DNS to get a host IP
-		if (_message_looper) { 
-			BMessage msg(RESOLVING_HOSTNAME);
-				msg.AddString("hostname", hostname);
-
-			_message_looper->PostMessage(&msg);
-		}
-
-		hostent *host = gethostbyname(hostname);
-
-		if (!host) {
+	if (result >= 0) {
+	
+		if(result != 0) {
 			if (_message_looper) {
-				BMessage msg(COULD_NOT_RESOLVE_HOSTNAME);
-					msg.AddString("hostname", hostname);
-
+				BMessage msg(result);
+				msg.AddString("hostname", hostname);
 				_message_looper->PostMessage(&msg);
 			}
-
-			_Reset(false);
-			return false;
-		}
-		
-		dest_addr.sin_family      = AF_INET;
-		dest_addr.sin_port        = htons(port);
-		dest_addr.sin_addr.s_addr = *(ulong *)host->h_addr;
-
-		memset(dest_addr.sin_zero, 0, sizeof(dest_addr.sin_zero)); 
-
-		if (_message_looper) {
-			BMessage msg(CONNECTING_TO_HOST);
-				msg.AddString("hostname", hostname);
-			
-			_message_looper->PostMessage(&msg);
-		}
-
-		if(connect(_socket_token, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) == -1) {
 			_Reset(false);
 			return false;
 		}
@@ -111,7 +92,7 @@ bool PortTalker::Connect(const char *hostname, const int port, bool keep_alive) 
 }
 
 bool PortTalker::IsConnected() const {
-	 return (_socket_token >= 0 && _listener_thread_id > B_NO_ERROR);
+	 return (_plug && _plug->IsConnected() && _listener_thread_id > B_NO_ERROR);
 }
 
 void PortTalker::Disconnect() {
@@ -151,7 +132,8 @@ int PortTalker::Send(const char *data, int len) {
 		}
 		
 		// Send the data
-		bytes_sent = send(_socket_token, data, (len - total_bytes_sent), 0);
+		BString sdata(data,(len - total_bytes_sent));
+		bytes_sent = _plug->Send(sdata);
 
 		// Accumulate total
 		total_bytes_sent += bytes_sent;
@@ -190,14 +172,10 @@ void PortTalker::_Reset(bool hard_disconnect) {
 	}
 
 	// end any running processes
-	if (_socket_token >= 0) {
-		#ifdef BONE
-			shutdown(_socket_token, SHUTDOWN_BOTH);
-		#else
-			close(_socket_token);
-		#endif
-
-		_socket_token = -1;
+	if (_plug ) 
+	{
+		delete _plug;
+		_plug = NULL;
 	}
 
 	// callback
@@ -214,40 +192,28 @@ int32 PortTalker::_SpawnListenerThread(void *obj) {
 }
 
 void PortTalker::_ListenerThread() {
-	char buffer[PortTalker::_MAX_BUFFER_SIZE];
-
+	//char buffer[PortTalker::_MAX_BUFFER_SIZE];
+	
+	BMessage msg(PortTalker::DATA);
+				
 	while(true) {
 		// Listen to socket
-		ssize_t bytes_received = recv(_socket_token, buffer, PortTalker::_MAX_BUFFER_SIZE - 1, 0);
+		msg.MakeEmpty();
+		ssize_t bytes_received = ((JabberSSLPlug*)_plug)->ReceiveData(&msg);
 
 		// connection dropped BUGBUG make sure 0 return is handled correctly
 		if (bytes_received <= 0) {
 			// ignore this particular error
-			if (strcasecmp(strerror(errno), "Interrupted system call")) {
+			if (bytes_received<0) {
 				_listener_thread_id = -1;
-				_Reset(true);
-			
+				_Reset(true);			
 				return;
 			}
 		}
 			
-		if (bytes_received > 0) {
-			// Give the return buffer a NULL
-			buffer[bytes_received] = '\0';
-
-			// display results for debuggers
-			#if DEBUG
-				cout << "[PortTalker Receives " << bytes_received << " bytes]" << buffer << "[Done]" << endl << flush;
-			#endif
-
-			if (_message_looper) {
-				BMessage msg(PortTalker::DATA);
-
-				msg.AddString("data", buffer);
-				msg.AddInt32("length", bytes_received);
-
-				_message_looper->PostMessage(&msg);
-			}
+		if (bytes_received > 0 && _message_looper) 
+		{
+			_message_looper->PostMessage(&msg);
 		}
 		
 		// in case networking goes schitz (can't wait for BONE!)

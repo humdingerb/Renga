@@ -8,6 +8,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) 3rdparty jabber4beos ] ;
+
 # source directories
 local sourceDirs =
 	jabber
@@ -102,7 +104,9 @@ Application JabberForBeos :
 	
 	#shared/network
 	PortTalker.cpp
-	KeepAlive.cpp	
-	: be game translation tracker $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
+	KeepAlive.cpp
+	JabberSSLPlug.cpp
+	JabberSocketPlug.cpp	
+	: be game translation tracker $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++) ./3rdparty/jabber4beos/libs/libssl.so ./3rdparty/jabber4beos/libs/libcrypto.so
 	: Resource.rsrc  
 ;

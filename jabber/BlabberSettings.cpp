@@ -35,7 +35,7 @@ BlabberSettings::BlabberSettings(const char *filename)
 	
 	if (status == FileXMLReader::FILE_NOT_FOUND) {
 		// first time user perhaps?
-		ModalAlertFactory::NonModalAlert("It appears that this is your first time using Jabber for Haiku.  We at Rapture In Venice thank you for your interest in our application.", "Your welcome!");
+//		ModalAlertFactory::NonModalAlert("It appears that this is your first time using Jabber for Haiku.", "Your welcome!");
 	} else if (status == FileXMLReader::FILE_CORRUPTED) {
 		// back up their settings
 		ModalAlertFactory::Alert("We regret to inform you that your settings file has been corrupted.  It has been replaced with a fresh copy.", "Oh, darn!");

@@ -79,8 +79,14 @@ private:
 	BTextControl             *_login_realname;
 	BTextControl             *_login_username;
 	BTextControl             *_login_password;
+
+	BTextControl			 *_ssl_server;
+	BTextControl			 *_ssl_port;
+
 	BCheckBox                *_login_new_account;
 	BCheckBox                *_login_auto_login;
+	BCheckBox				 *_ssl_enabled;
+	
 	BButton                  *_login_login;
 
 	BMenuBar                 *_menubar;
