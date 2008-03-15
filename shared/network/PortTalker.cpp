@@ -66,7 +66,7 @@ bool PortTalker::Connect(const char *hostname, const int port, bool keep_alive, 
 	else
 		_plug	= new JabberSocketPlug();
 		
-	int32 result= _plug->StartConnection(BString(hostname), port, NULL);
+	int32 result= _plug->StartConnection(BString(hostname), port);
 	// connect to remote machine
 	if (result >= 0) {
 	
@@ -199,7 +199,7 @@ void PortTalker::_ListenerThread() {
 	while(true) {
 		// Listen to socket
 		msg.MakeEmpty();
-		ssize_t bytes_received = ((JabberSSLPlug*)_plug)->ReceiveData(&msg);
+		ssize_t bytes_received = ((JabberPlug*)_plug)->ReceiveData(&msg);
 
 		// connection dropped BUGBUG make sure 0 return is handled correctly
 		if (bytes_received <= 0) {

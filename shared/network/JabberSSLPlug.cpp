@@ -2,15 +2,15 @@
 
 
 #define LOG(X) printf X;
-#define STDOUT
+//#define STDOUT
 
-JabberSSLPlug::JabberSSLPlug(BString forceserver, int32 port){
-
+JabberSSLPlug::JabberSSLPlug()
+{
 	bio = NULL;
 	ctx = NULL;
 	
-	ffServer = forceserver;
-	ffPort = port;
+	ffServer = "";
+	ffPort = 0;
 	
 	 /* Set up the library */
 
@@ -21,20 +21,25 @@ JabberSSLPlug::JabberSSLPlug(BString forceserver, int32 port){
     OpenSSL_add_all_algorithms();
     
     //if any?
-    ERR_print_errors_fp(stderr); 
-		
+    ERR_print_errors_fp(stderr); 		
 }
 
 
 JabberSSLPlug::~JabberSSLPlug()
 {
-	if(bio != NULL & ctx !=NULL) 
-		StopConnection();
+	if (bio)
+		BIO_free_all(bio);
+    
+    if (ctx)
+    	SSL_CTX_free(ctx);
+
+	bio = NULL;
+	ctx = NULL;
 }
 
 
 int32
-JabberSSLPlug::StartConnection(BString fServer, int32 fPort,void* cookie){
+JabberSSLPlug::StartConnection(BString fServer, int32 fPort){
 	
 	BString fHost;
 	
@@ -124,10 +129,6 @@ JabberSSLPlug::ReceiveData(BMessage * mdata)
 	return length;
 }
 
-void
-JabberSSLPlug::ReceivedData(const char* data,int32 len)
-{
-}
 
 int
 JabberSSLPlug::Send(const BString & xml)
@@ -139,16 +140,6 @@ JabberSSLPlug::Send(const BString & xml)
 	return BIO_write(bio, xml.String(), xml.Length());
 }
 
-int		
-JabberSSLPlug::StopConnection()
-{
-	BIO_free_all(bio);
-    SSL_CTX_free(ctx);
-
-	bio = NULL;
-	ctx = NULL;
-	return 0;
-}
 
 
 //--

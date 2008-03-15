@@ -5,18 +5,20 @@
 #include <netdb.h>
 
 #define LOG(X) printf X;
+//#define STDOUT
 
-JabberSocketPlug::JabberSocketPlug(){
-	
-	fReceiverThread = -1;
+JabberSocketPlug::JabberSocketPlug()
+{
 	fSocket = -1;
 }
 
-JabberSocketPlug::~JabberSocketPlug(){
+JabberSocketPlug::~JabberSocketPlug()
+{
+	close(fSocket);
 }
 
 int32
-JabberSocketPlug::StartConnection(BString fHost, int32 fPort,void* cookie){
+JabberSocketPlug::StartConnection(BString fHost, int32 fPort){
 	
 	LOG(("StartConnection to %s:%ld\n",fHost.String(),fPort));
 	
@@ -51,7 +53,7 @@ JabberSocketPlug::StartConnection(BString fHost, int32 fPort,void* cookie){
     	return CONNECTING_TO_HOST;
     }
    
-	LOG(("DONE: StartConnection to %s:%ld\n",fHost.String(),fPort));
+	LOG(("DONE: StartConnection to %s:%ld -- fSocket %ld\n", fHost.String(), fPort, fSocket));
 	return 0;	
 }
 
@@ -62,67 +64,25 @@ JabberSocketPlug::ReceiveData(BMessage* mdata){
 	char data[1024];
 	int length = 0;
 	
-	
-	while (true) 
+	if ((length = (int)recv(fSocket, data, 1023, 0)) > 0) 
 	{
-		if ((length = (int)recv(fSocket, data, 1023, 0)) > 0) 
-		{
-			data[length] = 0;
-			mdata->AddString("data", data);
+		data[length] = 0;
+		mdata->AddString("data", data);
 			
-			#ifdef STDOUT
-				printf("\n<< %s\n", data);
-			#endif
-		} 
-			
-		ReceivedData(data,length);
+		#ifdef STDOUT
+			printf("\n<< %s\n", data);
+		#endif
 	}
 
 	mdata->AddInt32("length", length);
 	return length;
 }
 
-void
-JabberSocketPlug::ReceivedData(const char* data,int32 len)
-{
-	
-}
 
 int
-JabberSocketPlug::Send(const BString & xml){
-	
-	if (fSocket) 
-	{
-		#ifdef STDOUT
-			printf("\n>> %s\n", xml.String());
-		#endif
-		
-		if(send(fSocket, xml.String(), xml.Length(), 0) == -1)
-			return -1;
-	} 
-	
-	else
-	
-	{
-		printf("Socket not initialized\n");
-		return -1;
-	}
-	return 0;
-}
-
-int		
-JabberSocketPlug::StopConnection()
+JabberSocketPlug::Send(const BString & xml)
 {
-	
-	//Thread Killing!
-	suspend_thread(fReceiverThread);
-	
-	if(fReceiverThread)	kill_thread(fReceiverThread);
-	
-	fReceiverThread = 0;
-	
-	close(fSocket);
-	return 0;
+	return send(fSocket, xml.String(), xml.Length(), 0);
 }
 
 

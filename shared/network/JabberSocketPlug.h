@@ -17,19 +17,16 @@ class JabberSocketPlug : public JabberPlug {
 					 JabberSocketPlug();
 		    virtual ~JabberSocketPlug();
 		
-			   int32	StartConnection(BString fHost, int32 fPort,void* cook);//if >= 0 it's ok.
+			   int32	StartConnection(BString fHost, int32 fPort);//if >= 0 it's ok.
 		 	   int32 	ReceiveData(BMessage* data);    	//thread called function
 			   int		Send(const BString & xml);	//if >= 0 it's ok.		
-			   int		StopConnection();	
+
 	
-			   void		ReceivedData(const char* data,int32);
-			   
-			   bool		IsConnected() { return !(fSocket == -1); }
+			   bool		IsConnected() { return (fSocket >= 0); }
 	private:
 	
 	
 		int32 						fSocket;
-		volatile thread_id 			fReceiverThread;
 };
 
 #endif

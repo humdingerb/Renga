@@ -10,16 +10,20 @@
 #define JabberPlug_H_
 
 #include <String.h>
+#include <Message.h>
 
-class JabberPlug {
+class JabberPlug 
+{
 
 	public:
 		
 		virtual 			~JabberPlug(){};
-		virtual	   int32	StartConnection(BString fHost, int32 fPort,void*) = 0;
-		virtual	   int		Send(const BString & xml) = 0;	
-		virtual	   int		StopConnection() = 0;
+		virtual	   int32	StartConnection(BString fHost, int32 fPort) = 0; //if >= 0 it's ok.
+		virtual	   int		Send(const BString & xml) = 0; //if >= 0 it's ok.
+
 		virtual	   bool		IsConnected() = 0;
+		
+		virtual	   int32 	ReceiveData(BMessage* data) = 0; //thread called function
 		
 		enum    messages   {DATA = 0x68374920};
 		enum    netstatus  {RESOLVING_HOSTNAME = 0x68374921, COULD_NOT_RESOLVE_HOSTNAME, CONNECTING_TO_HOST, COULD_NOT_CONNECT};

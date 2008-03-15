@@ -16,33 +16,28 @@
 #include <openssl/err.h>
 
 
-// public JabberPlug
-class JabberSSLPlug : public JabberPlug {
+class JabberSSLPlug : public JabberPlug 
+{
+
 
 	public:
-			JabberSSLPlug(BString forceserver = NULL,int32 port = 0);
-		   ~JabberSSLPlug();
-	//private:
+						JabberSSLPlug();
+					   ~JabberSSLPlug();
 		
-			   int32	StartConnection(BString fHost, int32 fPort,void* cook);//if >= 0 it's ok.
-			   int32 	ReceiveData(BMessage *);    	//thread called function
-			   int		Send(const BString & xml);	//if >= 0 it's ok.		
-			   int		StopConnection();	
-	
-			   void		ReceivedData(const char* data,int32);
-			   
+			   int32	StartConnection(BString fHost, int32 fPort);
+			   int32 	ReceiveData(BMessage *);    //thread called function
+			   int		Send(const BString & xml);			
 
-			   bool		IsConnected() { if(bio==NULL || ctx==NULL) return false; else return true;}
+			   bool		IsConnected() { return !(bio == NULL || ctx == NULL); }
 	private:
 	
 	
 		BIO* 		bio;
     	SSL_CTX* 	ctx; 
     	
-    	BString	ffServer;
-    	int32	ffPort;
-		
-						
+    	BString		ffServer;
+    	int32		ffPort;
+
 };
 
 #endif
