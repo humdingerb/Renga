@@ -108,6 +108,9 @@
 	#include "TalkManager.h"
 #endif
 
+
+#define SSL_ENABLED	'ssle'
+
 BlabberMainWindow *BlabberMainWindow::_instance = NULL;
 
 BlabberMainWindow *BlabberMainWindow::Instance() {
@@ -219,7 +222,9 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_CONNECTING: {
 			// we are connecting
-			_status_view->SetMessage("contacting " + UserID(JabberSpeak::Instance()->CurrentLogin()).JabberServer() + ":5222");
+			// << ":" << JabberSpeak::Instance()->GetRealPort();
+			
+			_status_view->SetMessage("contacting " + JabberSpeak::Instance()->GetRealServer() );
 
 			break;
 		}
@@ -651,6 +656,13 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			TalkManager::Instance()->RotateToNextWindow(NULL, TalkManager::ROTATE_BACKWARD);
 			break;
 		}
+		
+		case SSL_ENABLED:
+		{
+			_ssl_port->SetEnabled(_ssl_enabled->Value());
+			_ssl_server->SetEnabled(_ssl_enabled->Value());
+		}
+		break;
 	}
 }
 
@@ -941,10 +953,10 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	rect.OffsetBy(0.0, 21.0);
 	BRect crect(rect);
 	crect.bottom = crect.top+100;
-	_ssl_enabled =new BCheckBox(BRect(0,0,20,20), NULL, "SSL", NULL, B_FOLLOW_LEFT);
+	_ssl_enabled = new BCheckBox(BRect(0,0,20,20), NULL, "SSL", new BMessage(SSL_ENABLED), B_FOLLOW_LEFT);
 	_ssl_enabled->ResizeToPreferred();
 	
-	BBox*		_ssl_box=new BBox(crect,"box",B_FOLLOW_LEFT_RIGHT);
+	BBox* _ssl_box=new BBox(crect,"box",B_FOLLOW_LEFT_RIGHT);
 	_ssl_box->SetLabel(_ssl_enabled);
 	
 	BRect insideRect(_ssl_box->Bounds());
@@ -954,11 +966,15 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	BRect servRect(insideRect);
 	
 	_ssl_server = new BTextControl(servRect, NULL, "Server: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	_ssl_server->ResizeToPreferred();
+	_ssl_server->ResizeToPreferred(); //TODO: fix.
+	_ssl_server->SetEnabled(false);
 	
 	servRect.OffsetBy(0,_ssl_server->Bounds().Height()+1);
 	_ssl_port = new BTextControl(servRect, NULL, "Port: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	_ssl_port->ResizeToPreferred();
+	_ssl_port->ResizeToPreferred(); //TODO: fix.
+	_ssl_port->SetEnabled(false);
+	
+	
 	_ssl_box->AddChild(_ssl_server);
 	_ssl_box->AddChild(_ssl_port);
 	rect.top = crect.bottom;
@@ -1041,12 +1057,27 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	} else {
 		_login_username->MakeFocus(true);
 	}
+	
+	//ssl support.
+	
+	_ssl_server->SetText(BlabberSettings::Instance()->Data("last-ssl_server"));
+	_ssl_port->SetText(BlabberSettings::Instance()->Data("last-ssl_port"));
+	
+	if (BlabberSettings::Instance()->Data("last-ssl_enabled"))
+	{
+		int enabled = atoi(BlabberSettings::Instance()->Data("last-ssl_enabled"));
+		_ssl_enabled->SetValue(enabled);
+		
+		_ssl_port->SetEnabled(_ssl_enabled->Value());
+		_ssl_server->SetEnabled(_ssl_enabled->Value());
+	}
+
 }
 
 bool BlabberMainWindow::ValidateLogin() {
 	// existance of username
 	if (!strcmp(_login_username->Text(), "")) {
-		ModalAlertFactory::Alert("Wait, you haven't specified your Jabber ID yet.\n(e.g. BeOSMan@jabber.org)", "Doh!", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
+		ModalAlertFactory::Alert("Wait, you haven't specified your Jabber ID yet.\n(e.g. haikuFan@jabber.org)", "Doh!", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_username->MakeFocus(true);
 
 		return false;
@@ -1098,7 +1129,7 @@ bool BlabberMainWindow::ValidateLogin() {
 	if (_ssl_port->Text())
 		port = atoi(_ssl_port->Text());
 	
-	if (_ssl_enabled && (!strcmp(_ssl_server->Text(), "") || port <=0 ) )
+	if (_ssl_enabled->Value() && (!strcmp(_ssl_server->Text(), "") || port <=0 ) )
 	{
 		ModalAlertFactory::Alert("You enabled SSL. Please specify a valid server name and port.", "Sorry!", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		return false;		

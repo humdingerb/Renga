@@ -101,6 +101,10 @@ public:
 	// SEMAPHORE ON XMLReader
 	void                     LockXMLReader();
 	void                     UnlockXMLReader();
+	
+	
+	string					GetRealServer();
+	int						GetRealPort();
 	          
 protected:
 	// CREATORS

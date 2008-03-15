@@ -1033,27 +1033,37 @@ int32 JabberSpeak::_SpawnConnectionThread(void *obj) {
 	return 1;
 }
 
+string					
+JabberSpeak::GetRealServer()
+{
+	if (_ssl_enabled && _ssl_server.size() >0 && _ssl_port >0 )
+	{
+		return _ssl_server;
+	}
+	
+	return UserID(_curr_login).JabberServer();
+}
+
+int	
+JabberSpeak::GetRealPort()
+{
+	if (_ssl_enabled && _ssl_server.size() >0 && _ssl_port >0 )
+	{
+		return _ssl_port;
+	}
+	
+	return 5222; //default jabber port.
+}	
+
 void JabberSpeak::_ConnectionThread() {
 	// now we have the data, let's process this user request
 	XMLEntity *entity;
 	char **atts = CreateAttributeMemory(6);
 
-	string 	server = UserID(_curr_login).JabberServer();
-	int 	port = 5222; //default jabber port.
-	bool	useSSL = false;
-	
-	if (_ssl_enabled && _ssl_server.size() >0 && _ssl_port >0 )
-	{
-		server = _ssl_server;
-		port = _ssl_port;
-		useSSL = true;
-	}
-
 	// connect to the server
 	while (!IsConnected()) {
 		// try to establish connection
-		Connect(server.c_str(), port, true, useSSL);
-		//ssl example : Connect("talk.google.com",5223, true,);
+		Connect(GetRealServer().c_str(), GetRealPort(), true, _ssl_enabled);
 
 		if (IsConnected()) {
 			break;
@@ -1064,7 +1074,7 @@ void JabberSpeak::_ConnectionThread() {
 	}
 
 	strcpy(atts[0], "to");
-	strcpy(atts[1], server.c_str());
+	strcpy(atts[1], UserID(_curr_login).JabberServer().c_str());
 	strcpy(atts[2], "xmlns");
 	strcpy(atts[3], "jabber:client");
 	strcpy(atts[4], "xmlns:stream");
