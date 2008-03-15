@@ -224,7 +224,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			// we are connecting
 			// << ":" << JabberSpeak::Instance()->GetRealPort();
 			
-			_status_view->SetMessage("contacting " + JabberSpeak::Instance()->GetRealServer() );
+			//_status_view->SetMessage("contacting " + JabberSpeak::Instance()->GetRealServer() );
 
 			break;
 		}
@@ -934,25 +934,37 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	rect.InsetBy(5.0, 5.0);
 	rect.top = 108.0;
 	rect.right -= 3.0;
+	
+	
 
 	_login_realname = new BTextControl(rect, NULL, "Nickname: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	_login_realname->SetDivider(57.0);
-
-	rect.OffsetBy(0.0, 21.0);
+	
+	rect.OffsetBy(0.0, 21.0); //fix this is too static!
+	
+	float labelWidth = _login_realname->StringWidth("Nickname: ");
 
 	_login_username = new BTextControl(rect, NULL, "Jabber ID: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	_login_username->SetDivider(57.0);
+		
+	rect.OffsetBy(0.0, 21.0); //fix this is too static!
 	
-	rect.OffsetBy(0.0, 21.0);
+	if (labelWidth < _login_username->StringWidth("Jabber ID: "))
+		labelWidth = _login_username->StringWidth("Jabber ID: ");
 
 	_login_password = new BTextControl(rect, NULL, "Password: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	_login_password->SetDivider(57.0);
 	_login_password->TextView()->HideTyping(true);
 	
+	if (labelWidth < _login_password->StringWidth("Password: "))
+		labelWidth = _login_password->StringWidth("Password: ");
+		
+		
+
+	
+	
 	// SSL Box
-	rect.OffsetBy(0.0, 21.0);
+	rect.OffsetBy(0.0, 21.0); //fix this is too static!
 	BRect crect(rect);
-	crect.bottom = crect.top+100;
+	crect.bottom = crect.top + 100; //fix this is too static!
+	
 	_ssl_enabled = new BCheckBox(BRect(0,0,20,20), NULL, "SSL", new BMessage(SSL_ENABLED), B_FOLLOW_LEFT);
 	_ssl_enabled->ResizeToPreferred();
 	
@@ -961,23 +973,41 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	
 	BRect insideRect(_ssl_box->Bounds());
 	
-	insideRect.OffsetTo(2,_ssl_enabled->Frame().bottom+2);
-	insideRect.InsetBy(4,2);
-	BRect servRect(insideRect);
+	insideRect.OffsetTo(2,_ssl_enabled->Frame().bottom + 2);
+	insideRect.InsetBy(4, 2);
+	BRect servRect(insideRect);	
+	
 	
 	_ssl_server = new BTextControl(servRect, NULL, "Server: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	_ssl_server->ResizeToPreferred(); //TODO: fix.
+	_ssl_server->ResizeToPreferred();
 	_ssl_server->SetEnabled(false);
 	
-	servRect.OffsetBy(0,_ssl_server->Bounds().Height()+1);
+	if (labelWidth <  _ssl_server->StringWidth("Server: "))
+	 labelWidth = _ssl_server->StringWidth("Server: ");
+	
+	servRect.OffsetBy(0,_ssl_server->Bounds().Height() + 1);
 	_ssl_port = new BTextControl(servRect, NULL, "Port: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	_ssl_port->ResizeToPreferred(); //TODO: fix.
+	_ssl_port->ResizeToPreferred();
 	_ssl_port->SetEnabled(false);
 	
+	if (labelWidth <  _ssl_port->StringWidth("Port: "))
+		labelWidth = _ssl_port->StringWidth("Port: ");
+	
+	
+	labelWidth += 5.0;
+	
+	_login_realname->SetDivider(labelWidth);
+	_login_username->SetDivider(labelWidth);
+	_login_password->SetDivider(labelWidth);
+	_ssl_server->SetDivider(labelWidth);
+	_ssl_port->SetDivider(labelWidth);
+	
+	
+	_ssl_box->ResizeTo(_ssl_box->Bounds().Width(), _ssl_port->Frame().bottom + 10.0);
 	
 	_ssl_box->AddChild(_ssl_server);
 	_ssl_box->AddChild(_ssl_port);
-	rect.top = crect.bottom;
+	rect.top = _ssl_box->Frame().bottom + 10.0; //crect.bottom;
 	rect.OffsetBy(59.0, 1.0);
 	
 	//end SSL Box
@@ -1061,8 +1091,13 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	//ssl support.
 	
 	_ssl_server->SetText(BlabberSettings::Instance()->Data("last-ssl_server"));
-	_ssl_port->SetText(BlabberSettings::Instance()->Data("last-ssl_port"));
 	
+	if (BlabberSettings::Instance()->Data("last-ssl_port"))
+		_ssl_port->SetText(BlabberSettings::Instance()->Data("last-ssl_port"));
+	else
+		_ssl_port->SetText("5223");
+
+
 	if (BlabberSettings::Instance()->Data("last-ssl_enabled"))
 	{
 		int enabled = atoi(BlabberSettings::Instance()->Data("last-ssl_enabled"));
