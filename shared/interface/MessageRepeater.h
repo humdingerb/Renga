@@ -16,9 +16,9 @@
 	#include <Looper.h>
 #endif
 
-typedef list<BLooper *>                  LooperList;
-typedef list<BLooper *>::iterator        LooperIter;
-typedef list<BLooper *>::const_iterator  ConstLooperIter;
+typedef std::list<BLooper *>                  LooperList;
+typedef std::list<BLooper *>::iterator        LooperIter;
+typedef std::list<BLooper *>::const_iterator  ConstLooperIter;
 
 class MessageRepeater : public BLooper {
 public:

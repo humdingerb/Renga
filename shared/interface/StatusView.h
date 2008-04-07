@@ -5,31 +5,27 @@
 #ifndef STATUS_VIEW_H
 #define STATUS_VIEW_H
 
-#ifndef __STRING__
-	#include <string>
-#endif
+#include <string>
 
-#ifndef _VIEW_H
-	#include <interface/View.h>
-#endif
+#include <interface/View.h>
 
 class StatusView : public BView {
 public:
-	               StatusView(const char *name = NULL);
-	              ~StatusView();
-	
-	void           AttachedToWindow();
-	void           Draw(BRect rect);
+						StatusView(const char *name = NULL);
+						~StatusView();
 
-	void           SetMessage(string message);
-	const string   Message() const;
+	void				AttachedToWindow();
+	void				Draw(BRect rect);
 
-	const float    GetHeight() const;
-	
+	void				SetMessage(std::string message);
+	const std::string	Message() const;
+
+	const float			GetHeight() const;
+
 private:
-	string        _current_message;
-	float         _height;
-	font_height   _fh;
+	std::string		_current_message;
+	float			_height;
+	font_height		_fh;
 };
 
 #endif

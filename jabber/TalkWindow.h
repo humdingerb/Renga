@@ -6,89 +6,29 @@
 #ifndef TALK_WINDOW_H
 #define TALK_WINDOW_H
 
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
+#include <cstdio>
+#include <deque>
+#include <string>
 
-#ifndef __DEQUE__
-	#include <deque>
-#endif
-
-#ifndef __STRING__
-	#include <string>
-#endif
-
-#ifndef _BOX_H
-	#include <interface/Box.h>
-#endif
-
-#ifndef _BUTTON_H
-	#include <interface/Button.h>
-#endif
-
-#ifndef _CHECK_BOX_H
-	#include <interface/CheckBox.h>
-#endif
-
-#ifndef _LIST_VIEW_H
-	#include <interface/ListView.h>
-#endif
-
-#ifndef _MENU_BAR_H
-	#include <interface/MenuBar.h>
-#endif
-
-#ifndef _MENU_ITEM_H
-	#include <interface/MenuItem.h>
-#endif
-
-#ifndef _SCROLL_VIEW_H
-	#include <interface/ScrollView.h>
-#endif
-
-#ifndef _STRING_VIEW_H
-	#include <interface/StringView.h>
-#endif
-
-#ifndef _TEXT_VIEW_H
-	#include <interface/TextView.h>
-#endif
-
-#ifndef _WINDOW_H
-	#include <interface/Window.h>
-#endif
-
-#ifndef _FILE_PANEL_H
-	#include <storage/FilePanel.h>
-#endif
-
-#ifndef BETTER_TEXT_VIEW_H
-	#include "BetterTextView.h"
-#endif
-
-#ifndef CHAT_TEXT_VIEW_H
-	#include "ChatTextView.h"
-#endif
-
-#ifndef CHAT_WIDGET_H
-	#include "ChatWidget.h"
-#endif
-
-#ifndef EDITING_FILTER_H
-	#include "EditingFilter.h"
-#endif
-
-#ifndef _SPLIT_PANE_VIEW_H
-	#include "SplitPane.h"
-#endif
-
-#ifndef _STATUS_VIEW_H
-	#include "StatusView.h"
-#endif
-
-#ifndef USER_ID_H
-	#include "UserID.h"
-#endif
+#include <interface/Box.h>
+#include <interface/Button.h>
+#include <interface/CheckBox.h>
+#include <interface/ListView.h>
+#include <interface/MenuBar.h>
+#include <interface/MenuItem.h>
+#include <interface/ScrollView.h>
+#include <interface/StringView.h>
+#include <interface/TextView.h>
+#include <interface/Window.h>
+#include <storage/FilePanel.h>
+	
+#include "BetterTextView.h"
+#include "ChatTextView.h"
+#include "ChatWidget.h"
+#include "EditingFilter.h"
+#include "SplitPane.h"
+#include "StatusView.h"
+#include "UserID.h"
 
 class TalkWindow : public BWindow {
 public:
@@ -100,7 +40,8 @@ public:
 	static float         y_placement_offset;
 	
 public:  
-	                     TalkWindow(talk_type type, const UserID *user, string group_room, string group_username, bool follow_focus_rules = false);
+	                     TalkWindow(talk_type type, const UserID *user, std::string group_room,
+				std::string group_username, bool follow_focus_rules = false);
 	                    ~TalkWindow();
 
 	talk_type            Type();
@@ -111,34 +52,34 @@ public:
 	bool                 QuitRequested();
 	
 	void                 Log(const char *buffer);
-	string               OurRepresentation();
-	void                 AddToTalk(string username, string message, user_type type);
-	void                 NewMessage(string new_message);
-	void                 NewMessage(string username, string new_message);
-	void                 SetThreadID(string id);
+	std::string          OurRepresentation();
+	void                 AddToTalk(std::string username, std::string message, user_type type);
+	void                 NewMessage(std::string new_message);
+	void                 NewMessage(std::string username, std::string new_message);
+	void                 SetThreadID(std::string id);
 
 	bool                 NewlinesAllowed();
 
 	const UserID        *GetUserID();
-	string               GetGroupRoom();
-	string               GetGroupUsername();
+	std::string          GetGroupRoom();
+	std::string          GetGroupUsername();
 
-	int                  CountHyperlinks(string message);
-	void                 GenerateHyperlinkText(string message, text_run standard, text_run_array **tra);
+	int                  CountHyperlinks(std::string message);
+	void                 GenerateHyperlinkText(std::string message, text_run standard, text_run_array **tra);
 
-	void                 AddGroupChatter(string username);
-	void                 RemoveGroupChatter(string username);
+	void                 AddGroupChatter(std::string username);
+	void                 RemoveGroupChatter(std::string username);
 
 	void                 RevealPreviousHistory();		
 	void                 RevealNextHistory();		
 
 private:
 	const UserID          *_user;
-	string                 _group_room;
-	string                 _group_username;
+	std::string            _group_room;
+	std::string            _group_username;
 	UserID::online_status  _current_status;
 	talk_type              _type;
-	string                 _thread;
+	std::string            _thread;
 	
 	// GUI
 	BView              *_full_view;
@@ -199,8 +140,8 @@ private:
 	BScrollView        *_scrolled_people_pane;
 	
 	// user history
-	deque<string>     _chat_history;
-	string              _chat_buffer;
+	std::deque<std::string>  _chat_history;
+	std::string              _chat_buffer;
 	int                 _chat_index;
 	
 	BFilePanel         *_fp;

@@ -21,26 +21,26 @@
 
 class AgentList {
 public:
-	typedef map<string, Agent *>                   AgentMap;
-	typedef map<string, Agent *>::iterator         AgentIter;
-	typedef map<string, Agent *>::const_iterator   ConstAgentIter;
+	typedef std::map<std::string, Agent *>                   AgentMap;
+	typedef std::map<std::string, Agent *>::iterator         AgentIter;
+	typedef std::map<std::string, Agent *>::const_iterator   ConstAgentIter;
 
 public:
 	static AgentList  *Instance();
 					  ~AgentList();
-					 
+
 	void               AddAgent(Agent *new_agent);
-	Agent             *GetAgentByService(string service);
-	Agent             *GetAgentByID(string id);
+	Agent             *GetAgentByService(std::string service);
+	Agent             *GetAgentByID(std::string id);
 
 	void               RemoveAllAgents();
-		
+
 protected:
 	                   AgentList();
 
 private:
 	static AgentList *_instance;
-	
+
 	AgentMap          _agent_list;
 };
 

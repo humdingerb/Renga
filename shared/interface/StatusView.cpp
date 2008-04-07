@@ -14,7 +14,7 @@ StatusView::StatusView(const char *name)
 
 	// construct text positioning
 	GetFontHeight(&_fh);
-	
+
 	_height = _fh.ascent + _fh.descent;
 }
 
@@ -24,7 +24,7 @@ StatusView::~StatusView() {
 void StatusView::AttachedToWindow() {
 	// resize to connect to bottom of parent
 	BRect rect = Parent()->Bounds();
-	
+
 	// set new size
 	ResizeTo(rect.Width(), _height + 3.0);
 	MoveTo(0.0, rect.bottom - _height - 2.0);
@@ -42,15 +42,15 @@ void StatusView::Draw(BRect rect) {
 	SetHighColor(0, 0, 0, 255);
 	DrawString(_current_message.c_str(), BPoint(5, Bounds().bottom - ((Bounds().Height() - _height - 2) / 2) - _fh.descent));
 }
-	
-void StatusView::SetMessage(string message) {
+
+void StatusView::SetMessage(std::string message) {
 	_current_message = message;
-	
+
 	// redraw self
 	Invalidate();
 }
 
-const string StatusView::Message() const {
+const std::string StatusView::Message() const {
 	return _current_message;
 }
 

@@ -9,6 +9,7 @@
 #include "JabberPlug.h"
 
 #include <OS.h>
+#include <String.h>
 #include <Message.h>
 
 #include <openssl/ssl.h>
@@ -16,25 +17,25 @@
 #include <openssl/err.h>
 
 
-class JabberSSLPlug : public JabberPlug 
+class JabberSSLPlug : public JabberPlug
 {
 
 
 	public:
 						JabberSSLPlug();
 					   ~JabberSSLPlug();
-		
+
 			   int32	StartConnection(BString fHost, int32 fPort);
 			   int32 	ReceiveData(BMessage *);    //thread called function
-			   int		Send(const BString & xml);			
+			   int		Send(const BString & xml);
 
 			   bool		IsConnected() { return !(bio == NULL || ctx == NULL); }
 	private:
-	
-	
+
+
 		BIO* 		bio;
-    	SSL_CTX* 	ctx; 
-    	
+    	SSL_CTX* 	ctx;
+
     	BString		ffServer;
     	int32		ffPort;
 

@@ -165,7 +165,7 @@ char *XMLEntity::ToString(bool encoded, int level) {
 	return strdup(text.c_str());	
 }
 
-char *XMLEntity::StartToString(bool encoded=true) {
+char *XMLEntity::StartToString(bool encoded) {
 	// piece together text-version XML from XMLEntity
 	string text = "";
 

@@ -20,7 +20,7 @@ TalkListItem::~TalkListItem() {
 	delete _user;
 }
 
-void TalkListItem::DrawItem(BView *owner, BRect frame, bool complete = false) {
+void TalkListItem::DrawItem(BView *owner, BRect frame, bool complete) {
 	// text characteristics
 	owner->SetFont(be_plain_font);
 	owner->SetFontSize(10.0);
@@ -30,11 +30,11 @@ void TalkListItem::DrawItem(BView *owner, BRect frame, bool complete = false) {
 	owner->FillRect(frame);
 
 	float height;
-	
+
 	// construct text positioning
 	font_height fh;
 	owner->GetFontHeight(&fh);
-	
+
 	height = fh.ascent + fh.descent;
 
 	// font color for user

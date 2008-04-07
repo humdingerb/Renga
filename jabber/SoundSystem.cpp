@@ -28,7 +28,7 @@ SoundSystem *SoundSystem::Instance() {
 	if (_instance == NULL) {
 		_instance = new SoundSystem();
 	}
-	
+
 	return _instance;
 }
 
@@ -78,8 +78,8 @@ SoundSystem::SoundSystem() {
 SoundSystem::~SoundSystem() {
 	_instance = NULL;
 }
-	 
-string SoundSystem::NewMessageSound() {
+
+std::string SoundSystem::NewMessageSound() {
 	if (_new_message_sound != "<none>") {
 		return _new_message_sound;
 	} else {
@@ -87,7 +87,7 @@ string SoundSystem::NewMessageSound() {
 	}
 }
 
-string SoundSystem::NewMessageSoundLeaf() {
+std::string SoundSystem::NewMessageSoundLeaf() {
 	if (_new_message_sound != "<none>") {
 		return BPath(_new_message_sound.c_str()).Leaf();
 	} else {
@@ -95,12 +95,12 @@ string SoundSystem::NewMessageSoundLeaf() {
 	}
 }
 
-void SoundSystem::SetNewMessageSound(string new_message_sound) {
+void SoundSystem::SetNewMessageSound(std::string new_message_sound) {
 	BEntry entry(new_message_sound.c_str());
 	if (new_message_sound == "<none>" || !entry.Exists()) {
 		new_message_sound = "<none>";
 	}
-	
+
 	_new_message_sound = new_message_sound;
 
 	BlabberSettings::Instance()->SetData("new-message-sound", new_message_sound.c_str());
@@ -128,7 +128,7 @@ void SoundSystem::PlayNewMessageSound() {
 
 //
 
-string SoundSystem::MessageSound() {
+std::string SoundSystem::MessageSound() {
 	if (_message_sound != "<none>") {
 		return _message_sound;
 	} else {
@@ -136,7 +136,7 @@ string SoundSystem::MessageSound() {
 	}
 }
 
-string SoundSystem::MessageSoundLeaf() {
+std::string SoundSystem::MessageSoundLeaf() {
 	if (_message_sound != "<none>") {
 		return BPath(_message_sound.c_str()).Leaf();
 	} else {
@@ -144,12 +144,12 @@ string SoundSystem::MessageSoundLeaf() {
 	}
 }
 
-void SoundSystem::SetMessageSound(string message_sound) {
+void SoundSystem::SetMessageSound(std::string message_sound) {
 	BEntry entry(message_sound.c_str());
 	if (message_sound == "<none>" || !entry.Exists()) {
 		message_sound = "<none>";
 	}
-	
+
 	_message_sound = message_sound;
 
 	BlabberSettings::Instance()->SetData("message-sound", _message_sound.c_str());
@@ -175,7 +175,7 @@ void SoundSystem::PlayMessageSound() {
 	}
 }
 
-string SoundSystem::UserOnlineSound() {
+std::string SoundSystem::UserOnlineSound() {
 	if (_user_online_sound != "<none>") {
 		return _user_online_sound;
 	} else {
@@ -183,7 +183,7 @@ string SoundSystem::UserOnlineSound() {
 	}
 }
 
-string SoundSystem::UserOnlineSoundLeaf() {
+std::string SoundSystem::UserOnlineSoundLeaf() {
 	if (_user_online_sound != "<none>") {
 		return BPath(_user_online_sound.c_str()).Leaf();
 	} else {
@@ -191,12 +191,12 @@ string SoundSystem::UserOnlineSoundLeaf() {
 	}
 }
 
-void SoundSystem::SetUserOnlineSound(string user_online_sound) {
+void SoundSystem::SetUserOnlineSound(std::string user_online_sound) {
 	BEntry entry(user_online_sound.c_str());
 	if (user_online_sound == "<none>" || !entry.Exists()) {
 		user_online_sound = "<none>";
 	}
-	
+
 	_user_online_sound = user_online_sound;
 
 	BlabberSettings::Instance()->SetData("user-online-sound", user_online_sound.c_str());
@@ -222,7 +222,7 @@ void SoundSystem::PlayUserOnlineSound() {
 	}
 }
 
-string SoundSystem::UserOfflineSound() {
+std::string SoundSystem::UserOfflineSound() {
 	if (_user_offline_sound != "<none>") {
 		return _user_offline_sound;
 	} else {
@@ -230,7 +230,7 @@ string SoundSystem::UserOfflineSound() {
 	}
 }
 
-string SoundSystem::UserOfflineSoundLeaf() {
+std::string SoundSystem::UserOfflineSoundLeaf() {
 	if (_user_offline_sound != "<none>") {
 		return BPath(_user_offline_sound.c_str()).Leaf();
 	} else {
@@ -238,7 +238,7 @@ string SoundSystem::UserOfflineSoundLeaf() {
 	}
 }
 
-void SoundSystem::SetUserOfflineSound(string user_offline_sound) {
+void SoundSystem::SetUserOfflineSound(std::string user_offline_sound) {
 	BEntry entry(user_offline_sound.c_str());
 	if (user_offline_sound == "<none>" || !entry.Exists()) {
 		user_offline_sound = "<none>";
@@ -269,7 +269,7 @@ void SoundSystem::PlayUserOfflineSound() {
 	}
 }
 
-string SoundSystem::AlertSound() {
+std::string SoundSystem::AlertSound() {
 	if (_alert_sound != "<none>") {
 		return _alert_sound;
 	} else {
@@ -277,7 +277,7 @@ string SoundSystem::AlertSound() {
 	}
 }
 
-string SoundSystem::AlertSoundLeaf() {
+std::string SoundSystem::AlertSoundLeaf() {
 	if (_alert_sound != "<none>") {
 		return BPath(_alert_sound.c_str()).Leaf();
 	} else {
@@ -285,7 +285,7 @@ string SoundSystem::AlertSoundLeaf() {
 	}
 }
 
-void SoundSystem::SetAlertSound(string alert_sound) {
+void SoundSystem::SetAlertSound(std::string alert_sound) {
 	BEntry entry(alert_sound.c_str());
 	if (alert_sound == "<none>" || !entry.Exists()) {
 		alert_sound = "<none>";

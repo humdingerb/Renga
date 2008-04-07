@@ -12,7 +12,7 @@ AgentList *AgentList::Instance() {
 	if (_instance == NULL) {
 		_instance = new AgentList();
 	}
-	
+
 	return _instance;
 }
 
@@ -27,7 +27,7 @@ void AgentList::AddAgent(Agent *new_agent) {
 	}
 }
 
-Agent *AgentList::GetAgentByService(string service) {
+Agent *AgentList::GetAgentByService(std::string service) {
 	if (_agent_list.count(service) > 0) {
 		return _agent_list[service];
 	}
@@ -35,7 +35,7 @@ Agent *AgentList::GetAgentByService(string service) {
 	return NULL;
 }
 
-Agent *AgentList::GetAgentByID(string id) {
+Agent *AgentList::GetAgentByID(std::string id) {
 	for (AgentIter i = _agent_list.begin(); i != _agent_list.end(); ++i) {
 		if (i->second->JID() == id) {
 			return i->second;
@@ -44,7 +44,7 @@ Agent *AgentList::GetAgentByID(string id) {
 
 	return NULL;
 }
-	
+
 AgentList::AgentList() {
 }
 

@@ -30,7 +30,7 @@ RosterItem::RosterItem(const UserID *userid)
 
 	// intitialize static members
 	if (_offline_icon == NULL) {
-		string graphic;
+		std::string graphic;
 
 		// generate path for home icon
 		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/away-online.png");
@@ -93,7 +93,7 @@ void RosterItem::DrawItem(BView *owner, BRect frame, bool complete) {
 
 	// get online status
 	UserID::online_status status = _userid->OnlineStatus();
-	string                exact_status = _userid->ExactOnlineStatus();
+	std::string                exact_status = _userid->ExactOnlineStatus();
 
 	// text characteristics
 	owner->SetFont(be_plain_font);
@@ -143,13 +143,13 @@ void RosterItem::DrawItem(BView *owner, BRect frame, bool complete) {
 	}
 
 	float height;
-	
+
 	// construct name
-	string name = GetUserID()->FriendlyName();
+	std::string name = GetUserID()->FriendlyName();
 
 	if (name.empty()) {
 		name = GetUserID()->Handle();
-		
+
 		if (name.empty()) {
 			name = "<anonymous>";
 		}
@@ -171,7 +171,7 @@ void RosterItem::DrawItem(BView *owner, BRect frame, bool complete) {
 	// construct text positioning
 	font_height fh;
 	owner->GetFontHeight(&fh);
-	
+
 	height = fh.ascent + fh.descent;
 
 	// draw name
@@ -185,7 +185,7 @@ void RosterItem::DrawItem(BView *owner, BRect frame, bool complete) {
 		owner->DrawString(GetUserID()->MoreExactOnlineStatus().c_str());
 		owner->DrawString("]");
 	}
-	
+
 	// draw external chat icon
 	if (GetUserID()->UserType() == UserID::AIM) {
 		if (_aol_icon) {
@@ -210,7 +210,7 @@ void RosterItem::Update(BView *owner, const BFont *font) {
 	BListItem::Update(owner, font);
 
 	// set height to accomodate graphics and text
-	SetHeight(16.0);	
+	SetHeight(16.0);
 }
 
 bool RosterItem::StalePointer() const {

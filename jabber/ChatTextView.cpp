@@ -2,62 +2,64 @@
 // Blabber [ChatTextView.cpp]
 //////////////////////////////////////////////////
 
-#ifndef CHAT_TEXT_VIEW_H
-	#include "ChatTextView.h"
-#endif
+#include "ChatTextView.h"
 
-#ifndef __STRING__
-	#include <string>
-#endif
-
-#ifndef _NETPOSITIVE_H
-	#include <be_apps/NetPositive/NetPositive.h>
-#endif
-
-#ifndef _ROSTER_H
-	#include <Roster.h>
-#endif
-
+#include <string>
 #include <iostream>
-ChatTextView::ChatTextView(BRect frame, const char *name, BRect text_rect, uint32 resizing_mode, uint32 flags)
-	: BTextView(frame, name, text_rect, resizing_mode, flags) {
+
+#include <be_apps/NetPositive/NetPositive.h>
+#include <Roster.h>
+
+ChatTextView::ChatTextView(BRect frame, const char *name, BRect text_rect,
+	uint32 resizing_mode, uint32 flags)
+	: BTextView(frame, name, text_rect, resizing_mode, flags)
+{
 }
 
-ChatTextView::ChatTextView(BRect frame, const char *name, BRect text_rect, const BFont *font, const rgb_color *color, uint32 resizing_mode, uint32 flags)
-	: BTextView(frame, name, text_rect, font, color, resizing_mode, flags) {
+ChatTextView::ChatTextView(BRect frame, const char *name, BRect text_rect,
+	const BFont *font, const rgb_color *color, uint32 resizing_mode, uint32 flags)
+	: BTextView(frame, name, text_rect, font, color, resizing_mode, flags)
+{
 }
 
-void ChatTextView::MouseDown(BPoint pt) {
+void ChatTextView::MouseDown(BPoint pt)
+{
 	const char *text = Text();
-	string url;
-		
+	std::string url;
+
 	// base
 	BTextView::MouseDown(pt);
-		
+
 	// Ugly link search
 	int32 curr_offset = OffsetAt(pt);
-	
+
 	// no more looking at spaces
 	while (curr_offset >= 0 && !isspace(text[curr_offset])) {
-		if (curr_offset + 8 <= TextLength() && text[curr_offset] == 'h' && text[curr_offset + 1] == 't' && text[curr_offset + 2] == 't' && text[curr_offset + 3] == 'p' && text[curr_offset + 4] == ':' && text[curr_offset + 5] == '/' && text[curr_offset + 6] == '/') {
+		if (curr_offset + 8 <= TextLength() && text[curr_offset] == 'h'
+			&& text[curr_offset + 1] == 't' && text[curr_offset + 2] == 't'
+			&& text[curr_offset + 3] == 'p' && text[curr_offset + 4] == ':'
+			&& text[curr_offset + 5] == '/' && text[curr_offset + 6] == '/') {
+
 			url = text[curr_offset++];
-			
 			while(curr_offset < TextLength() && !isspace(text[curr_offset])) {
 				url += text[curr_offset++];
 			}
 
 			break;
-		}			
+		}
 
-		if (curr_offset + 7 <= TextLength() && text[curr_offset] == 'f' && text[curr_offset + 1] == 't' && text[curr_offset + 2] == 'p' && text[curr_offset + 3] == ':' && text[curr_offset + 4] == '/' && text[curr_offset + 5] == '/') {
+		if (curr_offset + 7 <= TextLength() && text[curr_offset] == 'f'
+			&& text[curr_offset + 1] == 't' && text[curr_offset + 2] == 'p'
+			&& text[curr_offset + 3] == ':' && text[curr_offset + 4] == '/'
+			&& text[curr_offset + 5] == '/') {
+
 			url = text[curr_offset++];
-			
 			while(curr_offset < TextLength() && !isspace(text[curr_offset])) {
 				url += text[curr_offset++];
 			}
 
 			break;
-		}			
+		}
 
 		--curr_offset;
 	}
@@ -68,7 +70,9 @@ void ChatTextView::MouseDown(BPoint pt) {
 		curr_offset = OffsetAt(pt);
 
 		while (curr_offset >= 0 && !isspace(text[curr_offset])) {
-			if (curr_offset + 5 <= TextLength() && text[curr_offset] == 'w' && text[curr_offset + 1] == 'w' && text[curr_offset + 2] == 'w' && text[curr_offset + 3] == '.') {
+			if (curr_offset + 5 <= TextLength() && text[curr_offset] == 'w'
+				&& text[curr_offset + 1] == 'w' && text[curr_offset + 2] == 'w'
+				&& text[curr_offset + 3] == '.') {
 				// ignore if it's not at the beginning or has no whitespace
 				if ((curr_offset - 1) >= 0 && isalnum(text[curr_offset - 1])) {
 					--curr_offset;
@@ -82,29 +86,31 @@ void ChatTextView::MouseDown(BPoint pt) {
 				}
 
 				url = text[curr_offset++];
-			
+
 				while(curr_offset < TextLength() && !isspace(text[curr_offset])) {
 					url += text[curr_offset++];
 				}
-				
+
 				// prepend http
 				url = "http://" + url;
 
 				break;
-			}			
+			}
 
-			if (curr_offset + 5 <= TextLength() && text[curr_offset] == 'f' && text[curr_offset + 1] == 't' && text[curr_offset + 2] == 'p' && text[curr_offset + 3] == '.') {
+			if (curr_offset + 5 <= TextLength() && text[curr_offset] == 'f'
+				&& text[curr_offset + 1] == 't' && text[curr_offset + 2] == 'p'
+				&& text[curr_offset + 3] == '.') {
 				url = text[curr_offset++];
-			
+
 				while(curr_offset < TextLength() && !isspace(text[curr_offset])) {
 					url += text[curr_offset++];
 				}
-				
+
 				// prepend http
 				url = "ftp://" + url;
 
 				break;
-			}			
+			}
 
 			--curr_offset;
 		}
@@ -113,14 +119,18 @@ void ChatTextView::MouseDown(BPoint pt) {
 	// prune punctuation
 	if (!url.empty()) {
 		while (url.size() > 0) {
-			if (url[url.size() - 1] == ',' || url[url.size() - 1] == '!' || url[url.size() - 1] == '.' || url[url.size() - 1] == ')' || url[url.size() - 1] == ';' || url[url.size() - 1] == ']' || url[url.size() - 1] == '>' || url[url.size() - 1] == '?' || url[url.size() - 1] == '\'' || url[url.size() - 1] == '"') {
+			if (url[url.size() - 1] == ',' || url[url.size() - 1] == '!'
+				|| url[url.size() - 1] == '.' || url[url.size() - 1] == ')'
+				|| url[url.size() - 1] == ';' || url[url.size() - 1] == ']'
+				|| url[url.size() - 1] == '>' || url[url.size() - 1] == '?'
+				|| url[url.size() - 1] == '\'' || url[url.size() - 1] == '"') {
 				url.erase(url.size() - 1);
 			} else {
 				break;
 			}
 		}
 	}
-	
+
 	// load up browser!!
 	if (!url.empty()) {
 		char *argv[] = {const_cast<char *>(url.c_str()), NULL};
@@ -132,5 +142,5 @@ void ChatTextView::MouseDown(BPoint pt) {
 			msg.AddString("be:url", url.c_str());
 			messenger.SendMessage(&msg);
 		}
-	}		
+	}
 }

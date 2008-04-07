@@ -24,9 +24,9 @@ public:
 	enum search_method         {FRIENDLY_NAME, HANDLE, COMPLETE_HANDLE, TRANSPORT_ID};
 
 	// shortened
-	typedef vector<UserID *>                 RosterList;
-	typedef vector<UserID *>::iterator       RosterIter;
-	typedef vector<UserID *>::const_iterator ConstRosterIter;
+	typedef std::vector<UserID *>                 RosterList;
+	typedef std::vector<UserID *>::iterator       RosterIter;
+	typedef std::vector<UserID *>::const_iterator ConstRosterIter;
 
 public:
 	static JRoster              *Instance();
@@ -36,25 +36,25 @@ public:
 	void                         AddNewUser(UserID *new_user);
 	void                         RemoveUser(const UserID *removed_user);
 	void                         RemoveAllUsers();
-	
-	UserID                      *FindUser(search_method search_type, string key); 
-	UserID                      *FindUser(const UserID *comparing_user); 
+
+	UserID                      *FindUser(search_method search_type, std::string key);
+	UserID                      *FindUser(const UserID *comparing_user);
 	bool                         ExistingUserObject(const UserID *comparing_user);
 
-	void                         SetUserStatus(string username, UserID::online_status status);
-	const UserID::online_status  UserStatus(string username);
+	void                         SetUserStatus(std::string username, UserID::online_status status);
+	const UserID::online_status  UserStatus(std::string username);
 
 	ConstRosterIter              BeginIterator();
 	ConstRosterIter              EndIterator();
 
 	void                         RefreshRoster();
-	
+
 	void                         Lock();
 	void                         Unlock();
-	
+
 protected:
 	                             JRoster();
-	    
+
 private:
 	static JRoster             *_instance;
 	RosterList                 *_roster;

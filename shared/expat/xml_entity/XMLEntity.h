@@ -7,11 +7,10 @@
 #ifndef XML_ENTITY_H
 #define XML_ENTITY_H
 
-#ifndef __STRING__
-	#include <string>
-#endif
-
+#include <string>
 #include <vector>
+
+using namespace std;
 
 class XMLEntity {
 	public:

@@ -7,25 +7,23 @@
 #ifndef APP_LOCATION_H
 #define APP_LOCATION_H
 
-#ifndef __STRING__
-	#include <string>
-#endif
+#include <string>
 
 class AppLocation {
 public:
 	static AppLocation  *Instance();
 	                    ~AppLocation();
 
-	void                 SetExecutableCall(string executable_call);
-	string               Path();
-	string               AbsolutePath(string relative_path);
-	
+	void                 SetExecutableCall(std::string executable_call);
+	std::string          Path();
+	std::string          AbsolutePath(std::string relative_path);
+
 protected:
 	                     AppLocation();
 
 private:
-	static AppLocation *_instance;
-	string              _executable_path;
-};                    
+	static AppLocation  *_instance;
+	std::string         _executable_path;
+};
 
 #endif

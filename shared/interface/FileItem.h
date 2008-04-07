@@ -16,12 +16,13 @@
 
 class FileItem : public BMenuItem {
 public:
-	        FileItem(const char *label, const char *filename, BMessage *msg, char shortcut = 0, uint32 modifiers = 0);
+	        FileItem(const char *label, const char *filename, BMessage *msg,
+	        	char shortcut = 0, uint32 modifiers = 0);
 
-	string  Filename();
+	std::string  Filename();
 
 private:
-	string _filename;	
+	std::string _filename;
 };
 
 #endif

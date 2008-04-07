@@ -6,53 +6,51 @@
 #ifndef AGENT_H
 #define AGENT_H
 
-#ifndef __STRING__
-	#include <string>
-#endif
+#include <string>
 
 class Agent {
 	public:
 		        Agent();
 		       ~Agent();
-		
-		string  JID() const;
-		string  Name();
-		string  Description();
-		string  Service() const;
+
+		std::string  JID() const;
+		std::string  Name();
+		std::string  Description();
+		std::string  Service() const;
 		bool    IsRegisterable() const;
 		bool    IsRegistered() const;
-		string  Transport();
+		std::string  Transport();
 		bool    IsSearchable();
 
-		string  Username() const;
-		string  Password() const;
+		std::string  Username() const;
+		std::string  Password() const;
 
-		void    SetJID(string jid);
-		void    SetName(string name);
-		void    SetDescription(string description);
-		void    SetService(string service);
+		void    SetJID(std::string jid);
+		void    SetName(std::string name);
+		void    SetDescription(std::string description);
+		void    SetService(std::string service);
 		void    SetRegisterableFlag(bool is_registerable);
 		void    SetRegisteredFlag(bool is_registered);
-		void    SetTransport(string transport);
+		void    SetTransport(std::string transport);
 		void    SetSearchableFlag(bool is_searchable);
-		
-		void    SetUsername(string username);
-		void    SetPassword(string password);
-		
+
+		void    SetUsername(std::string username);
+		void    SetPassword(std::string password);
+
 		void    Register();
 		void    UnRegister();
-		
+
 	private:
-		string _jid;
-		string _name;
-		string _description;
-		string _service;
+		std::string _jid;
+		std::string _name;
+		std::string _description;
+		std::string _service;
 		bool   _is_registerable;
-		string _transport;
+		std::string _transport;
 		bool   _is_searchable;
 
-		string _username;
-		string _password;
+		std::string _username;
+		std::string _password;
 
 		bool   _is_registered;
 };

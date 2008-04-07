@@ -18,10 +18,10 @@
 	#include "UserID.h"
 #endif
 
-UserID::UserID(string handle) {
+UserID::UserID(std::string handle) {
 	// initialize values
 	SetHandle(handle);
-	
+
 	// bare defaults
 	SetOnlineStatus(UserID::UNKNOWN);
 	SetAsk("");
@@ -39,7 +39,7 @@ UserID::UserID(const UserID &copied_userid) {
 	SetExactOnlineStatus(copied_userid.ExactOnlineStatus());
 	SetMoreExactOnlineStatus(copied_userid.MoreExactOnlineStatus());
 }
-	
+
 UserID::~UserID() {
 }
 
@@ -57,15 +57,15 @@ const UserID::user_type UserID::UserType() const {
 	return _user_type;
 }
 
-const string UserID::Handle() const {
+const std::string UserID::Handle() const {
 	return _handle;
 }
 
-const string UserID::FriendlyName() const {
+const std::string UserID::FriendlyName() const {
 	return _friendly_name;
 }
 
-const string UserID::Ask() const {
+const std::string UserID::Ask() const {
 	return _ask;
 }
 
@@ -77,7 +77,7 @@ const UserID::online_status UserID::OnlineStatus() const {
 	}
 }
 
-const string UserID::ExactOnlineStatus() const {
+const std::string UserID::ExactOnlineStatus() const {
 	if (OnlineStatus() == ONLINE) {
 		// exact status only applies for users online
 		return _exact_status;
@@ -87,7 +87,7 @@ const string UserID::ExactOnlineStatus() const {
 	}
 }
 
-const string UserID::MoreExactOnlineStatus() const {
+const std::string UserID::MoreExactOnlineStatus() const {
 	if (OnlineStatus() == ONLINE) {
 		// more exact status only applies for users online
 		return _more_exact_status;
@@ -97,7 +97,7 @@ const string UserID::MoreExactOnlineStatus() const {
 	}
 }
 
-const string UserID::SubscriptionStatus() const {
+const std::string UserID::SubscriptionStatus() const {
 	return _subscription_status;
 }
 
@@ -109,12 +109,12 @@ bool UserID::IsUser() const {
 	return (UserType() == JABBER || UserType() == AIM || UserType() == ICQ || UserType() == YAHOO || UserType() == MSN);
 }
 
-const string UserID::JabberHandle() const {
-	string handle;
-	
-	string username = JabberUsername();
-	string server   = JabberServer();
-	
+const std::string UserID::JabberHandle() const {
+	std::string handle;
+
+	std::string username = JabberUsername();
+	std::string server   = JabberServer();
+
 	if (!username.empty() && !server.empty()) {
 		handle = username;
 		handle += '@';
@@ -124,16 +124,16 @@ const string UserID::JabberHandle() const {
 	return handle;
 }
 
-const string UserID::JabberCompleteHandle() const {
-	string complete_handle;
-	
+const std::string UserID::JabberCompleteHandle() const {
+	std::string complete_handle;
+
 	// get handle
-	string handle = JabberHandle();
-	
+	std::string handle = JabberHandle();
+
 	if (!handle.empty()) {
 		complete_handle = handle;
 
-		string resource = JabberResource();
+		std::string resource = JabberResource();
 		if (!resource.empty()) {
 			complete_handle += "/" + resource;
 		}
@@ -142,46 +142,46 @@ const string UserID::JabberCompleteHandle() const {
 	return complete_handle;
 }
 
-const string UserID::JabberUsername() const {
+const std::string UserID::JabberUsername() const {
 	return _jabber_username;
 }
 
-const string UserID::JabberServer() const {
+const std::string UserID::JabberServer() const {
 	return _jabber_server;
 }
 
-const string UserID::JabberResource() const {
+const std::string UserID::JabberResource() const {
 	return _jabber_resource;
 }
 
-const string UserID::TransportID() const {
+const std::string UserID::TransportID() const {
 	return _transport_id;
 }
 
-const string UserID::TransportUsername() const {
+const std::string UserID::TransportUsername() const {
 	return _transport_username;
 }
 
-const string UserID::TransportPassword() const {
+const std::string UserID::TransportPassword() const {
 	return _transport_password;
 }
 
 void UserID::StripJabberResource() {
 	if (WhyNotValidJabberHandle().size()) {
 		// strip off last / if it's there
-		string::size_type last_slash = _handle.rfind("/");
-		
-		if (last_slash != string::npos) {
+		std::string::size_type last_slash = _handle.rfind("/");
+
+		if (last_slash != std::string::npos) {
 			// remove it
 			_handle.erase(last_slash);
-			
+
 			// reset handle to cause reparse
 			SetHandle(_handle);
 		}
 	}
 }
 
-string UserID::WhyNotValidJabberHandle() {
+std::string UserID::WhyNotValidJabberHandle() {
 	if (UserType() == JABBER) {
 		return "";
 	}
@@ -189,37 +189,37 @@ string UserID::WhyNotValidJabberHandle() {
 	if (_jabber_username.size() == 0 || _jabber_server.size() == 0) {
 		return "Jabber ID must be of the form username@server[/resource].";
 	}
-	
+
 	// verify length
 	if (_jabber_username.size() > 255) {
 		return "Jabber ID username part must not be longer than 255 characters.";
 	}
-			
+
 	// verify ASCII charactership of entire login
 	for (uint i=0; i<_handle.size(); ++i) {
 		if (int(_handle[i]) < 33) {
 			return "Jabber ID must not contain unprintable characters.";
 		}
-					
+
 		if (isspace(int(_handle[i]))) {
 			return "Jabber ID must not contain whitespace.";
 		}
-		
+
 		if (iscntrl(int(_handle[i]))) {
 			return "Jabber ID must not contain control characters.";
 		}
-	}			
+	}
 
 	// verify ASCII charactership of abbreviated username
-	if (_jabber_username.find_first_of(":@<>'\"&") != string::npos) {
+	if (_jabber_username.find_first_of(":@<>'\"&") != std::string::npos) {
 		return "Jabber ID username part must not contain any of the following characters in the handle: @<>:'\"&";
 	}
-	
+
 	// no errors found
 	return "";
 }
 
-void UserID::SetHandle(string handle) {
+void UserID::SetHandle(std::string handle) {
 	// initialize values
 	_handle = handle;
 
@@ -227,11 +227,11 @@ void UserID::SetHandle(string handle) {
 	_ProcessHandle();
 }
 
-void UserID::SetFriendlyName(string friendly_name) {
+void UserID::SetFriendlyName(std::string friendly_name) {
 	_friendly_name = friendly_name;
 }
 
-void UserID::SetAsk(string status) {
+void UserID::SetAsk(std::string status) {
 	_ask = status;
 }
 
@@ -243,7 +243,7 @@ void UserID::SetOnlineStatus(online_status status) {
 
 	if (_status != status) {
 		_status = status;
-		
+
 		// transport conversion
 		if (UserType() == TRANSPORT && _status == ONLINE) {
 			SetOnlineStatus(TRANSPORT_ONLINE);
@@ -254,7 +254,7 @@ void UserID::SetOnlineStatus(online_status status) {
 	}
 }
 
-void UserID::SetExactOnlineStatus(string exact_status) {
+void UserID::SetExactOnlineStatus(std::string exact_status) {
 	// only set legal status
 	if (exact_status == "away" || exact_status == "chat" || exact_status == "xa" || exact_status == "dnd") {
 		_exact_status = exact_status;
@@ -264,7 +264,7 @@ void UserID::SetExactOnlineStatus(string exact_status) {
 	}
 }
 
-void UserID::SetMoreExactOnlineStatus(string more_exact_status) {
+void UserID::SetMoreExactOnlineStatus(std::string more_exact_status) {
 	// ignore certain values
 	if (more_exact_status == "Autoreply" || more_exact_status == "Online") {
 		return;
@@ -273,7 +273,7 @@ void UserID::SetMoreExactOnlineStatus(string more_exact_status) {
 	_more_exact_status = more_exact_status;
 }
 
-void UserID::SetSubscriptionStatus(string status) {
+void UserID::SetSubscriptionStatus(std::string status) {
 	// only set legal status
 	if (status == "none" || status == "to" || status == "from" || status == "both") {
 		_subscription_status = status;
@@ -303,8 +303,8 @@ void UserID::_ProcessHandle() {
 
 		// extract abbreviated username (text between start of username and @)
 		squigly_pos = _handle.find("@");
-	
-		if (squigly_pos != string::npos && squigly_pos != 0) {
+
+		if (squigly_pos != std::string::npos && squigly_pos != 0) {
 			// extract the abbreviated username
 			_jabber_username = _handle.substr(0, squigly_pos);
 		} else {
@@ -315,8 +315,8 @@ void UserID::_ProcessHandle() {
 		if ((_handle.size() - 1) != squigly_pos) {
 			// extract server name (text between @ and /)
 			slash_pos = _handle.find("/", squigly_pos);
-	
-			if (slash_pos == string::npos) {
+
+			if (slash_pos == std::string::npos) {
 				// all the rest is the server name (there is no resource)
 				_jabber_server = _handle.substr(squigly_pos + 1, _handle.size() - squigly_pos);
 			} else {
@@ -343,11 +343,11 @@ void UserID::_ProcessHandle() {
 		// extract transport ID (text between start of ID and / - i.e., aim.jabber.org)
 		slash_pos = _handle.find("/registered");
 
-		if (slash_pos != string::npos) {
+		if (slash_pos != std::string::npos) {
 			slash_pos = _handle.find("/register");
 		}
-			
-		if (slash_pos != string::npos && slash_pos != 0) {
+
+		if (slash_pos != std::string::npos && slash_pos != 0) {
 			// extract the abbreviated username
 			_transport_id = _handle.substr(0, slash_pos);
 		} else {
@@ -363,44 +363,44 @@ void UserID::_ProcessHandle() {
 
 		// this agent is registered
 		agent->SetRegisteredFlag(true);
-		
+
 		// advance to username
 		arguments_pos = slash_pos + 12;
 
 		// is there still reason to go on (is there more text)?
 		if ((_handle.size() - 1) > arguments_pos) {
 			// clip off the name/value pairs
-			string pairs = _handle.substr(arguments_pos);
+			std::string pairs = _handle.substr(arguments_pos);
 			pairs += "&";
-			
+
 			// iterate through and parse out individual name/value pairs
 			while(pairs.size()) {
 				uint amp_pos = pairs.find("&");
-				
+
 				// if there's another segment of data
-				if (amp_pos != string::npos) {
+				if (amp_pos != std::string::npos) {
 					// extract data
-					string name_value = pairs.substr(0, amp_pos);
-					
+					std::string name_value = pairs.substr(0, amp_pos);
+
 					// find =
 					uint equal_pos = name_value.find("=");
-					
-					if (equal_pos != string::npos) {
+
+					if (equal_pos != std::string::npos) {
 						// extract key and value separately
-						string key   = name_value.substr(0, equal_pos);
-						string value = name_value.substr(equal_pos + 1, name_value.size() - equal_pos - 1);					
+						std::string key   = name_value.substr(0, equal_pos);
+						std::string value = name_value.substr(equal_pos + 1, name_value.size() - equal_pos - 1);
 
 						if (key.size() && value.size()) {
 							if (key == "name" || key == "uin") {
-								agent->SetUsername(value);							
+								agent->SetUsername(value);
 							}
-							
+
 							if (key == "pass") {
-								agent->SetPassword(value);							
+								agent->SetPassword(value);
 							}
 						}
 					}
-					
+
 					// prune off segment
 					pairs.erase(0, amp_pos + 1);
 				} else {
@@ -414,10 +414,10 @@ void UserID::_ProcessHandle() {
 
 	if (_jabber_username.size() && _jabber_server.size()) {
 		_user_type = JABBER;
-		
+
 		// is this pure Jabber or external?
 		Agent *agent = AgentList::Instance()->GetAgentByID(_jabber_server);
-		
+
 		if (agent) {
 			// determine type
 			if (agent->Service() == "aim") {

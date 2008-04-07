@@ -19,20 +19,20 @@ Agent::Agent() {
 
 Agent::~Agent() {
 }
-		
-string Agent::JID() const {
+
+std::string Agent::JID() const {
 	return _jid;
 }
 
-string Agent::Name() {
+std::string Agent::Name() {
 	return _name;
 }
 
-string Agent::Description() {
+std::string Agent::Description() {
 	return _description;
 }
 
-string Agent::Service() const {
+std::string Agent::Service() const {
 	return _service;
 }
 
@@ -44,7 +44,7 @@ bool Agent::IsRegistered() const {
 	return _is_registered;
 }
 
-string Agent::Transport() {
+std::string Agent::Transport() {
 	return _transport;
 }
 
@@ -52,27 +52,27 @@ bool Agent::IsSearchable() {
 	return _is_searchable;
 }
 
-string Agent::Username() const {
+std::string Agent::Username() const {
 	return _username;
 }
 
-string Agent::Password() const {
+std::string Agent::Password() const {
 	return _password;
 }
 
-void Agent::SetJID(string jid) {
+void Agent::SetJID(std::string jid) {
 	_jid = jid;
 }
 
-void Agent::SetName(string name) {
+void Agent::SetName(std::string name) {
 	_name = name;
 }
 
-void Agent::SetDescription(string description) {
+void Agent::SetDescription(std::string description) {
 	_description = description;
 }
 
-void Agent::SetService(string service) {
+void Agent::SetService(std::string service) {
 	_service = service;
 }
 
@@ -83,8 +83,8 @@ void Agent::SetRegisterableFlag(bool is_registerable) {
 void Agent::SetRegisteredFlag(bool is_registered) {
 	if (_is_registered != is_registered) {
 		_is_registered = is_registered;
-	
-		
+
+
 		if (_is_registered == false) {
 			SetUsername("");
 			SetPassword("");
@@ -92,7 +92,7 @@ void Agent::SetRegisteredFlag(bool is_registered) {
 	}
 }
 
-void Agent::SetTransport(string transport) {
+void Agent::SetTransport(std::string transport) {
 	_transport = transport;
 }
 
@@ -100,11 +100,11 @@ void Agent::SetSearchableFlag(bool is_searchable) {
 	_is_searchable = is_searchable;
 }
 
-void Agent::SetUsername(string username) {
+void Agent::SetUsername(std::string username) {
 	_username = username;
 }
 
-void Agent::SetPassword(string password) {
+void Agent::SetPassword(std::string password) {
 	_password = password;
 }
 

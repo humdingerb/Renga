@@ -3,6 +3,8 @@
 //     An icon for the deskbar.
 //////////////////////////////////////////////////
 
+#include <iostream>
+
 #ifndef DESKBAR_ICON_H
 	#include "DeskbarIcon.h"
 #endif
@@ -39,17 +41,18 @@ BArchivable *DeskbarIcon::Instantiate(BMessage *msg) {
 //	if  (!validate_instantiation(msg, "Jabber Desktop Icon")) {
 //		return NULL;
 //	}
-	
+
 	return new DeskbarIcon(msg);
 }
 
 DeskbarIcon::DeskbarIcon()
-	: BView(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), "Jabber Deskbar Icon", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW) {
+	: BView(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), "Jabber Deskbar Icon",
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW) {
 	app_info info;
 
 	// initialize
 	_counter = 0;
-	
+
 	// read application info
 	be_app->GetAppInfo(&info);
 
@@ -68,20 +71,20 @@ DeskbarIcon::DeskbarIcon(BMessage *msg)
 
 DeskbarIcon::~DeskbarIcon() {
 }
-	
+
 status_t DeskbarIcon::Archive(BMessage *msg, bool deep) const {
 	status_t err;
 	app_info info;
-	
+
 	// base class archiver
 	err = BView::Archive(msg, deep);
 
 	// application information
 	be_app->GetAppInfo(&info);
-	
+
 	msg->AddRef("app_ref", &info.ref);
 	msg->AddString("add_on", "application/jabber");
-	
+
 	return err;
 }
 
@@ -96,22 +99,22 @@ void DeskbarIcon::MouseDown(BPoint pt) {
 	if (!Window()) {
 		return;
 	}
-		
+
 	// get mouse position
 	BMessage *msg = Window()->CurrentMessage();
-	
+
 	if (!msg) {
 		return;
 	}
-	
+
 	// take action
 	if (msg->what == B_MOUSE_DOWN) {
 		uint32 buttons   = 0;
 		uint32 modifiers = 0;
-		
+
 		msg->FindInt32("buttons", (int32 *)&buttons);
 		msg->FindInt32("modifiers", (int32 *)&modifiers);
-		
+
 		switch(buttons) {
 			case B_PRIMARY_MOUSE_BUTTON: {
 				BlabberMainWindow::Instance()->Activate();
@@ -120,24 +123,24 @@ void DeskbarIcon::MouseDown(BPoint pt) {
 		}
 	}
 }
-	
+
 void DeskbarIcon::AttachedToWindow() {
 	BAppFileInfo appInfo;
 	BFile        file;
-	
+
 	// read the application file
 	file.SetTo(&_app_ref, B_READ_ONLY);
-	
+
 	appInfo.SetTo(&file);
-	
+
 	// load the application icon
 	_icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8, false, false);
-	
+
 	if (appInfo.GetIcon(_icon, B_MINI_ICON) != B_OK) {
 		delete _icon;
 		_icon = NULL;
 	}
-	
+
 	if (Parent()) {
 		SetViewColor(Parent()->ViewColor());
 	}
@@ -156,5 +159,5 @@ void DeskbarIcon::SetMyID(uint32 id) {
 }
 
 void DeskbarIcon::Pulse() {
-	cout << "tick\n";
+	std::cout << "tick\n";
 }

@@ -63,7 +63,7 @@ public:
 
 	bool                       ValidateLogin();
 	void                       ShowLogin();
-	void                       SetCustomStatus(string status);
+	void                       SetCustomStatus(std::string status);
 	
 protected:
 	                           BlabberMainWindow(BRect frame);

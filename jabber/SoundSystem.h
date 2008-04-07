@@ -17,49 +17,49 @@
 class SoundSystem {
 public:
 	static SoundSystem  *Instance();
-	
+
 public:
 	                     SoundSystem();
     	                ~SoundSystem();
-	 
-	 string              NewMessageSound();
-	 string              NewMessageSoundLeaf();
-	 void                SetNewMessageSound(string new_message_sound);
+
+	 std::string         NewMessageSound();
+	 std::string         NewMessageSoundLeaf();
+	 void                SetNewMessageSound(std::string new_message_sound);
 	 void                PlayNewMessageSound();
 
-	 string              MessageSound();
-	 string              MessageSoundLeaf();
-	 void                SetMessageSound(string message_sound);
+	 std::string         MessageSound();
+	 std::string         MessageSoundLeaf();
+	 void                SetMessageSound(std::string message_sound);
 	 void                PlayMessageSound();
 
-	 string              UserOnlineSound();
-	 string              UserOnlineSoundLeaf();
-	 void                SetUserOnlineSound(string user_online_sound);
+	 std::string         UserOnlineSound();
+	 std::string         UserOnlineSoundLeaf();
+	 void                SetUserOnlineSound(std::string user_online_sound);
 	 void                PlayUserOnlineSound();
 
-	 string              UserOfflineSound();
-	 string              UserOfflineSoundLeaf();
-	 void                SetUserOfflineSound(string user_offline_sound);
+	 std::string         UserOfflineSound();
+	 std::string         UserOfflineSoundLeaf();
+	 void                SetUserOfflineSound(std::string user_offline_sound);
 	 void                PlayUserOfflineSound();
 
-	 string              AlertSound();
-	 string              AlertSoundLeaf();
-	 void                SetAlertSound(string alert_sound);
+	 std::string         AlertSound();
+	 std::string         AlertSoundLeaf();
+	 void                SetAlertSound(std::string alert_sound);
 	 void                PlayAlertSound();
-	 
+
 private:
-	string              _new_message_sound;
-	string              _message_sound;
-	string              _user_online_sound;
-	string              _user_offline_sound;
-	string              _alert_sound;
-	
+	std::string          _new_message_sound;
+	std::string          _message_sound;
+	std::string          _user_online_sound;
+	std::string          _user_offline_sound;
+	std::string          _alert_sound;
+
 	BSimpleGameSound   *_new_message_alarm;
 	BSimpleGameSound   *_message_alarm;
 	BSimpleGameSound   *_user_online_alarm;
 	BSimpleGameSound   *_user_offline_alarm;
 	BSimpleGameSound   *_alert_alarm;
-	
+
 private:
 	static SoundSystem *_instance;
 };

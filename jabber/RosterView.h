@@ -48,8 +48,8 @@
 
 class RosterView : public BOutlineListView {
 public:
-	typedef map<BListItem *, UserID::online_status>  ItemToStatusMap; 
-	typedef map<UserID::online_status, BListItem *>  StatusToItemMap; 
+	typedef std::map<BListItem *, UserID::online_status>  ItemToStatusMap;
+	typedef std::map<UserID::online_status, BListItem *>  StatusToItemMap;
 
 public:
 	     	            RosterView(BRect frame);
@@ -64,7 +64,7 @@ public:
 	void                MouseDown(BPoint point);
 	void                RemoveSelected();
 	void                SelectionChanged();
- 
+
 	void                LinkUser(const UserID *added_user);
 	void                LinkTransport(const UserID *added_transport);
 	void                UnlinkUser(const UserID *removed_user);
@@ -72,13 +72,13 @@ public:
 
 	int32               FindUser(const UserID *compare_user);
 	int32               FindTransport(const UserID *compare_transport);
-	
+
 	void                UpdatePopUpMenu();
 	void                UpdateRoster();
-	
+
 private:
 	BPopUpMenu        *_popup;
-	
+
 	BMenuItem         *_message_item;
 	BMenuItem         *_chat_item;
 	BMenuItem         *_change_user_item;
@@ -88,7 +88,7 @@ private:
 	BMenu             *_presence;
 	BMenuItem         *_subscribe_presence;
 	BMenuItem         *_unsubscribe_presence;
-	
+
 	StatusToItemMap    _status_to_item_map;
 	ItemToStatusMap    _item_to_status_map;
 

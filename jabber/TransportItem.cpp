@@ -33,7 +33,7 @@ TransportItem::TransportItem(const UserID *userid)
 
 	// intitialize static members
 	if (_offline_icon == NULL) {
-		string graphic;
+		std::string graphic;
 
 		// generate path for home icon
 		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/online.png");
@@ -99,13 +99,13 @@ void TransportItem::DrawItem(BView *owner, BRect frame, bool complete) {
 	}
 
 	float height;
-	
+
 	// construct name
-	string name = GetUserID()->FriendlyName();
+	std::string name = GetUserID()->FriendlyName();
 
 	if (name.empty()) {
 		name = GetUserID()->Handle();
-		
+
 		if (name.empty()) {
 			name = "<anonymous>";
 		}
@@ -125,12 +125,12 @@ void TransportItem::DrawItem(BView *owner, BRect frame, bool complete) {
 	// construct text positioning
 	font_height fh;
 	owner->GetFontHeight(&fh);
-	
+
 	height = fh.ascent + fh.descent;
 
 	// draw name
 	Agent *agent = AgentList::Instance()->GetAgentByID(GetUserID()->TransportID());
-	
+
 	if (!agent) {
 		// just to be safe
 		owner->DrawString(name.c_str(), BPoint(frame.left + 13, frame.bottom - ((frame.Height() - height) / 2) - fh.descent));
@@ -143,7 +143,7 @@ void TransportItem::Update(BView *owner, const BFont *font) {
 	BListItem::Update(owner, font);
 
 	// set height to accomodate graphics and text
-	SetHeight(16.0);	
+	SetHeight(16.0);
 }
 
 bool TransportItem::StalePointer() {

@@ -67,7 +67,7 @@ private:
 	BButton      *_unregister;
 	
 	bool          _current_transport_registered;
-	string        _curr_transport;
+	std::string   _curr_transport;
 };
 
 #endif

@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////
 
 #ifndef PORT_TALKER_H
-	#include "PortTalker.h" 
+	#include "PortTalker.h"
 #endif
 
 #ifndef __CSTRING__
@@ -33,7 +33,7 @@ PortTalker *PortTalker::Instance() {
 	if (_instance == NULL) {
 		_instance = new PortTalker();
 	}
-	
+
 	return _instance;
 }
 
@@ -45,7 +45,7 @@ PortTalker::PortTalker() {
 	_message_looper         = NULL;
 	_keep_alive             = NULL;
 	_plug					= NULL;
-	
+
 	// initialize all other values
 	_Reset(false);
 }
@@ -56,20 +56,20 @@ PortTalker::~PortTalker() {
 
 bool PortTalker::Connect(const char *hostname, const int port, bool keep_alive, bool useSSL) {
 	// connect to socket
-	
+
 	//safety: if there is already a _plug defined, we delete it first.
 	if(_plug)
 		delete _plug;
-	
+
 	if(useSSL)
 		_plug	= new JabberSSLPlug();
 	else
 		_plug	= new JabberSocketPlug();
-		
+
 	int32 result= _plug->StartConnection(BString(hostname), port);
 	// connect to remote machine
 	if (result >= 0) {
-	
+
 		if(result != 0) {
 			if (_message_looper) {
 				BMessage msg(result);
@@ -112,14 +112,14 @@ int PortTalker::Send(const char *data, int len) {
 	if (len == -1) {
 		len = strlen(data);
 	}
-	
+
 	#ifdef DEBUG
 		cout << "[PortTalker Sends (" << len << ")]" << data << "[Done]" << endl << flush;
 	#endif
 
 	// don't send if we're not connected
 	if (!IsConnected()) {
- 		return 0; 
+ 		return 0;
 	}
 
 	// Send data and return number of bytes sent
@@ -128,9 +128,9 @@ int PortTalker::Send(const char *data, int len) {
 		data += bytes_sent;
 
 		if (!IsConnected()) {
-	 		return total_bytes_sent; 
+	 		return total_bytes_sent;
 		}
-		
+
 		// Send the data
 		BString sdata(data,(len - total_bytes_sent));
 		bytes_sent = _plug->Send(sdata);
@@ -142,7 +142,7 @@ int PortTalker::Send(const char *data, int len) {
 	return total_bytes_sent;
 }
 
-int PortTalker::SendFiltered(string data, int len) {
+int PortTalker::SendFiltered(std::string data, int len) {
 	// remove control characters and unprintables
 	for (unsigned int i = 0; i < data.size(); ++i) {
 		if (data[i] == 27) {
@@ -150,7 +150,7 @@ int PortTalker::SendFiltered(string data, int len) {
 			--i;
 		}
 	}
-	
+
 	// send filtered string
 	return Send(data.c_str(), len);
 }
@@ -167,12 +167,12 @@ void PortTalker::_Reset(bool hard_disconnect) {
 	// if we're connected
 	if (_listener_thread_id > B_NO_ERROR) {
 			kill_thread(_listener_thread_id);
-			
+
 			_listener_thread_id = -1;
 	}
 
 	// end any running processes
-	if (_plug ) 
+	if (_plug )
 	{
 		delete _plug;
 		_plug = NULL;
@@ -186,16 +186,16 @@ void PortTalker::_Reset(bool hard_disconnect) {
 
 int32 PortTalker::_SpawnListenerThread(void *obj) {
 	((PortTalker *)obj)->_ListenerThread();
-	
+
 	// Don't care about the return value
 	return 1;
 }
 
 void PortTalker::_ListenerThread() {
 	//char buffer[PortTalker::_MAX_BUFFER_SIZE];
-	
+
 	BMessage msg(PortTalker::DATA);
-				
+
 	while(true) {
 		// Listen to socket
 		msg.MakeEmpty();
@@ -206,16 +206,16 @@ void PortTalker::_ListenerThread() {
 			// ignore this particular error
 			if (bytes_received<0) {
 				_listener_thread_id = -1;
-				_Reset(true);			
+				_Reset(true);
 				return;
 			}
 		}
-			
-		if (bytes_received > 0 && _message_looper) 
+
+		if (bytes_received > 0 && _message_looper)
 		{
 			_message_looper->PostMessage(&msg);
 		}
-		
+
 		// in case networking goes schitz (can't wait for BONE!)
 		snooze(50000);
 	}

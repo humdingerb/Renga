@@ -16,18 +16,18 @@
 
 class PeopleListItem : public BListItem {
 public:
-	              PeopleListItem(string whoami, string user);
+	              PeopleListItem(std::string whoami, std::string user);
    	             ~PeopleListItem();
 
 	virtual void  DrawItem(BView *owner, BRect rect, bool complete);
 	virtual void  Update(BView *owner, const BFont *font);
 
-	string        User() const;
-	
+	std::string   User() const;
+
 private:
-	string       _user;
-	string       _whoami;
-}; 
+	std::string   _user;
+	std::string   _whoami;
+};
 
 #endif
 

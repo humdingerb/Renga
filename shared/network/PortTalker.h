@@ -55,14 +55,14 @@ public:
 	 void               OnDisconnect(void (*on_disconnect)(void *), void *argument = NULL);
 
 	 int                Send(const char *data, int len = -1);
-	 int                SendFiltered(string data, int len = -1);
+	 int                SendFiltered(std::string data, int len = -1);
 
    	 void               SetTargetLooper(BLooper *looper);
    	 BLooper           *GetTargetLooper() const;
-		
+
 protected:
                         PortTalker();
-				
+
 private:
 	static PortTalker *_instance;
 
@@ -75,7 +75,7 @@ private:
 	static const int   _MAX_BUFFER_SIZE = 1000;
 
 private:
-	
+
 	BLooper           *_message_looper;
 	thread_id          _listener_thread_id;
 
