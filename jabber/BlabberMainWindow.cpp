@@ -108,6 +108,10 @@
 	#include "TalkManager.h"
 #endif
 
+#ifndef STRING_H
+	#include "String.h"
+#endif
+
 
 #define SSL_ENABLED	'ssle'
 
