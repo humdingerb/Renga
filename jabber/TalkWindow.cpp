@@ -82,6 +82,10 @@
 	#include "TalkWindow.h"
 #endif
 
+#ifndef FIND_DIRECTORY_H
+	#include <FindDirectory.h>
+#endif
+
 float TalkWindow::x_placement_offset = -100;
 float TalkWindow::y_placement_offset = -100;
 
@@ -90,6 +94,7 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	_am_logging = false;
 	_log        = NULL;
 	_chat_index = -1;
+	_record_item = 0;
 	
 	// add self to message family
 	MessageRepeater::Instance()->AddTarget(this);
@@ -108,6 +113,23 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	
 	// generate a thread ID
 	_thread = GenericFunctions::GenerateUniqueID();
+
+    bool bAutoOpenChatLog = BlabberSettings::Instance()->Tag("autoopen-chatlog");
+	string chatlog_path = BlabberSettings::Instance()->Data("chatlog-path");
+	if(bAutoOpenChatLog) {
+		if(0 == chatlog_path.size()) {
+			BPath path;
+			find_directory(B_USER_DIRECTORY, &path);
+			chatlog_path = path.Path();
+		}
+		// assure that directory exists...
+		create_directory(chatlog_path.c_str(), 0777);
+		chatlog_path += "/" + _user->JabberHandle();
+				
+		// start file
+		_log = fopen(chatlog_path.c_str(), "a");
+		_am_logging = (0 != _log);
+	}
 	
 	// determine window size
 	BRect rect;
@@ -174,15 +196,25 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	// FILE MENU
 	_file_menu = new BMenu("File");
 
+	if(bAutoOpenChatLog) {
+		BMessage *msg = new BMessage(JAB_SHOW_CHATLOG);
+		msg->AddString("path", chatlog_path.c_str());
+		_record_entire_item = new BMenuItem("Show Chat Log", msg);
+		_record_entire_item->SetEnabled(true);
+		_record_entire_item->SetShortcut('H', 0);
+	} else {
 		_record_item = new BMenuItem("Start Chat Log", new BMessage(JAB_START_RECORD));
-		_record_item->SetEnabled(true);
+		_record_item->SetEnabled(!_am_logging);
 		_record_entire_item = new BMenuItem("Stop Chat Log", new BMessage(JAB_STOP_RECORD));
-		_record_entire_item->SetEnabled(false);
+		_record_entire_item->SetEnabled(_am_logging);
+	}
 		_close_item = new BMenuItem("Close", new BMessage(JAB_CLOSE_CHAT));
 		_close_item->SetShortcut('W', 0);
 
 	if (_type == CHAT) {
-		_file_menu->AddItem(_record_item);
+		if(0 != _record_item) {
+		  _file_menu->AddItem(_record_item);
+		}
 		_file_menu->AddItem(_record_entire_item);
 		_file_menu->AddSeparatorItem();
 	}
@@ -561,9 +593,27 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	if (!follow_focus_rules || !BlabberSettings::Instance()->Tag("suppress-chat-focus")) {
 		Activate();
 	}
+
+	// put Session started message
+	// construct timestamp
+	string message;
+	message.resize(128);
+	time_t now = time(NULL);
+	struct tm *time_struct = localtime(&now);
+	strftime(&message[0], message.size()-1, "Session started  %e %b %y [%R:%S]", time_struct);
+	Lock();
+	AddToTalk("", message.c_str(), OTHER);
+	Unlock();
 }
 
 TalkWindow::~TalkWindow() {
+	string message;
+	message.resize(128);
+	time_t now = time(NULL);
+	struct tm *time_struct = localtime(&now);
+	strftime(&message[0], message.size()-1, "Session finished %e %b %y [%R:%S]\n---", time_struct);
+	AddToTalk("", message.c_str(), OTHER);
+
 	// close log cleanly if it's open
 	if (_log) {
 		fclose(_log);
@@ -688,14 +738,18 @@ void TalkWindow::MenusBeginning() {
 	}
 
 	// logging
-	if (_am_logging) {
+/*	if (_am_logging) {
 		_record_item->SetEnabled(false);
 		_record_entire_item->SetEnabled(true);
 	} else {
 		_record_item->SetEnabled(true);
 		_record_entire_item->SetEnabled(false);
-	}
+	} */
 
+	if(0 != _record_item) {
+	  _record_item->SetEnabled(!_am_logging);
+	}
+	_record_entire_item->SetEnabled(_am_logging);
 }
 
 void TalkWindow::MessageReceived(BMessage *msg) {
@@ -748,6 +802,13 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 
+		case JAB_SHOW_CHATLOG: {
+			// just forward to main blabber window...
+			BMessage *msgForward = new BMessage(*msg);
+			BlabberMainWindow::Instance()->PostMessage(msgForward);
+			break;
+		}
+							   
 		case B_SAVE_REQUESTED: {
 			// collect data
 			char abs_path[B_PATH_NAME_LENGTH];

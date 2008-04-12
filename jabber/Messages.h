@@ -63,6 +63,7 @@
 
 #define JAB_START_RECORD                0x1400C000
 #define JAB_STOP_RECORD                 0x1400C888
+#define JAB_SHOW_CHATLOG                0x1400C001
 
 #define JAB_CLOSE_TALKS                 0x1400C999
 

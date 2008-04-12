@@ -106,6 +106,7 @@ private:
 	BMenuItem                *_change_buddy_item;
 	BMenuItem                *_remove_buddy_item;
 	BMenuItem                *_user_info_item;
+	BMenuItem                *_user_chatlog_item;
 	BMenuItem                *_chat_item;
 	BMenuItem                *_away_item;
 	BMenuItem                *_dnd_item;

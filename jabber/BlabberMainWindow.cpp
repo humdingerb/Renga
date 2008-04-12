@@ -36,8 +36,18 @@
 	#include <interface/ScrollView.h>
 #endif
 
+#include <String.h>
+
 #ifndef _ROSTER_H
 	#include <Roster.h>
+#endif
+
+#ifndef _PATH_H
+	#include <Path.h>
+#endif
+
+#ifndef FIND_DIRECTORY_H
+	#include <FindDirectory.h>
 #endif
 
 #ifndef ABOUT_WINDOW_H
@@ -106,10 +116,6 @@
 
 #ifndef TALK_MANAGER_H
 	#include "TalkManager.h"
-#endif
-
-#ifndef STRING_H
-	#include "String.h"
 #endif
 
 
@@ -449,6 +455,37 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 
+		case JAB_SHOW_CHATLOG: {
+			BString path;
+			// try to get the chatlog path from message
+			if(B_OK != msg->FindString("path", &path)) {
+				// no path provided with message? try to open history for selected user...
+  				RosterItem *item = _roster->CurrentItemSelection();
+				if (item != NULL) {
+					const UserID *user = item->GetUserID();
+					string chatlog_path = BlabberSettings::Instance()->Data("chatlog-path");
+					if(0 == chatlog_path.size()) {
+						BPath path;
+						find_directory(B_USER_DIRECTORY, &path);
+						chatlog_path = path.Path();
+					}
+					chatlog_path += "/" + user->JabberHandle();
+					path = chatlog_path.c_str();
+				}
+			}
+			// now attemt to open history file with default application for "text/x-jabber-chatlog" MIME type
+			if(path.Length() > 0) {
+				BEntry entry(path.String());
+				entry_ref ref;
+				entry.GetRef(&ref);
+				BMessage *msgRefs = new BMessage(B_REFS_RECEIVED);
+				msgRefs->AddRef("refs", &ref);
+				be_roster->Launch("text/plain", msgRefs);
+				//be_roster->Launch(path.String());
+			}
+			break;
+		}
+
 		case JAB_OPEN_NEW_CHAT: {
 			(new SendTalkWindow(TalkWindow::CHAT))->Show();
 			break;
@@ -694,6 +731,7 @@ void BlabberMainWindow::MenusBeginning() {
 		_remove_buddy_item->SetEnabled(true);
 
 		_user_info_item->SetEnabled(true);
+		_user_chatlog_item->SetEnabled(BlabberSettings::Instance()->Tag("autoopen-chatlog"));
 	} else {		
 		sprintf(buffer, "Edit Buddy");
 		_change_buddy_item->SetLabel(buffer);
@@ -704,6 +742,7 @@ void BlabberMainWindow::MenusBeginning() {
 		_remove_buddy_item->SetEnabled(false);
 
 		_user_info_item->SetEnabled(false);
+		_user_chatlog_item->SetEnabled(false);
 	}
 }
 
@@ -795,6 +834,9 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_user_info_item = new BMenuItem("Get User Info", new BMessage(JAB_USER_INFO));
 		_user_info_item->SetShortcut('I', 0);
 		
+		_user_chatlog_item = new BMenuItem("Show Chat Log", new BMessage(JAB_SHOW_CHATLOG));
+		_user_chatlog_item->SetShortcut('H', 0);
+		
 		_preferences_item = new BMenuItem("Preferences...", new BMessage(JAB_PREFERENCES));
 
 	_edit_menu->AddItem(_add_buddy_item);
@@ -802,6 +844,8 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_edit_menu->AddItem(_remove_buddy_item);
 	_edit_menu->AddSeparatorItem();
 	_edit_menu->AddItem(_user_info_item);
+	_edit_menu->AddSeparatorItem();
+	_edit_menu->AddItem(_user_chatlog_item);
 	_edit_menu->AddSeparatorItem();
 	_edit_menu->AddItem(_preferences_item);
 	_edit_menu->SetTargetForItems(this);

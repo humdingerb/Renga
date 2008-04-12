@@ -29,25 +29,33 @@ void LoginPreferencesView::AttachedToWindow() {
 
 	// box frame
 	frame.InsetBy(5.0, 5.0);
-	frame.bottom = frame.top + 91.0;	
+	frame.bottom = frame.top + 81.0;	
 
 	_surrounding_options = new BBox(frame, NULL, B_FOLLOW_ALL);
 	_surrounding_options->SetLabel("Options");
 
 	frame.OffsetBy(0.0, frame.Height() + 10.0);
-
+	frame.bottom = frame.top + 64.0;
+	
 	_surrounding = new BBox(frame, NULL, B_FOLLOW_ALL);
 	_surrounding->SetLabel("/ Syntax");
 
 	frame.OffsetBy(0.0, frame.Height() + 10.0);
+	frame.bottom = frame.top + 48.0;
 
 	_surrounding_groupchat = new BBox(frame, NULL, B_FOLLOW_ALL);
 	_surrounding_groupchat->SetLabel("Group Chat Options");
 
+	frame.OffsetBy(0.0, frame.Height() + 10.0);
+	frame.bottom = frame.top + 68.0;
+
+	_surrounding_chatlog = new BBox(frame, NULL, B_FOLLOW_ALL);
+	_surrounding_chatlog->SetLabel("Chat Log Options");
+
 	frame = _surrounding->Bounds();
 	
 	// auto-login
-	frame.InsetBy(25.0, 28.0);
+	frame.InsetBy(25.0, 17.0);
 	frame.right  = frame.left + 375.0;
 	frame.bottom = frame.top + 18;
 
@@ -65,7 +73,7 @@ void LoginPreferencesView::AttachedToWindow() {
 	frame = _surrounding->Bounds();
 	
 	// auto-login
-	frame.InsetBy(25.0, 22.0);
+	frame.InsetBy(25.0, 17.0);
 	frame.right  = frame.left + 375.0;
 	frame.bottom = frame.top + 18;
 
@@ -84,7 +92,7 @@ void LoginPreferencesView::AttachedToWindow() {
 	frame = _surrounding_groupchat->Bounds();
 	
 	// channel name
-	frame.InsetBy(25.0, 28.0);
+	frame.InsetBy(25.0, 17.0);
 	frame.right  = frame.left + 375.0;
 	frame.bottom = frame.top + 18;
 
@@ -96,9 +104,26 @@ void LoginPreferencesView::AttachedToWindow() {
 
 	_surrounding_groupchat->AddChild(_name);
 
+	frame = _surrounding_chatlog->Bounds();
+	
+	// chatlog
+	frame.InsetBy(25.0, 17.0);
+	frame.right  = frame.left + 375.0;
+	frame.bottom = frame.top + 18;
+
+	_autoopen_chatlog = new BCheckBox(frame, NULL, "Autoopen of Chat Log.", NULL);	
+	_autoopen_chatlog->SetValue(BlabberSettings::Instance()->Tag("autoopen-chatlog"));
+	
+	frame.OffsetBy(0.0, 19.0);
+	_chatlog_path = new BTextControl(frame, NULL, "Path:", BlabberSettings::Instance()->Data("chatlog-path"), NULL);
+
+	_surrounding_chatlog->AddChild(_autoopen_chatlog);
+	_surrounding_chatlog->AddChild(_chatlog_path);
+	
 	AddChild(_surrounding);
 	AddChild(_surrounding_options);
 	AddChild(_surrounding_groupchat);
+	AddChild(_surrounding_chatlog);
 }
 
 void LoginPreferencesView::UpdateFile() {
@@ -108,4 +133,6 @@ void LoginPreferencesView::UpdateFile() {
 	BlabberSettings::Instance()->SetTag("convert-messages-to-chat", _show_all_chat->Value());
 	BlabberSettings::Instance()->SetTag("enable-double-click", _double_click->Value());
 	BlabberSettings::Instance()->SetData("channel-name", _name->Text());
+	BlabberSettings::Instance()->SetTag("autoopen-chatlog", _autoopen_chatlog->Value());
+	BlabberSettings::Instance()->SetData("chatlog-path", _chatlog_path->Text());
 }

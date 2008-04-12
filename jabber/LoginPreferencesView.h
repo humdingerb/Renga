@@ -44,6 +44,11 @@ private:
 
 	BBox         *_surrounding_groupchat;
 	BTextControl *_name;
+	
+	BBox         *_surrounding_chatlog;
+	BCheckBox    *_autoopen_chatlog;
+	BTextControl *_chatlog_path;
 };
 
 #endif
+
