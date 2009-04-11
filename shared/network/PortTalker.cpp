@@ -204,7 +204,7 @@ void PortTalker::_ListenerThread() {
 		// connection dropped BUGBUG make sure 0 return is handled correctly
 		if (bytes_received <= 0) {
 			// ignore this particular error
-			if (bytes_received<0) {
+			if (strcasecmp(strerror(errno), "Interrupted system call")) {
 				_listener_thread_id = -1;
 				_Reset(true);
 				return;
