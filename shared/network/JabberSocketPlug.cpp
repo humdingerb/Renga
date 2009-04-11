@@ -1,8 +1,13 @@
 #include "JabberSocketPlug.h"
 
+#ifdef __BEOS__
+#include <net/socket.h>
+#else
 #include <arpa/inet.h>
+#endif
 #include <sys/socket.h>
 #include <netdb.h>
+#include <stdio.h>
 
 #define LOG(X) printf X;
 //#define STDOUT
@@ -14,7 +19,11 @@ JabberSocketPlug::JabberSocketPlug()
 
 JabberSocketPlug::~JabberSocketPlug()
 {
+#ifdef __BEOS__
+	closesocket(fSocket);
+#else
 	close(fSocket);
+#endif
 }
 
 int32
@@ -24,8 +33,12 @@ JabberSocketPlug::StartConnection(BString fHost, int32 fPort){
 	
 	struct sockaddr_in remoteAddr;
 	remoteAddr.sin_family = AF_INET;
-				
-    if (inet_aton(fHost.String(), &remoteAddr.sin_addr) == 0)
+
+	int result = 0;
+#ifndef __BEOS__
+	result = inet_aton(fHost.String(), &remoteAddr.sin_addr);
+#endif
+    if (result == 0)
 	{
        	struct hostent * remoteInet(gethostbyname(fHost.String()));
        	if (remoteInet)
