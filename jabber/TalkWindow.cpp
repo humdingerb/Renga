@@ -115,7 +115,10 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	_thread = GenericFunctions::GenerateUniqueID();
 
     bool bAutoOpenChatLog = BlabberSettings::Instance()->Tag("autoopen-chatlog");
-	string chatlog_path = BlabberSettings::Instance()->Data("chatlog-path");
+	string chatlog_path = "";
+	if (BlabberSettings::Instance()->Data("chatlog-path") != NULL) {
+		chatlog_path = BlabberSettings::Instance()->Data("chatlog-path");
+	}
 	if(bAutoOpenChatLog) {
 		if(0 == chatlog_path.size()) {
 			BPath path;
