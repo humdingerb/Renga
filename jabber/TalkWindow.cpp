@@ -127,8 +127,11 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 		}
 		// assure that directory exists...
 		create_directory(chatlog_path.c_str(), 0777);
-		chatlog_path += "/" + _user->JabberHandle();
-				
+		if(_user != 0) {
+		  chatlog_path += "/" + _user->JabberHandle();
+		} else {
+		  chatlog_path += "/" + group_room;
+		}	
 		// start file
 		_log = fopen(chatlog_path.c_str(), "a");
 		_am_logging = (0 != _log);
