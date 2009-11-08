@@ -109,10 +109,18 @@ RSRCS= jabber/Resource.rsrc
 #		naming scheme you need to specify the path to the library
 #		and it's name
 #		library: my_lib.a entry: my_lib.a or path/my_lib.a
-LIBS=be game root stdc++.r4 translation tracker ssl crypto 
+LIBS=be game root translation tracker ssl crypto
+
+GCC_VERSION= $(shell gcc --version)
+IS_NOT_GCC2=$(findstring 2.95.3, $(GCC_VERSION))
+ifeq ($(IS_NOT_GCC2), )
+	LIBS+=stdc++
+else
+	LIBS+=stdc++.r4
+endif
 
 ifeq "$(shell uname)" "Haiku"
-	LIBS+=bind socket
+	LIBS+=network
 endif
 
 #	specify additional paths to directories following the standard
@@ -121,12 +129,12 @@ endif
 #	be recursive, so include all of the paths where libraries can
 #	be found.  Directories where source files are found are
 #	automatically included.
-LIBPATHS=/boot/home/config/lib 
+LIBPATHS=/boot/home/config/lib /boot/common/lib
 
 #	additional paths to look for system headers
 #	thes use the form: #include <header>
 #	source file directories are NOT auto-included here
-SYSTEM_INCLUDE_PATHS =/boot/home/config/include 
+SYSTEM_INCLUDE_PATHS =/boot/home/config/include
 
 #	additional paths to look for local headers
 #	thes use the form: #include "header"

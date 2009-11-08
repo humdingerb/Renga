@@ -54,6 +54,8 @@
 	#include "XMLEntity.h"
 #endif
 
+#include <stdlib.h>
+
 JabberSpeak *JabberSpeak::_instance = NULL;
 
 //////////////////////////////////////////////////

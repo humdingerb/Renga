@@ -22,6 +22,7 @@
 	#include "Messages.h"
 #endif
 
+#include <stdlib.h>
 
 PreferencesWindow *PreferencesWindow::_instance = NULL;
 

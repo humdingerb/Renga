@@ -6,6 +6,8 @@
 
 #include <cstdio>
 #include <string>
+#include <strings.h>
+#include <stdlib.h>
 
 XMLReader::XMLReader() {
 	_parser              = NULL;

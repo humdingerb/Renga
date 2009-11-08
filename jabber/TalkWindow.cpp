@@ -86,6 +86,10 @@
 	#include <FindDirectory.h>
 #endif
 
+#include <malloc.h>
+#include <stdlib.h>
+
+
 float TalkWindow::x_placement_offset = -100;
 float TalkWindow::y_placement_offset = -100;
 

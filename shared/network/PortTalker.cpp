@@ -18,11 +18,11 @@
 	#include <string>
 #endif
 
-#ifdef DEBUG
-	#ifndef __IOSTREAM__
-		#include <iostream>
-	#endif
+#ifndef __IOSTREAM__
+	#include <iostream>
 #endif
+
+using namespace std;
 
 #include "JabberSSLPlug.h"
 #include "JabberSocketPlug.h"

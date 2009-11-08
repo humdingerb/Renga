@@ -9,6 +9,9 @@
 #include <storage/FindDirectory.h>
 #include <storage/StorageDefs.h>
 
+#include <stdlib.h>
+#include <strings.h>
+
 #include "XMLEntity.h"
 
 FileXMLReader::FileXMLReader(const char *filename, bool in_settings) {

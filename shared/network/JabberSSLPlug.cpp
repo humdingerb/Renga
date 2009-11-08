@@ -49,7 +49,17 @@ JabberSSLPlug::StartConnection(BString fServer, int32 fPort){
 
 	SSL * ssl = NULL;
 	
+	
+	/* full load the library */
+	
+	ERR_load_BIO_strings();
+	SSL_load_error_strings();
+	OpenSSL_add_all_algorithms();
+	SSLeay_add_ssl_algorithms();
+	
+    
     /* Set up the SSL context */
+	
 	
     ctx = SSL_CTX_new( SSLv23_client_method() );
 	if( !ctx)

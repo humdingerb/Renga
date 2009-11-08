@@ -8,6 +8,7 @@
 #include "BitmapButton.h"
 #include "translation/TranslationUtils.h"
 
+
 BitmapButton::BitmapButton(BRect size, const char *name, BMessage *msg, uint32 resizing_mode, uint32 flags)
 	: BButton(size, name, NULL, msg, resizing_mode, flags) {
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -45,7 +46,7 @@ void BitmapButton::Draw(BRect update_frame) {
 	}
 }
 		
-bool BitmapButton::SetUpState(string filename) {
+bool BitmapButton::SetUpState(std::string filename) {
 	// set the new state
 	_up_state = BTranslationUtils::GetBitmap(filename.c_str());
 
@@ -56,7 +57,7 @@ bool BitmapButton::SetUpState(string filename) {
 	return (_up_state != NULL);
 }
 
-bool BitmapButton::SetDownState(string filename) {
+bool BitmapButton::SetDownState(std::string filename) {
 	// set the new state
 	_down_state = BTranslationUtils::GetBitmap(filename.c_str());
 
@@ -67,7 +68,7 @@ bool BitmapButton::SetDownState(string filename) {
 	return (_down_state != NULL);
 }
 
-bool BitmapButton::SetDisabledState(string filename) {
+bool BitmapButton::SetDisabledState(std::string filename) {
 	// set the new state
 	_disabled_state = BTranslationUtils::GetBitmap(filename.c_str());
 

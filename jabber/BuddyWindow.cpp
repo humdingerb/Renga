@@ -50,6 +50,8 @@
 	#include "PictureView.h"
 #endif
 
+#include <strings.h>
+
 BuddyWindow *BuddyWindow::_instance = NULL;
 
 BuddyWindow *BuddyWindow::Instance() {

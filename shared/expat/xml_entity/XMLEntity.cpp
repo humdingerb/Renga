@@ -5,6 +5,7 @@
 #include "XMLEntity.h"
 
 #include <cstring>
+#include <stdlib.h>
 
 XMLEntity::XMLEntity(const char *name, const char **atts) {
 	_parent         = NULL;

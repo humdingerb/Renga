@@ -34,6 +34,8 @@
 	#include "SoundSystem.h"
 #endif
 
+#include <strings.h>
+
 RosterView::RosterView(BRect frame)
 	: BOutlineListView(frame, NULL, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL) {
 }

@@ -118,6 +118,8 @@
 	#include "TalkManager.h"
 #endif
 
+#include <stdlib.h>
+
 
 #define SSL_ENABLED	'ssle'
 
