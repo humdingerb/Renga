@@ -57,7 +57,7 @@ int RosterView::ListComparison(const void *a, const void *b) {
 	const char *str_b = (*(RosterItem **)b)->Text();
 
 	return strcasecmp(str_a, str_b);
-}
+}   
 
 void RosterView::AttachedToWindow() {
 	// superclass call	

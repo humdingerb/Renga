@@ -22,6 +22,8 @@ protected:
 private:
 	// "Singleton" pattern's only instance of class
 	static BlabberSettings *_instance;
+	
+	void SetDefaultTagsValue();
 };
 
 #endif
