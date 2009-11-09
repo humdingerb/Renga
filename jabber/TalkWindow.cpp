@@ -89,6 +89,8 @@
 #include <malloc.h>
 #include <stdlib.h>
 
+#define NOTIFICATION_CHAR "√"
+
 
 float TalkWindow::x_placement_offset = -100;
 float TalkWindow::y_placement_offset = -100;
@@ -592,6 +594,7 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	}
 		
 	SetTitle(buffer);
+	originalWindowTitle.SetTo(buffer);
 
 	// do this to allow the following...
 	Show();
@@ -1393,6 +1396,7 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 			if (_chat->TextLength() > 0) {
 				if (_type != GROUP || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
 					SoundSystem::Instance()->PlayMessageSound();
+					NotifyWindowTitle();
 				}
 			}
 			
@@ -1434,6 +1438,7 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 			if (comm_type != CommandMessage::NORMAL_ALERT && SoundSystem::Instance()->AlertSound() != "<none>" && _chat->TextLength() > 0) {
 				if (_type != GROUP || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
 					SoundSystem::Instance()->PlayMessageSound();
+					NotifyWindowTitle();
 				}
 			}
 
@@ -1518,6 +1523,7 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 				// play sound
 				if (type != LOCAL) {
 					SoundSystem::Instance()->PlayAlertSound();
+					NotifyWindowTitle();
 				}
 			}
 		}
@@ -1898,6 +1904,27 @@ void TalkWindow::RevealNextHistory() {
 	} else {
 		// update text
 		_message->SetText(_chat_history[_chat_index].c_str());
+	}
+}
+
+void 				
+TalkWindow::WindowActivated(bool active)
+{
+	if(Title() && 
+		active && 
+		memcmp(Title(), NOTIFICATION_CHAR, strlen(NOTIFICATION_CHAR)) == 0)
+	{
+		SetTitle(originalWindowTitle.String());
+	}
+}
+void
+TalkWindow::NotifyWindowTitle()
+{
+	if(!IsActive())
+	{
+		BString newTitle = originalWindowTitle;
+		newTitle.Prepend(NOTIFICATION_CHAR);
+		SetTitle(newTitle.String());
 	}
 }
 

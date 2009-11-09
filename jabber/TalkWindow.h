@@ -74,6 +74,11 @@ public:
 	void                 RevealNextHistory();		
 
 private:
+    //xed: new message window title notification
+    void 				WindowActivated(bool active);
+    void				NotifyWindowTitle();
+    BString				originalWindowTitle;
+
 	const UserID          *_user;
 	std::string            _group_room;
 	std::string            _group_username;
@@ -134,7 +139,6 @@ private:
 	
 	SplitPane          *_split_talk;
 	SplitPane          *_split_group_people;
-
 	BScrollView        *_scrolled_chat_pane;
 	BBox               *_chat_pane;
 	BScrollView        *_scrolled_people_pane;
@@ -147,6 +151,7 @@ private:
 	BFilePanel         *_fp;
 	bool                _am_logging;
 	FILE               *_log;
+
 };
 
 #endif
