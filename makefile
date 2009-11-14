@@ -108,18 +108,21 @@ RSRCS= jabber/Resource.rsrc
 #		library: my_lib.a entry: my_lib.a or path/my_lib.a
 LIBS=be game root translation tracker ssl crypto expat 
 
-# determine gcc version 
-GCC_VERSION=$(subst -, ,$(subst ., , $(shell gcc --version)))
-GCC_MAJOR_VERSION=$(word 1, $(GCC_VERSION))
-GCC_MINOR_VERSION=$(word 2, $(GCC_VERSION))
-
-OP_SYSTEM=$(shell uname)
+# guess gcc version 
+GCC2_VERSION=$(findstring 2.95.3, $(shell gcc --version))
+ifeq ($(GCC2_VERSION), )
+GCC_MAJOR_VERSION=4
+else
+GCC_MAJOR_VERSION=2
+endif
 
 ifeq ($(GCC_MAJOR_VERSION), 4)
 	LIBS+=stdc++
 else
 	LIBS+=stdc++.r4
 endif
+
+OP_SYSTEM=$(shell uname)
 
 ifeq "$(OP_SYSTEM)" "Haiku"
 	LIBS+=network
