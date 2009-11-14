@@ -9,6 +9,7 @@
 ##
 ## Do not forget to run "make depend" before working with makefile build!!! 
 
+
 ## Application Specific Settings ---------------------------------------------
 
 # specify the name of the binary
@@ -107,15 +108,20 @@ RSRCS= jabber/Resource.rsrc
 #		library: my_lib.a entry: my_lib.a or path/my_lib.a
 LIBS=be game root translation tracker ssl crypto expat 
 
-GCC_VERSION= $(shell gcc --version)
-IS_NOT_GCC2=$(findstring 2.95.3, $(GCC_VERSION))
-ifeq ($(IS_NOT_GCC2), )
+# determine gcc version 
+GCC_VERSION=$(subst -, ,$(subst ., , $(shell gcc --version)))
+GCC_MAJOR_VERSION=$(word 1, $(GCC_VERSION))
+GCC_MINOR_VERSION=$(word 2, $(GCC_VERSION))
+
+OP_SYSTEM=$(shell uname)
+
+ifeq ($(GCC_MAJOR_VERSION), 4)
 	LIBS+=stdc++
 else
 	LIBS+=stdc++.r4
 endif
 
-ifeq "$(shell uname)" "Haiku"
+ifeq "$(OP_SYSTEM)" "Haiku"
 	LIBS+=network
 endif
 
@@ -185,8 +191,39 @@ DRIVER_PATH =
 ## include the makefile-engine
 include $(BUILDHOME)/etc/makefile-engine
 
-#	rule to create resources directory if needed
-resources: $(TARGET)
-	@[ -d $(OBJ_DIR)/resources ] || mkdir $(OBJ_DIR)/resources > /dev/null 2>&1
-	cp -R -u jabber/resources/* $(OBJ_DIR)/resources
+# package version
+VERSION=1.2.1-gcc$(GCC_MAJOR_VERSION)
+
+dist:
+	mkdir dist
+
+# For the zip files we need to create a file with the comment line
+dist/comment:
+	mkdir dist/comment
+
+ZIP_COMMENT = comment/$(VERSION)
+
+dist/$(ZIP_COMMENT): dist/comment
+	echo "////////////////////////////////////////////////////" > dist/$(ZIP_COMMENT)
+	echo "// Jabber $(VERSION) for Haiku OS" >> dist/$(ZIP_COMMENT)
+	echo "// To INSTALL this package, please expand it to /boot" >> dist/$(ZIP_COMMENT)
+	echo "////////////////////////////////////////////////////" >> dist/$(ZIP_COMMENT)
+
+package: clean dist dist/$(ZIP_COMMENT)
+	-rm -rf dist/boot/
+	make
+	-mkdir -p dist/boot/common/data/licenses
+	-mkdir -p dist/boot/apps/Jabber
+	-mkdir -p dist/boot/home/config/be/Applications
+	cp -r resources dist/boot/apps/Jabber
+	rm -rf `find dist/boot/ -type d -name .svn`
+	cp $(TARGET) dist/boot/apps/Jabber
+	-cp resources/license.txt "dist/boot/common/data/licenses/Other(Jabber)"
+	ln -s /boot/apps/Jabber/Jabber dist/boot/home/config/be/Applications
+	echo "Package: Jabber" > dist/boot/.OptionalPackageDescription
+	echo "Version: $(VERSION)" >> dist/boot/.OptionalPackageDescription
+	echo "Description: Free XMPP Instant Messaging Client for Haiku OS." >> dist/boot/.OptionalPackageDescription
+	echo "License: Other(Jabber)" >> dist/boot/.OptionalPackageDescription
+	echo "URL: http://dev.osdrawer.net/projects/show/jabber4beos" >> dist/boot/.OptionalPackageDescription
+	cd dist/boot && zip -9  -r -y -z ../Jabber-$(VERSION)-`date +%F`.zip * .OptionalPackageDescription* < ../$(ZIP_COMMENT)
 
