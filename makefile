@@ -12,7 +12,7 @@
 ## Application Specific Settings ---------------------------------------------
 
 # specify the name of the binary
-NAME=jabber4ihaiku
+NAME=Jabber
 
 # specify the type of binary
 #	APP:	Application
@@ -105,7 +105,7 @@ RSRCS= jabber/Resource.rsrc
 #		naming scheme you need to specify the path to the library
 #		and it's name
 #		library: my_lib.a entry: my_lib.a or path/my_lib.a
-LIBS=be game root stdc++.r4 translation tracker ssl crypto expat 
+LIBS=be game root translation tracker ssl crypto expat 
 
 GCC_VERSION= $(shell gcc --version)
 IS_NOT_GCC2=$(findstring 2.95.3, $(GCC_VERSION))
