@@ -11,9 +11,8 @@
 #include <string>
 #include <vector>
 
-#include "../xml_entity/XMLEntity.h"
-#include "../xmlparse/xmlparse.h"
-#include "../xmltok/xmltok.h"
+#include "XMLEntity.h"
+#include <expat.h>
 
 class XMLReader {
 	public:
@@ -39,7 +38,7 @@ class XMLReader {
 		void				 _OnEndTag(const char *);
 		void				 _OnCharacterData(const XML_Char *, int);
 
-	    XML_Parser          *_parser;	
+	    XML_Parser          _parser;	
 		XMLEntity           *_xml_entity;
 		XMLEntity           *_curr_entity;
 		string               _curr_character_data;

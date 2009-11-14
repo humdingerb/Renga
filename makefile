@@ -4,7 +4,7 @@
 ## 
 ## Build rules
 ##		make depend      # create .dependencies file 
-##		make [default]   # build jabber4beos binaries
+##		make [default]   # build jabber4haiku binaries
 ##		make resources   # copy resources used by jabber binary into build dir
 ##
 ## Do not forget to run "make depend" before working with makefile build!!! 
@@ -12,7 +12,7 @@
 ## Application Specific Settings ---------------------------------------------
 
 # specify the name of the binary
-NAME=jabber4beos
+NAME=jabber4ihaiku
 
 # specify the type of binary
 #	APP:	Application
@@ -71,24 +71,20 @@ SRCS=jabber/Agent.cpp\
 	 jabber/JRoster.cpp\
 	 jabber/SoundSystem.cpp\
 	 jabber/GenericFunctions.cpp\
-	 shared/interface/BitmapButton.cpp\
-	 shared/interface/FileItem.cpp\
-	 shared/interface/StatusView.cpp\
-	 shared/interface/PictureView.cpp\
-	 shared/interface/MessageRepeater.cpp\
-	 shared/network/KeepAlive.cpp\
-	 shared/network/PortTalker.cpp\
-	 shared/network/JabberSSLPlug.cpp\
-	 shared/network/JabberSocketPlug.cpp\
-	 shared/storage/FileXMLReader.cpp\
-	 shared/storage/AppLocation.cpp\
+	 jabber/BitmapButton.cpp\
+	 jabber/FileItem.cpp\
+	 jabber/StatusView.cpp\
+	 jabber/PictureView.cpp\
+	 jabber/MessageRepeater.cpp\
+	 jabber/KeepAlive.cpp\
+	 jabber/PortTalker.cpp\
+	 jabber/JabberSSLPlug.cpp\
+	 jabber/JabberSocketPlug.cpp\
+	 jabber/FileXMLReader.cpp\
+	 jabber/AppLocation.cpp\
 	 shared/split-pane/SplitPane.cpp\
-	 shared/expat/xml_entity/XMLEntity.cpp\
-	 shared/expat/xmltok/xmlrole.c\
-	 shared/expat/xmltok/xmltok.c\
-	 shared/expat/xmlparse/xmlparse.c\
-	 shared/expat/xmlparse/hashtable.c\
-	 shared/expat/xml_reader/XMLReader.cpp
+	 jabber/XMLEntity.cpp\
+	 jabber/XMLReader.cpp
 
 #	specify the resource files to use
 #	full path or a relative path to the resource file can be used.
@@ -109,7 +105,7 @@ RSRCS= jabber/Resource.rsrc
 #		naming scheme you need to specify the path to the library
 #		and it's name
 #		library: my_lib.a entry: my_lib.a or path/my_lib.a
-LIBS=be game root translation tracker ssl crypto
+LIBS=be game root stdc++.r4 translation tracker ssl crypto expat 
 
 GCC_VERSION= $(shell gcc --version)
 IS_NOT_GCC2=$(findstring 2.95.3, $(GCC_VERSION))
@@ -139,9 +135,7 @@ SYSTEM_INCLUDE_PATHS =/boot/home/config/include
 #	additional paths to look for local headers
 #	thes use the form: #include "header"
 #	source file directories are automatically included
-LOCAL_INCLUDE_PATHS = shared/storage shared/interface shared/expat/xml_reader\
-                      shared/split-pane shared/network shared/expat/xml_entity\
-					  shared/include
+LOCAL_INCLUDE_PATHS = shared/split-pane
 
 #	specify the level of optimization that you desire
 #	NONE, SOME, FULL

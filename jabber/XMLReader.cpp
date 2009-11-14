@@ -18,7 +18,7 @@ XMLReader::XMLReader() {
 	_please_reset        = false;
 	
 	// Create parser
-    _parser = (XML_Parser *)XML_ParserCreate(NULL);	
+    _parser = XML_ParserCreate(NULL);	
 
 	if (_parser) {
 		XML_SetUserData(_parser, this);
@@ -58,7 +58,7 @@ void XMLReader::FeedData(const char *data, int len) {
 		_please_reset        = false;
 
 		// Create parser
-	    _parser = (XML_Parser *)XML_ParserCreate(NULL);	
+	    _parser = XML_ParserCreate(NULL);	
 
 		if (_parser) {
 			XML_SetUserData(_parser, this);
@@ -150,7 +150,7 @@ void XMLReader::_OnCharacterData(const XML_Char *data, int len) {
 	strncpy(new_data, data, len);
 	new_data[len] = '\0';
 
-	if (!new_data || *new_data == NULL) {
+	if (!new_data || *new_data == 0) {
 		return;
 	}
 
