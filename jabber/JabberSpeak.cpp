@@ -18,6 +18,14 @@
 	#include "unistd.h"
 #endif
 
+#ifndef _SYS_UTSNAME_H
+	#include "sys/utsname.h"
+#endif
+
+#ifndef BLABBER_APP_H
+	#include "BlabberApp.h"
+#endif
+
 #ifndef AGENT_LIST_H
 	#include "AgentList.h"
 #endif
@@ -336,7 +344,7 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 		if (entity->Attribute("id")) {
 			iq_id = entity->Attribute("id");
 		}
-
+		
 		// handle SETS only (change)
 		if (!strcasecmp(entity->Attribute("type"), "set")) {
 		// handle ERRORS only (failure)
@@ -483,6 +491,33 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 				// remove the item from the list of pending IQs
 				_iq_map.erase(iq_id);
 			}
+		}
+
+		// handle verion request
+		if (!strcasecmp(entity->Attribute("type"), "get")) {
+			string iq_from;   
+			if (entity->Attribute("from")) {
+				iq_from = entity->Attribute("from");
+			}
+		
+			// get access to query tag
+			XMLEntity *query = entity->Child("query");
+			if (query && query->Attribute("xmlns")) {
+				if (!strcasecmp(query->Attribute("xmlns"), "jabber:iq:version")) {
+					_ProcessVersionRequest(iq_id, iq_from);
+				}
+			}
+
+/*
+			// get the intent of the IQ message
+			if (_iq_map.count(iq_id) > 0) {
+				// process based on the intent
+				iq_intent intent = _iq_map[iq_id];
+
+
+				// remove the item from the list of pending IQs
+				_iq_map.erase(iq_id);
+			} */
 		}
 
 		// IQ messages can be disposed of after use
@@ -1542,6 +1577,55 @@ void JabberSpeak::_SendAuthentication(string username, string password, string r
 	free(str);
 
 	DestroyAttributeMemory(atts_iq, 4);
+	DestroyAttributeMemory(atts_query, 2);
+	
+	delete entity_iq;
+}
+
+void JabberSpeak::_ProcessVersionRequest(string req_id, string req_from) {
+	XMLEntity   *entity_iq, *entity_query;
+	char **atts_iq    = CreateAttributeMemory(6);
+	char **atts_query = CreateAttributeMemory(2);
+
+	// assemble attributes;
+	strcpy(atts_iq[0], "id");
+	strcpy(atts_iq[1], req_id.c_str());
+
+	strcpy(atts_iq[2], "to");
+	strcpy(atts_iq[3], req_from.c_str());
+
+	strcpy(atts_iq[4], "type");
+	strcpy(atts_iq[5], "result");
+
+	strcpy(atts_query[0], "xmlns");
+	strcpy(atts_query[1], "jabber:iq:version");
+
+	// construct XML tagset
+	entity_iq    = new XMLEntity("iq", (const char **)atts_iq);
+	entity_query = new XMLEntity("query", (const char **)atts_query);
+
+	entity_iq->AddChild(entity_query);
+	
+	entity_query->AddChild("name", NULL, "Jabber");
+	entity_query->AddChild("version", NULL, APP_VERSION);
+	
+	string os_info;
+	utsname utsname_info = {0};
+	uname(&utsname_info);
+
+	os_info += utsname_info.sysname;
+	os_info += " ";
+	os_info += utsname_info.release;
+	os_info += " ";
+	os_info += utsname_info.version;
+	entity_query->AddChild("os", NULL, os_info.c_str());
+
+	// send XML command
+	char *str = entity_iq->ToString();
+	SendFiltered(str);
+	free(str);
+
+	DestroyAttributeMemory(atts_iq, 6);
 	DestroyAttributeMemory(atts_query, 2);
 	
 	delete entity_iq;

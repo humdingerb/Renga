@@ -2,6 +2,10 @@
 // Blabber [AboutWindow.cpp]
 //////////////////////////////////////////////////
 
+#ifndef BLABBER_APP_H
+	#include "BlabberApp.h"
+#endif
+
 #ifndef ABOUT_WINDOW_H
 	#include "AboutWindow.h"
 #endif
@@ -81,7 +85,7 @@ void AboutWindow::PopulateCredits() {
 	// title credit
 	_credits->Insert("\n\n", &tra_title);
 	
-	_credits->Insert("Jabber for Haiku v1.2h\n\n\n", &tra_title);
+	_credits->Insert("Jabber for Haiku " APP_VERSION "\n\n\n", &tra_title);
 	
 	_credits->Insert("Freely based on:\n", &tra_title);
 	_credits->Insert("Jabber for ", &tra_credit);

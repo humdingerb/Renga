@@ -116,6 +116,7 @@ private:
 
 	// OUTGOING COMMUNICATION
 	void                    _SendAuthentication(string username, string password, string resource);
+	void					_ProcessVersionRequest(string req_id, string req_from);
 	void                    _SendAgentRequest();
 	void                    _SendRosterRequest();
 

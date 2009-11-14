@@ -10,6 +10,8 @@
 	#include <app/Application.h>
 #endif
 
+#define APP_VERSION "v1.2h"
+
 class BlabberMainWindow;
 
 class BlabberApp : public BApplication {
