@@ -10,7 +10,7 @@
 	#include <app/Application.h>
 #endif
 
-#define APP_VERSION "v1.2h"
+#define APP_VERSION "v1.2.1"
 
 class BlabberMainWindow;
 

@@ -87,9 +87,15 @@ SRCS=jabber/Agent.cpp\
 	 jabber/XMLEntity.cpp\
 	 jabber/XMLReader.cpp
 
+OP_SYSTEM=$(shell uname)
+
 #	specify the resource files to use
 #	full path or a relative path to the resource file can be used.
+ifeq "$(OP_SYSTEM)" "Haiku"
+RDEFS= jabber/Resource.rdef
+else
 RSRCS= jabber/Resource.rsrc
+endif
 
 # @<-src@ 
 #%}
@@ -119,8 +125,6 @@ ifeq ($(GCC_MAJOR_VERSION), 4)
 else
 	LIBS+=stdc++.r4
 endif
-
-OP_SYSTEM=$(shell uname)
 
 ifeq "$(OP_SYSTEM)" "Haiku"
 	LIBS+=network
@@ -223,7 +227,7 @@ package: clean dist dist/$(ZIP_COMMENT)
 	ln -s /boot/apps/Jabber/Jabber dist/boot/home/config/be/Applications
 	echo "Package: Jabber" > dist/boot/.OptionalPackageDescription
 	echo "Version: $(VERSION)" >> dist/boot/.OptionalPackageDescription
-	echo "Description: Free XMPP Instant Messaging Client for Haiku OS." >> dist/boot/.OptionalPackageDescription
+	echo "Description: XMPP Instant Messaging Client for Haiku OS." >> dist/boot/.OptionalPackageDescription
 	echo "License: Other(Jabber)" >> dist/boot/.OptionalPackageDescription
 	echo "URL: http://dev.osdrawer.net/projects/show/jabber4beos" >> dist/boot/.OptionalPackageDescription
 	cd dist/boot && zip -9  -r -y -z ../Jabber-$(VERSION)-`date +%F`.zip * .OptionalPackageDescription* < ../$(ZIP_COMMENT)

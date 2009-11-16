@@ -32,8 +32,15 @@
 	#include "ModalAlertFactory.h"
 #endif
 
+// remove as soon as we decide to drop R5 support...
+#ifdef __BEOS__
+const char* kAppMIMEType = "application/jabber";
+#else
+const char* kAppMIMEType = "application/x-vnd.Haiku-Jabber";
+#endif
+
 BlabberApp::BlabberApp()
-	: BApplication("application/jabber") {
+	: BApplication(kAppMIMEType) {
 	
 	// launch the message repeater looper
 	MessageRepeater::Instance()->Run();
