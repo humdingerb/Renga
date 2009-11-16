@@ -109,12 +109,10 @@ RSRCS= jabber/Resource.rsrc
 LIBS=be game root translation tracker ssl crypto expat 
 
 # guess gcc version 
-GCC2_VERSION=$(findstring 2.95.3, $(shell gcc --version))
-ifeq ($(GCC2_VERSION), )
-GCC_MAJOR_VERSION=4
-else
-GCC_MAJOR_VERSION=2
-endif
+GCC_VERSION=$(subst -, , $(subst ., , $(shell gcc -dumpversion)))
+GCC_MAJOR_VERSION=$(word 1, $(GCC_VERSION))
+GCC_MINOR_VERSION=$(word 2, $(GCC_VERSION))
+GCC_MICRO_VERSION=$(word 3, $(GCC_VERSION))
 
 ifeq ($(GCC_MAJOR_VERSION), 4)
 	LIBS+=stdc++
