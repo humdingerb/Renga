@@ -155,17 +155,22 @@ void RosterItem::DrawItem(BView *owner, BRect frame, bool complete) {
 		}
 	}
 
+	BFont statusFont;
+			
 	// font color is based on online status
 	if (status == UserID::ONLINE) {
 		if (exact_status == "xa" || exact_status == "away" || exact_status == "dnd") {
 			owner->SetHighColor(0, 110, 0, 255);
+			owner->GetFont(&statusFont);
+			statusFont.SetFace(B_ITALIC_FACE);
+			owner->SetFont(&statusFont);
 		} else {
 			owner->SetHighColor(0, 180, 0, 255);
 		}
 	} else if (status == UserID::OFFLINE) {
-		owner->SetHighColor(255, 0, 0, 255);
+		owner->SetHighColor(255, 0, 0, 255); //red
 	} else {
-		owner->SetHighColor(0, 0, 255, 255);
+		owner->SetHighColor(0, 0, 255, 255); //blue
 	}
 
 	// construct text positioning
