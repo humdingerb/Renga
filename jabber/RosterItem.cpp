@@ -209,6 +209,10 @@ void RosterItem::DrawItem(BView *owner, BRect frame, bool complete) {
 			owner->DrawBitmapAsync(_msn_icon, BPoint(owner->PenLocation().x + 2.0, frame.top + 2));
 		}
 	}
+	
+	owner->SetFont(be_plain_font);
+	owner->SetFontSize(10.0);
+
 }
 
 void RosterItem::Update(BView *owner, const BFont *font) {
