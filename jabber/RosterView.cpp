@@ -160,8 +160,10 @@ void RosterView::MouseDown(BPoint point) {
 		
 		BPoint screen_point(point);
 		ConvertToScreen(&screen_point);
-
-		_popup->Go(screen_point, true, true, false);
+		
+		BRect r(screen_point.x - 4, screen_point.y - 20, screen_point.x + 24, screen_point.y + 4);
+		_popup->Go(screen_point, true, true, r, false);
+		//_popup->Go(screen_point, true, true, false);
 	}
 }
 
