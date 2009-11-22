@@ -929,43 +929,23 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 
 	// tabbed view
 	rect = Bounds();
-	rect.OffsetBy(0.0, 19.0);
-	rect.InsetBy(0.0, 6.0);
-	rect.bottom -= 35.0 + _status_view->GetHeight();
-	_tab_strip = new BTabView(rect, NULL);
-	_tab_strip->SetTabWidth(B_WIDTH_AS_USUAL);
-	
-	// buddy tab
-	rect = _tab_strip->Bounds();
-	
-	rect.InsetBy(4.5, 6.0);
-	rect.OffsetBy(-2.0, 0.0);
-	rect.bottom -= _tab_strip->TabHeight();
-	rect.right  -= B_V_SCROLL_BAR_WIDTH;
+	rect.top = _menubar->Bounds().bottom + 1 ;
+	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+
+	// roster view
+	rect.right  -= B_V_SCROLL_BAR_WIDTH;	
 
 	_roster          = new RosterView(rect);
 	_roster_scroller = new BScrollView(NULL, _roster, B_FOLLOW_ALL_SIDES, 0, false, true);
 	_roster->TargetedByScrollView(_roster_scroller);
 
-	_roster_tab = new BTab();
-	_tab_strip->AddTab(_roster_scroller, _roster_tab);
-	_roster_tab->SetLabel("Buddy List");
-
 	// chat service
-	rect.OffsetBy(7.0, _tab_strip->Bounds().Height() + _tab_strip->TabHeight());
+	rect.OffsetBy(7.0, _roster_scroller->Bounds().Height());
 	rect.bottom = rect.top + 18;
 
-	// title
-	float x_pos = (Bounds().Width() - 150.0) / 2.0;
-	float y_pos = rect.top + 2.0;
-
-	_title = new PictureView(AppLocation::Instance()->AbsolutePath("resources/graphics/jabber-for-beos.png").c_str(), BPoint(x_pos, y_pos), B_FOLLOW_H_CENTER | B_FOLLOW_BOTTOM);
-
-	// children
-	_full_view->AddChild(_title);
 	_full_view->AddChild(_status_view);
 	_full_view->AddChild(_menubar);
-	_full_view->AddChild(_tab_strip);
+	_full_view->AddChild(_roster_scroller);
 
 	AddChild(_full_view);
 	

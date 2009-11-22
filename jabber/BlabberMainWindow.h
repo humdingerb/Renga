@@ -136,8 +136,6 @@ private:
 	int32                     _deskbar_id;
 	
 	BView                    *_full_view;
-	BTabView                 *_tab_strip;
-	BTab                     *_roster_tab;
 
 	PictureView              *_title;
 	StatusView               *_status_view;
