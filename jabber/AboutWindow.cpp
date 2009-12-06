@@ -102,6 +102,7 @@ void AboutWindow::PopulateCredits() {
 	_credits->Insert("Graphics:\n", &tra_title);
 	_credits->Insert("Daniel Fischer\n", &tra_credit);
 	_credits->Insert("John Blanco\n", &tra_credit);
+	_credits->Insert("zuMi\n", &tra_credit);
 	_credits->Insert("Jabber.org\n\n", &tra_credit);
 	
 	_credits->Insert("Source Code hosted by:\n", &tra_title);
