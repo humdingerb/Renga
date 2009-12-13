@@ -11,7 +11,7 @@
 #endif
 
 #ifndef _MENU_ITEM_H
-	#include <interface/MenuItem.h>
+	#include <MenuItem.h>
 #endif
 
 #ifndef BLABBER_SETTINGS_H

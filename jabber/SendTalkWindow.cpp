@@ -11,11 +11,11 @@
 #endif
 
 #ifndef _BUTTON_H
-	#include <interface/Button.h>
+	#include <Button.h>
 #endif
 
 #ifndef _STRING_VIEW_H
-	#include <interface/StringView.h>
+	#include <StringView.h>
 #endif
 
 #ifndef AGENT_H

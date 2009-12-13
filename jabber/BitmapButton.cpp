@@ -6,7 +6,7 @@
 #include <string>
 
 #include "BitmapButton.h"
-#include "translation/TranslationUtils.h"
+#include <TranslationUtils.h>
 
 
 BitmapButton::BitmapButton(BRect size, const char *name, BMessage *msg, uint32 resizing_mode, uint32 flags)

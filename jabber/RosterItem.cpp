@@ -11,7 +11,7 @@
 #endif
 
 #ifndef _TRANSLATION_UTILS_H
-	#include "translation/TranslationUtils.h"
+	#include <TranslationUtils.h>
 #endif
 
 BBitmap *RosterItem::_kinda_online_icon = NULL;

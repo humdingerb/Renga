@@ -1,5 +1,5 @@
 #include "PictureView.h"
-#include "TranslationKit.h"
+#include <TranslationKit.h>
 
 PictureView::PictureView(const char *filename, BPoint point, uint32 resizing_flags, uint32 flags)
 	: BView(BRect(0, 0, 0, 0), NULL, resizing_flags, flags) {

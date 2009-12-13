@@ -11,15 +11,15 @@
 #endif
 
 #ifndef _ROSTER_H
-	#include "app/Roster.h"
+	#include <Roster.h>
 #endif
 
 #ifndef _UNI_STD_H
-	#include "unistd.h"
+	#include <unistd.h>
 #endif
 
 #ifndef _SYS_UTSNAME_H
-	#include "sys/utsname.h"
+	#include <sys/utsname.h>
 #endif
 
 #ifndef BLABBER_APP_H
@@ -63,6 +63,11 @@
 #endif
 
 #include <stdlib.h>
+
+#include <Path.h>
+#include <FindDirectory.h>
+#include <AppFileInfo.h>
+#include <File.h>
 
 JabberSpeak *JabberSpeak::_instance = NULL;
 
@@ -1608,16 +1613,37 @@ void JabberSpeak::_ProcessVersionRequest(string req_id, string req_from) {
 	
 	entity_query->AddChild("name", NULL, "Jabber");
 	entity_query->AddChild("version", NULL, APP_VERSION);
-	
-	string os_info;
-	utsname utsname_info = {0};
-	uname(&utsname_info);
 
-	os_info += utsname_info.sysname;
-	os_info += " ";
-	os_info += utsname_info.release;
-	os_info += " ";
-	os_info += utsname_info.version;
+	string strVersion("Haiku");
+	BPath path;
+	if (find_directory(B_BEOS_LIB_DIRECTORY, &path) == B_OK) {
+		path.Append("libbe.so");
+
+		BAppFileInfo appFileInfo;
+		version_info versionInfo;
+		BFile file;
+		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
+			&& appFileInfo.SetTo(&file) == B_OK
+			&& appFileInfo.GetVersionInfo(&versionInfo, 
+				B_APP_VERSION_KIND) == B_OK
+			&& versionInfo.short_info[0] != '\0')
+				strVersion = versionInfo.short_info;
+	}
+
+	string os_info;
+	utsname uname_info;
+	if (uname(&uname_info) == 0) {
+		os_info = uname_info.sysname;
+		long revision = 0;
+		if (sscanf(uname_info.version, "r%ld", &revision) == 1) {
+			char version[16];
+			snprintf(version, sizeof(version), "%ld", revision);
+			os_info += " ( " + strVersion + " Rev. ";
+			os_info += version;
+			os_info += ")";
+		}
+	}
+
 	entity_query->AddChild("os", NULL, os_info.c_str());
 
 	// send XML command

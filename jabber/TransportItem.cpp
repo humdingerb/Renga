@@ -19,7 +19,7 @@
 #endif
 
 #ifndef _TRANSLATION_UTILS_H
-	#include "translation/TranslationUtils.h"
+	#include <TranslationUtils.h>
 #endif
 
 BBitmap *TransportItem::_offline_icon = NULL;

@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 #define LOG(X) printf X;
-//#define STDOUT
+#define STDOUT
 
 JabberSocketPlug::JabberSocketPlug()
 {

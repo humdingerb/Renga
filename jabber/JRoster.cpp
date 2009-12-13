@@ -7,7 +7,7 @@
 #endif
 
 #ifndef _OS_H
-	#include "kernel/OS.h"
+	#include <kernel/OS.h>
 #endif
 
 #ifndef MESSAGES_H

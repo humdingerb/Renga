@@ -11,7 +11,7 @@
 #endif
 
 #ifndef _TRANSLATION_UTILS_H
-	#include "translation/TranslationUtils.h"
+	#include "TranslationUtils.h"
 #endif
 
 OnlineStatusItem::OnlineStatusItem(const char *resource, const char *label, BMessage *msg)
