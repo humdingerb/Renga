@@ -112,23 +112,7 @@ endif
 #		naming scheme you need to specify the path to the library
 #		and it's name
 #		library: my_lib.a entry: my_lib.a or path/my_lib.a
-LIBS=be game root translation tracker ssl crypto expat 
-
-# guess gcc version 
-GCC_VERSION=$(subst -, , $(subst ., , $(shell gcc -dumpversion)))
-GCC_MAJOR_VERSION=$(word 1, $(GCC_VERSION))
-GCC_MINOR_VERSION=$(word 2, $(GCC_VERSION))
-GCC_MICRO_VERSION=$(word 3, $(GCC_VERSION))
-
-ifeq ($(GCC_MAJOR_VERSION), 4)
-	LIBS+=stdc++
-else
-	LIBS+=stdc++.r4
-endif
-
-ifeq "$(OP_SYSTEM)" "Haiku"
-	LIBS+=network
-endif
+LIBS=be game root translation tracker ssl crypto expat network $(STDCPPLIBS)
 
 #	specify additional paths to directories following the standard
 #	libXXX.so or libXXX.a naming scheme.  You can specify full paths
