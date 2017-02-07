@@ -6,7 +6,7 @@
 
 #include <cstdio>
 #include <string>
-#include <strings.h>
+#include <string.h>
 #include <stdlib.h>
 
 XMLReader::XMLReader() {

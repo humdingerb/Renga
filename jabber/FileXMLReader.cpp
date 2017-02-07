@@ -10,7 +10,7 @@
 #include <storage/StorageDefs.h>
 
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 
 #include "XMLEntity.h"
 
