@@ -88,7 +88,7 @@ CustomStatusWindow::CustomStatusWindow()
 	rect = Bounds();
 
 	// lightbulb
-	PictureView *picture = new PictureView(AppLocation::Instance()->AbsolutePath("resources/graphics/bulb-normal.png").c_str(), BPoint(-5.0, -3.0), B_FOLLOW_LEFT);
+	PictureView *picture = new PictureView(AppLocation::Instance()->AbsolutePath("resources/graphics/bulb-normal.png").c_str());
 	
 	// query
 	rect.left = 80.0;

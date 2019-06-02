@@ -9,7 +9,7 @@
 #include <ScrollView.h>
 
 StatusView::StatusView(const char *name)
-	: BView(BRect(0, 0, 0, 0), name, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW) {
+	: BView(name, B_WILL_DRAW) {
 	// set font
 	SetFont(be_plain_font);
 	SetFontSize(9.0);
@@ -24,17 +24,11 @@ void StatusView::AttachedToWindow() {
 
 	GetFontHeight(&_fh);
 
-	float height = _fh.ascent + _fh.descent + 1.0;
+	_height = _fh.ascent + _fh.descent + 1.0;
 	
-	if (height <  B_V_SCROLL_BAR_WIDTH)
-		height = B_V_SCROLL_BAR_WIDTH;
-		
-	
-	_height =  height  - _fh.descent - 1.0;	
-	
-	// set new size
-	ResizeTo(rect.Width(), height);
-	MoveTo(0.0, rect.bottom - height + 1 );
+	if (_height <  B_V_SCROLL_BAR_WIDTH)
+		_height = B_V_SCROLL_BAR_WIDTH;
+	SetExplicitSize(BSize(B_SIZE_UNSET, _height));
 }
 
 void StatusView::Draw(BRect rect) {

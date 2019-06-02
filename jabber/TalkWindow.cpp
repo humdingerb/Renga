@@ -405,7 +405,7 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	BFont black_11(be_plain_font);
 	black_11.SetSize(11.0);
 	
-	_message          = new BetterTextView(rect, "message", text_rect, &black_11, &sent, B_FOLLOW_TOP_BOTTOM | B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW);
+	_message          = new BetterTextView("message", &black_11, &sent, B_WILL_DRAW);
 	_message_scroller = new BScrollView("message_scroller", _message, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW, false, false);
 	_message->TargetedByScrollView(_message_scroller);
 	_message->SetWordWrap(true);

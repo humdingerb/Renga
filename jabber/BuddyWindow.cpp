@@ -86,7 +86,7 @@ BuddyWindow::BuddyWindow(BRect frame)
 	_full_view->SetViewColor(216, 216, 216, 255);
 	
 	// lightbulb
-	PictureView *picture = new PictureView(AppLocation::Instance()->AbsolutePath("resources/graphics/bulb-big.png").c_str(), BPoint(-5.0, -3.0), B_FOLLOW_LEFT);
+	PictureView *picture = new PictureView(AppLocation::Instance()->AbsolutePath("resources/graphics/bulb-big.png").c_str());
 
 	rect.left += 140.0;
 	rect.InsetBy(6.0, 6.0);

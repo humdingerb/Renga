@@ -36,8 +36,8 @@
 
 #include <strings.h>
 
-RosterView::RosterView(BRect frame)
-	: BOutlineListView(frame, NULL, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL) {
+RosterView::RosterView()
+	: BOutlineListView(NULL, B_SINGLE_SELECTION_LIST) {
 }
 
 RosterView::~RosterView() {

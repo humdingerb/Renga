@@ -6,7 +6,7 @@
 
 class PictureView : public BView {
 public:
-			  PictureView(const char *filename, BPoint point, uint32 resizing_flags = B_FOLLOW_H_CENTER, uint32 flags = B_WILL_DRAW);
+			  PictureView(const char *filename, uint32 flags = B_WILL_DRAW);
    	         ~PictureView();
 
 	void      AttachedToWindow();

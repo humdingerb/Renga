@@ -1,8 +1,8 @@
 #include "PictureView.h"
 #include <TranslationKit.h>
 
-PictureView::PictureView(const char *filename, BPoint point, uint32 resizing_flags, uint32 flags)
-	: BView(BRect(0, 0, 0, 0), NULL, resizing_flags, flags) {
+PictureView::PictureView(const char *filename, uint32 flags)
+	: BView(NULL, flags) {
 	_bitmap = NULL;
 	_width  = 0.0;
 	_height = 0.0;
@@ -24,7 +24,6 @@ PictureView::PictureView(const char *filename, BPoint point, uint32 resizing_fla
 	
 	// finally, now that we know our filesize
 	ResizeTo(_width, _height);
-	MoveTo(point);
 }
 
 PictureView::~PictureView() {

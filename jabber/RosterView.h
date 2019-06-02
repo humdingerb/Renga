@@ -52,7 +52,7 @@ public:
 	typedef std::map<UserID::online_status, BListItem *>  StatusToItemMap;
 
 public:
-	     	            RosterView(BRect frame);
+	     	            RosterView();
 		               ~RosterView();
 
 	// sort algorithm used before outline list view used

@@ -2,122 +2,44 @@
 // Blabber [BlabberMainWindow.cpp]
 //////////////////////////////////////////////////
 
-#ifndef BLABBER_MAIN_WINDOW_H
-	#include "BlabberMainWindow.h"
-#endif
+#include "BlabberMainWindow.h"
 
 #include <InterfaceKit.h>
+#include <be_apps/NetPositive/NetPositive.h>
+#include "AboutWindow.h"
+#include "AppLocation.h"
+#include "BlabberSettings.h"
+#include "BuddyWindow.h"
+#include "BuddyInfoWindow.h"
+#include "ChangeNameWindow.h"
+#include "CustomStatusWindow.h"
+#include "GenericFunctions.h"
+#include "JabberSpeak.h"
+#include "Messages.h"
+#include "MessageRepeater.h"
+#include "ModalAlertFactory.h"
+#include "PreferencesWindow.h"
+#include "RosterItem.h"
+#include "RotateChatFilter.h"
+#include "SendTalkWindow.h"
+#include "TalkManager.h"
 
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
-
-#ifndef _APPLICATION_H
-	#include <app/Application.h>
-#endif
-
-#ifndef _DESKBAR_H
-	#include <Deskbar.h>
-#endif
-
-#ifndef _NETPOSITIVE_H
-	#include <be_apps/NetPositive/NetPositive.h>
-#endif
-
-#ifndef _MENU_BAR_H
-	#include <interface/MenuBar.h>
-#endif
-
-#ifndef _MENU_ITEM_H
-	#include <interface/MenuItem.h>
-#endif
-
-#ifndef _SCROLL_VIEW_H
-	#include <interface/ScrollView.h>
-#endif
-
+#include <Application.h>
+#include <CardLayout.h>
+#include <Deskbar.h>
+#include <FindDirectory.h>
+#include <GroupLayout.h>
+#include <GroupView.h>
+#include <LayoutBuilder.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <Path.h>
+#include <Roster.h>
+#include <ScrollView.h>
 #include <String.h>
 
-#ifndef _ROSTER_H
-	#include <Roster.h>
-#endif
-
-#ifndef _PATH_H
-	#include <Path.h>
-#endif
-
-#ifndef FIND_DIRECTORY_H
-	#include <FindDirectory.h>
-#endif
-
-#ifndef ABOUT_WINDOW_H
-	#include "AboutWindow.h"
-#endif
-
-#ifndef APP_LOCATION_H
-	#include "AppLocation.h"
-#endif
-
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef BUDDY_WINDOW_H
-	#include "BuddyWindow.h"
-#endif
-
-#ifndef BUDDY_INFO_WINDOW_H
-	#include "BuddyInfoWindow.h"
-#endif
-
-#ifndef CHANGE_NAME_WINDOW_H
-	#include "ChangeNameWindow.h"
-#endif
-
-#ifndef CUSTOM_STATUS_WINDOW_H
-	#include "CustomStatusWindow.h"
-#endif
-
-#ifndef GENERIC_FUNCTIONS_H
-	#include "GenericFunctions.h"
-#endif
-
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef MESSAGE_REPEATER_H
-	#include "MessageRepeater.h"
-#endif
-
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
-
-#ifndef PREFERENCES_WINDOW_H
-	#include "PreferencesWindow.h"
-#endif
-
-#ifndef ROSTER_ITEM_H
-	#include "RosterItem.h"
-#endif
-
-#ifndef ROTATE_CHAT_FILTER_H
-	#include "RotateChatFilter.h"
-#endif
-
-#ifndef SEND_TALK_WINDOW_H
-	#include "SendTalkWindow.h"
-#endif
-
-#ifndef TALK_MANAGER_H
-	#include "TalkManager.h"
-#endif
-
+#include <algorithm>
+#include <cstdio>
 #include <stdlib.h>
 
 
@@ -197,10 +119,8 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 			// switch out views
 			_login_login->MakeDefault(false);
-			_full_view->Show();
-			_full_view->Show();
-			_login_full_view->Hide();
-			_login_full_view->Hide();
+			BCardLayout* cl = (BCardLayout*)GetLayout();
+			//cl->SetVisibleItem((int32)0);
 
 			// connect with current username or register new account
 			JabberSpeak::Instance()->SendConnect(_login_username->Text(), _login_password->Text(), _login_realname->Text(), _ssl_enabled->Value(), _ssl_server->Text(), atoi(_ssl_port->Text()), _login_new_account->Value());
@@ -766,38 +686,19 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	// editing filter for taksing
 	AddCommonFilter(new RotateChatFilter(NULL));
 	
-	// add deskbar icon
-//	BDeskbar     db;
-//	DeskbarIcon *new_entry = new DeskbarIcon();
-
-//	db.AddItem(new_entry, &_deskbar_id);
-//	new_entry->SetMyID(_deskbar_id);
-	
 	// add self to message family
 	MessageRepeater::Instance()->AddTarget(this);
 
-	// set size constraints
-	SetSizeLimits(210, 3000, 332, 3000);
-
-	BRect rect;
-
 	// encompassing view
-	rect = Bounds();
-	rect.OffsetTo(B_ORIGIN);
-	
-	_full_view = new BView(rect, "main-full", B_FOLLOW_ALL, B_WILL_DRAW);
-	_full_view->SetViewColor(216, 216, 216, 255);
+	_full_view = new BGroupView("main-full", B_VERTICAL);
+	_full_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// status bar
 	_status_view = new StatusView();
-	_status_view->SetViewColor(216, 216, 216, 255);
-	_status_view->SetLowColor(216, 216, 216, 255);
+	_status_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	// menubar
-	rect = Bounds();
-	rect.bottom = rect.top + 18;
-
-	_menubar = new BMenuBar(rect, "menubar");
+	_menubar = new BMenuBar("menubar");
 
 	// FILE MENU
 	_file_menu = new BMenu("File");
@@ -928,172 +829,107 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	//_menubar->AddItem(_help_menu);	
 
 	// tabbed view
-	rect = Bounds();
-	rect.top = _menubar->Bounds().bottom + 1 ;
-	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
 	// roster view
-	rect.right  -= B_V_SCROLL_BAR_WIDTH;	
-
-	_roster          = new RosterView(rect);
-	_roster_scroller = new BScrollView(NULL, _roster, B_FOLLOW_ALL_SIDES, 0, false, true);
+	_roster          = new RosterView();
+	_roster_scroller = new BScrollView(NULL, _roster, 0, false, true,
+		B_NO_BORDER);
 	_roster->TargetedByScrollView(_roster_scroller);
 
 	// chat service
-	rect.OffsetBy(7.0, _roster_scroller->Bounds().Height());
-	rect.bottom = rect.top + 18;
-
-	_full_view->AddChild(_status_view);
-	_full_view->AddChild(_menubar);
-	_full_view->AddChild(_roster_scroller);
-
-	AddChild(_full_view);
+	BLayoutBuilder::Group<>(_full_view, B_VERTICAL, 0)
+		.SetInsets(0, 0, 0, 0)
+		.Add(_menubar)
+		.Add(_roster_scroller)
+		.Add(_status_view)
+	.End();
 	
 	///// NOW DO LOGIN STUFF
 	// encompassing view
-	rect = Bounds();
-	rect.OffsetTo(B_ORIGIN);
-
-	_login_full_view = new BView(rect, "login-full", B_FOLLOW_ALL, B_WILL_DRAW);
-	_login_full_view->SetViewColor(216, 216, 216, 255);
+	_login_full_view = new BGroupView("login-full", B_VERTICAL);
+	_login_full_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// graphics
-	_login_bulb = new PictureView(AppLocation::Instance()->AbsolutePath("resources/graphics/jabber-title.png").c_str(), BPoint((Bounds().Width() - 189.0) / 2.0, 5.0), B_FOLLOW_H_CENTER);
+	_login_bulb = new PictureView(AppLocation::Instance()->AbsolutePath("resources/graphics/jabber-title.png").c_str());
 
 	// username/password controls
-	rect.InsetBy(5.0, 5.0);
-	rect.top = 108.0;
-	rect.right -= 3.0;
+	_login_realname = new BTextControl(NULL, "Nickname: ", NULL, NULL);
 	
-	
-
-	_login_realname = new BTextControl(rect, NULL, "Nickname: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	
-	rect.OffsetBy(0.0, 21.0); //fix this is too static!
-	
-	float labelWidth = _login_realname->StringWidth("Nickname: ");
-
-	_login_username = new BTextControl(rect, NULL, "Jabber ID: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
+	_login_username = new BTextControl(NULL, "Jabber ID: ", NULL, NULL);
 		
-	rect.OffsetBy(0.0, 21.0); //fix this is too static!
-	
-	if (labelWidth < _login_username->StringWidth("Jabber ID: "))
-		labelWidth = _login_username->StringWidth("Jabber ID: ");
-
-	_login_password = new BTextControl(rect, NULL, "Password: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
+	_login_password = new BTextControl(NULL, "Password: ", NULL, NULL);
 	_login_password->TextView()->HideTyping(true);
 	
-	if (labelWidth < _login_password->StringWidth("Password: "))
-		labelWidth = _login_password->StringWidth("Password: ");
-		
-		
-
-	
-	
 	// SSL Box
-	rect.OffsetBy(0.0, 21.0); //fix this is too static!
-	BRect crect(rect);
-	crect.bottom = crect.top + 100; //fix this is too static!
+	_ssl_enabled = new BCheckBox(NULL, "SSL", new BMessage(SSL_ENABLED));
+	BBox* _ssl_box=new BBox("box");
+	_ssl_box->SetLabel("Advanced settings");
 	
-	_ssl_enabled = new BCheckBox(BRect(0,0,20,20), NULL, "SSL", new BMessage(SSL_ENABLED), B_FOLLOW_LEFT);
-	_ssl_enabled->ResizeToPreferred();
-	
-	BBox* _ssl_box=new BBox(crect,"box",B_FOLLOW_LEFT_RIGHT);
-	_ssl_box->SetLabel(_ssl_enabled);
-	
-	BRect insideRect(_ssl_box->Bounds());
-	
-	insideRect.OffsetTo(2,_ssl_enabled->Frame().bottom + 2);
-	insideRect.InsetBy(4, 2);
-	BRect servRect(insideRect);	
-	
-	
-	_ssl_server = new BTextControl(servRect, NULL, "Server: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	_ssl_server->ResizeToPreferred();
+	_ssl_server = new BTextControl(NULL, "Server: ", NULL, NULL);
 	_ssl_server->SetEnabled(false);
 	
-	if (labelWidth <  _ssl_server->StringWidth("Server: "))
-	 labelWidth = _ssl_server->StringWidth("Server: ");
-	
-	servRect.OffsetBy(0,_ssl_server->Bounds().Height() + 1);
-	_ssl_port = new BTextControl(servRect, NULL, "Port: ", NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	_ssl_port->ResizeToPreferred();
+	_ssl_port = new BTextControl(NULL, "Port: ", NULL, NULL);
 	_ssl_port->SetEnabled(false);
 	
-	if (labelWidth <  _ssl_port->StringWidth("Port: "))
-		labelWidth = _ssl_port->StringWidth("Port: ");
-	
-	
-	labelWidth += 5.0;
-	
-	_login_realname->SetDivider(labelWidth);
-	_login_username->SetDivider(labelWidth);
-	_login_password->SetDivider(labelWidth);
-	_ssl_server->SetDivider(labelWidth);
-	_ssl_port->SetDivider(labelWidth);
-	
-	
-	_ssl_box->ResizeTo(_ssl_box->Bounds().Width(), _ssl_port->Frame().bottom + 10.0);
-	
-	_ssl_box->AddChild(_ssl_server);
-	_ssl_box->AddChild(_ssl_port);
-	rect.top = _ssl_box->Frame().bottom + 10.0; //crect.bottom;
-	rect.OffsetBy(59.0, 1.0);
+	BGridView* v = new BGridView();
+	_ssl_box->AddChild(v);
+	BLayoutBuilder::Grid<>(v)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(_ssl_enabled, 0, 0)
+		.AddTextControl(_ssl_server, 0, 1)
+		.AddTextControl(_ssl_port, 0, 2)
+	.End();
 	
 	//end SSL Box
 	
-	rect.right = rect.left + 135.0;
-	rect.bottom = rect.top + 19.0;
-	_login_new_account = new BCheckBox(rect, NULL, "Create this account!", NULL, B_FOLLOW_LEFT);
+	_login_new_account = new BCheckBox(NULL, "Create this account!", NULL);
 
-	rect.OffsetBy(0.0, 19.0);
-	_login_auto_login = new BCheckBox(rect, NULL, "Auto-login", NULL, B_FOLLOW_LEFT);
+	_login_auto_login = new BCheckBox(NULL, "Auto-login", NULL);
 
 	// login button
-	rect.OffsetTo((Bounds().Width() - 120.0) / 2.0, rect.top + 25.0);
-	rect.right = rect.left + 120.0;
-
-	_login_login = new BButton(rect, "login", "Login", new BMessage(JAB_LOGIN), B_FOLLOW_H_CENTER);
+	_login_login = new BButton("login", "Login", new BMessage(JAB_LOGIN));
 	_login_login->MakeDefault(false);
 	_login_login->SetTarget(this);
 
 	// new user notes
-	rect.Set(0, rect.top + 32.0, Bounds().Width(), rect.top + 102.0); 
-	rect.InsetBy(5.0, 0.0);
-
-	rgb_color note = {0, 0, 0, 255};
+	rgb_color note = ui_color(B_PANEL_TEXT_COLOR);
 	BFont black_9(be_plain_font);
-	black_9.SetSize(9.0);
+	black_9.SetSize(std::min(black_9.Size() * 0.75f, 9.0f));
 
-	BRect text_rect(rect);
-	text_rect.OffsetTo(B_ORIGIN);
-	
-	BTextView *enter_note = new BetterTextView(rect, NULL, text_rect, &black_9, &note, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW);
-	enter_note->SetViewColor(216, 216, 216, 255);
+	BTextView *enter_note = new BetterTextView(NULL, &black_9, &note, B_WILL_DRAW);
+	enter_note->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	enter_note->MakeEditable(false);
 	enter_note->MakeSelectable(false);
 	enter_note->SetAlignment(B_ALIGN_CENTER);
 	enter_note->SetWordWrap(true);
-	enter_note->SetText("Note: Jabber ID's are of the form username@server. Pick a fun username! If you don't know any servers, jabber.org is recommended.");
+	enter_note->SetText("Note: Jabber ID's are of the form username@server.\n"
+		"Pick a fun username! If you don't know any servers, jabber.org is recommended.");
 	
-	// login always hidden at start
-	_login_full_view->Hide();
-
+	BLayoutBuilder::Group<>(_login_full_view, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(_login_bulb)
+		.AddGrid()
+			.AddTextControl(_login_realname, 0, 0)
+			.AddTextControl(_login_username, 0, 1)
+			.AddTextControl(_login_password, 0, 2)
+		.End()
+		.Add(_ssl_box)
+		.AddGroup(B_HORIZONTAL)
+			.Add(_login_new_account)
+			.Add(_login_auto_login)
+		.End()
+		.Add(_login_login)
+		.Add(enter_note)
+	.End();
+	
 	// attach all-encompassing main view to window
+	BCardLayout* cl = new BCardLayout();
+	SetLayout(cl);
+	AddChild(_full_view);
 	AddChild(_login_full_view);
 
-	_login_full_view->AddChild(_login_bulb);
-	_login_full_view->AddChild(_login_realname);
-	_login_full_view->AddChild(_login_username);
-	_login_full_view->AddChild(_login_password);
-	//xeD
-	_login_full_view->AddChild(_ssl_box);
-	//
-	_login_full_view->AddChild(_login_new_account);
-	_login_full_view->AddChild(_login_auto_login);
-	_login_full_view->AddChild(_login_login);
-	_login_full_view->AddChild(enter_note);
-	
+	// login always hidden at start
+	cl->SetVisibleItem((int32)1);
+
 	// default
 	if(BlabberSettings::Instance()->Data("last-realname")) {
 		_login_realname->SetText(BlabberSettings::Instance()->Data("last-realname"));
@@ -1234,10 +1070,9 @@ void BlabberMainWindow::ShowLogin() {
 		_login_username->MakeFocus(true);
 	}
 
-	_full_view->Hide();
-	_full_view->Hide();
-	_login_full_view->Show();
-	_login_full_view->Show();
+	puts("SHOW LOGIN");
+	BCardLayout* cl = (BCardLayout*)GetLayout();
+	//cl->SetVisibleItem(1);
 }
 
 void BlabberMainWindow::SetCustomStatus(string status) {

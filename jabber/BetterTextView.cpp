@@ -6,12 +6,12 @@
 	#include "BetterTextView.h"
 #endif
 
-BetterTextView::BetterTextView(BRect frame, const char *name, BRect text_rect, uint32 resizing_mode, uint32 flags)
-	: BTextView(frame, name, text_rect, resizing_mode, flags) {
+BetterTextView::BetterTextView(const char *name, uint32 flags)
+	: BTextView(name, flags) {
 }
 
-BetterTextView::BetterTextView(BRect frame, const char *name, BRect text_rect, const BFont *font, const rgb_color *color, uint32 resizing_mode, uint32 flags)
-	: BTextView(frame, name, text_rect, font, color, resizing_mode, flags) {
+BetterTextView::BetterTextView(const char *name, const BFont *font, const rgb_color *color, uint32 flags)
+	: BTextView(name, font, color, flags) {
 }
 
 void BetterTextView::FrameResized(float width, float height) {
