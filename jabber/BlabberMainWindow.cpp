@@ -849,7 +849,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_login_full_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// graphics
-	_login_bulb = new PictureView(AppLocation::Instance()->AbsolutePath("resources/graphics/jabber-title.png").c_str());
+	_login_bulb = new PictureView("jabber-title");
 
 	// username/password controls
 	_login_realname = new BTextControl(NULL, "Nickname: ", NULL, NULL);

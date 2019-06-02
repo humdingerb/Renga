@@ -11,8 +11,8 @@ resource app_version {
 	variety = B_APPV_DEVELOPMENT,
 	internal = 0,
 
-	short_info = "Jabber for Haiku OS",
-	long_info = "XMPP Instant Messaging Client for Haiku OS."
+	short_info = "Jabber for Haiku",
+	long_info = "XMPP Instant Messaging Client for Haiku."
 };
 
 resource vector_icon {

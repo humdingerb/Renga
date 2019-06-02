@@ -11,7 +11,7 @@ PictureView::PictureView(const char *filename, uint32 flags)
 	SetViewColor(B_TRANSPARENT_COLOR);
 
 	// try to get the image
-	_bitmap = BTranslationUtils::GetBitmap(filename);
+	_bitmap = BTranslationUtils::GetBitmap('PiNG', filename);
 
 	if (_bitmap) {
 		BRect frame(_bitmap->Bounds());
