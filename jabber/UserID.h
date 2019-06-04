@@ -7,6 +7,8 @@
 #ifndef USER_ID_H
 #define USER_ID_H
 
+#include <gloox/gloox.h>
+
 #include <string>
 
 class UserID {
@@ -29,7 +31,7 @@ public:
 	      online_status  OnlineStatus() const;
 	const std::string    ExactOnlineStatus() const;
 	const std::string    MoreExactOnlineStatus() const;
-	const std::string    SubscriptionStatus() const;
+	gloox::SubscriptionType SubscriptionStatus() const;
 
 	bool                 HaveSubscriptionTo() const;
 	bool                 IsUser() const;
@@ -56,7 +58,7 @@ public:
 	void                 SetOnlineStatus(online_status status);
 	void                 SetExactOnlineStatus(std::string exact_status);
 	void                 SetMoreExactOnlineStatus(std::string exact_status);
-	void                 SetSubscriptionStatus(std::string status);
+	void                 SetSubscriptionStatus(gloox::SubscriptionType status);
 
 private:
 	void                 _ProcessHandle();
@@ -70,7 +72,7 @@ private:
 	online_status        _status;
 	std::string          _exact_status;
 	std::string          _more_exact_status;
-	std::string          _subscription_status;
+	gloox::SubscriptionType _subscription_status;
 
 	// split into pieces
 	user_type            _user_type;

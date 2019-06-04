@@ -6,47 +6,23 @@
 #ifndef JABBER_SPEAK_H
 #define JABBER_SPEAK_H
 
-#ifndef __MAP__
-	#include <map>
-#endif
+#include <gloox/connectionlistener.h>
+#include <gloox/rosterlistener.h>
 
-#ifndef __STRING__
-	#include <string>
-#endif
+#include <map>
+#include <string>
+#include <Looper.h>
+#include "Agent.h"
+#include "AgentList.h"
+#include "BlabberSettings.h"
+#include "PortTalker.h"
+#include "TalkWindow.h"
+#include "UserID.h"
+#include "XMLReader.h"
 
-#ifndef _LOOPER_H
-	#include <Looper.h>
-#endif
-
-#ifndef AGENT_H
-	#include "Agent.h"
-#endif
-
-#ifndef AGENT_LIST_H
-	#include "AgentList.h"
-#endif
-
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef PORT_TALKER_H
-	#include "PortTalker.h"
-#endif
-
-#ifndef TALK_WINDOW_H
-	#include "TalkWindow.h"
-#endif
-
-#ifndef USER_ID_H
-	#include "UserID.h"
-#endif
-
-#ifndef XML_READER_H
-	#include "XMLReader.h"
-#endif
-
-class JabberSpeak : public PortTalker, public BLooper, public XMLReader {
+class JabberSpeak : public PortTalker, public BLooper, public XMLReader,
+	public gloox::ConnectionListener, public gloox::RosterListener
+{
 public:
 	enum iq_intent {LOGIN, ROSTER, AGENTS, REGISTER, SEND_REGISTER, UNREGISTER, SEND_UNREGISTER, NEW_USER, MESSAGE, CHAT};
 
@@ -62,9 +38,6 @@ public:
 	void                     Reset(bool leave_network_alone = false);
 	void                     JabberSpeakReset();
  
-	static void              StaticCalledOnDisconnect(void *obj);
-	void                     CalledOnDisconnect();
-
 	void                     MessageReceived(BMessage *msg);
 
 	// OUTGOING COMMUNICATION
@@ -105,29 +78,43 @@ public:
 	
 	string					GetRealServer();
 	int						GetRealPort();
-	          
+
+	// GLOOX LISTENERS
+	void					onConnect() final;
+	void					onDisconnect(gloox::ConnectionError e) final;
+	bool					onTLSConnect(const gloox::CertInfo& info) final;
+
+	void 					handleItemAdded(const gloox::JID&) final;
+	void 					handleItemSubscribed(const gloox::JID&) final;
+	void 					handleItemRemoved(const gloox::JID&) final;
+	void 					handleItemUpdated(const gloox::JID&) final;
+	void 					handleItemUnsubscribed(const gloox::JID&) final;
+	void 					handleRoster(const gloox::Roster&) final;
+	void 					handleRosterPresence(const gloox::RosterItem&, const string&, gloox::Presence::PresenceType, const string&) final;
+	void 					handleSelfPresence(const gloox::RosterItem&, const string&, gloox::Presence::PresenceType, const string&) final;
+	bool 					handleSubscriptionRequest(const gloox::JID&, const string&) final;
+	bool 					handleUnsubscriptionRequest(const gloox::JID&, const string&) final;
+	void 					handleNonrosterPresence(const gloox::Presence&) final;
+	void 					handleRosterError(const gloox::IQ&) final;
+
 protected:
 	// CREATORS
 	                         JabberSpeak();
 	                    
 private:
-    static int32            _SpawnConnectionThread(void *obj);
-    void                    _ConnectionThread();
+	static int32            _SpawnConnectionThread(void *obj);
+	void                    _ConnectionThread();
 
 	// OUTGOING COMMUNICATION
-	void                    _SendAuthentication(string username, string password, string resource);
 	void					_ProcessVersionRequest(string req_id, string req_from);
 	void                    _SendAgentRequest();
-	void                    _SendRosterRequest();
 
 	// INCOMING COMMUNICATION
 	void                    _ProcessRegistration(XMLEntity *iq_register_entity);
 	void                    _ProcessUnregistration(XMLEntity *iq_register_entity);
 	void                    _SendTransportRegistrationInformation(Agent *agent, string key);
 	void                    _SendTransportUnregistrationInformation(Agent *agent, string key);
-	void                    _ParseRosterList(XMLEntity *iq_roster_entity);
-	void                    _ProcessPresence(XMLEntity *entity);
-	void                    _ProcessUserPresence(UserID *user, XMLEntity *entity);
+	void                    _ProcessUserPresence(UserID *user, const gloox::Presence::PresenceType, const std::string&);
 	void                    _ParseAgentList(XMLEntity *iq_agent_entity);
 	void                    _AcceptPresence(string username);
 	void                    _RejectPresence(string username);

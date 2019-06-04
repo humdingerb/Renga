@@ -2,65 +2,25 @@
 // Blabber [JabberSpeak.cpp]
 //////////////////////////////////////////////////
 
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
+#include <gloox/client.h>
+#include <gloox/jid.h>
+#include <gloox/rostermanager.h>
 
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
-
-#ifndef _ROSTER_H
-	#include <Roster.h>
-#endif
-
-#ifndef _UNI_STD_H
-	#include <unistd.h>
-#endif
-
-#ifndef _SYS_UTSNAME_H
-	#include <sys/utsname.h>
-#endif
-
-#ifndef BLABBER_APP_H
-	#include "BlabberApp.h"
-#endif
-
-#ifndef AGENT_LIST_H
-	#include "AgentList.h"
-#endif
-
-#ifndef GENERIC_FUNCTIONS_H
-	#include "GenericFunctions.h"
-#endif
-
-#ifndef JROSTER_H
-	#include "JRoster.h"
-#endif
-
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
-
-#ifndef MESSAGE_REPEATER_H
-	#include "MessageRepeater.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef TALK_MANAGER_H
-	#include "TalkManager.h"
-#endif
-
-#ifndef USER_ID_H
-	#include "UserID.h"
-#endif
-
-#ifndef XML_ENTITY_H
-	#include "XMLEntity.h"
-#endif
+#include "JabberSpeak.h"
+#include <cstdio>
+#include <Roster.h>
+#include <unistd.h>
+#include <sys/utsname.h>
+#include "BlabberApp.h"
+#include "AgentList.h"
+#include "GenericFunctions.h"
+#include "JRoster.h"
+#include "ModalAlertFactory.h"
+#include "MessageRepeater.h"
+#include "Messages.h"
+#include "TalkManager.h"
+#include "UserID.h"
+#include "XMLEntity.h"
 
 #include <stdlib.h>
 
@@ -87,9 +47,6 @@ JabberSpeak::JabberSpeak()
 	: PortTalker(), BLooper(), XMLReader() {
 	_registering_new_account = false;
 	
-	// base network
-	OnDisconnect(JabberSpeak::StaticCalledOnDisconnect, this);
-
 	// create semaphore
 	_xml_reader_lock = create_sem(1, "xml reader semaphore");
 
@@ -140,8 +97,6 @@ void JabberSpeak::Reset(bool leave_network_alone) {
 	
 	// reset agent list
 	AgentList::Instance()->RemoveAllAgents();
-
-	OnDisconnect(JabberSpeak::StaticCalledOnDisconnect, this);
 }
 
 void JabberSpeak::JabberSpeakReset() {
@@ -158,34 +113,6 @@ void JabberSpeak::JabberSpeakReset() {
 	_got_some_roster_info    = false;
 
 	_iq_map.clear();
-}
-
-void JabberSpeak::StaticCalledOnDisconnect(void *obj) {
-	// call member version
-	((JabberSpeak *)obj)->CalledOnDisconnect();
-}
-
-void JabberSpeak::CalledOnDisconnect() {
-	Disconnect();
-	
-	// reset XMLReader
-	XMLReader::Reset();
-
-	if (_am_logged_in) {
-		// automatic reconnection
-		_reconnecting = true;
-	
-		MessageRepeater::Instance()->PostMessage(JAB_RECONNECTING);
-
-		_got_some_agent_info     = false;
-		_got_some_roster_info    = false;
-		_am_logged_in            = false;
-
-		// reset networking
-		Reset(true);
-
-		SendConnect();
-	}
 }
 
 //////////////////////////////////////////////////
@@ -292,9 +219,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 		if (_registering_new_account) {
 			// create account
 			_SendUserRegistration(UserID(_curr_login).JabberUsername(), _password, UserID(_curr_login).JabberResource());
-		} else {
-			// log in
-			_SendAuthentication(UserID(_curr_login).JabberUsername(), _password, UserID(_curr_login).JabberResource());
 		}
 	}
 
@@ -317,11 +241,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 		}
 
 		return;
-	}
-
-	// handle presence
-	if (entity->IsCompleted() && !strcasecmp(entity->Name(), "presence")) {
-		_ProcessPresence(entity);
 	}
 
 	// handle messages
@@ -350,24 +269,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 			iq_id = entity->Attribute("id");
 		}
 		
-		// handle SETS only (change)
-		if (!strcasecmp(entity->Attribute("type"), "set")) {
-		// handle ERRORS only (failure)
-			// get the intent of the IQ message
-			if (_iq_map.count(iq_id) > 0) {
-				// process based on the intent
-				iq_intent intent = _iq_map[iq_id];
-
-				// for roster changes
-				if (intent == ROSTER) {
-					_ParseRosterList(entity);
-				}
-
-				// remove the item from the list of pending IQs
-				_iq_map.erase(iq_id);
-			}
-		}
-						
 		if (!strcasecmp(entity->Attribute("type"), "error")) {
 			// get the intent of the IQ message
 			if (_iq_map.count(iq_id) > 0) {
@@ -441,28 +342,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 			if (_iq_map.count(iq_id) > 0) {
 				// process based on the intent
 				iq_intent intent = _iq_map[iq_id];
-
-				// for successful registration				
-				if (intent == NEW_USER) {
-					// log in
-					_SendAuthentication(UserID(_curr_login).JabberUsername(), _password, UserID(_curr_login).JabberResource());
-				}
-
-				// for successful login				
-				if (intent == LOGIN) {
-					MessageRepeater::Instance()->PostMessage(JAB_LOGGED_IN);
-						_SendAgentRequest();
-						_SendRosterRequest();
-
-						_reconnecting = false;
-					
-					SendLastPresence();	
-				}
-
-				// for the roster list
-				if (intent == ROSTER) {
-					_ParseRosterList(entity);
-				}
 
 				// for the agents list
 				if (intent == AGENTS) {
@@ -681,192 +560,28 @@ void JabberSpeak::_SendTransportUnregistrationInformation(Agent *agent, string k
 	delete entity_iq;
 }
 
-void JabberSpeak::_ParseRosterList(XMLEntity *iq_roster_entity) {
-	XMLEntity *entity = iq_roster_entity;
-
-	// go one level deep to query
-	if (entity->Child("query")) {
-		entity = entity->Child("query");
-	} else {
-		return;
-	}
-	
-	// iterate through child 'item' tags
-	JRoster::Instance()->Lock();
-	for (int i=0; i<entity->CountChildren(); ++i) {
-		// handle the item child
-		if (!strcasecmp(entity->Child(i)->Name(), "item")) {
-			if (!entity->Child(i)->Attribute("jid")) {
-				continue;
-			}
-
-			// make a user
-			UserID user(entity->Child(i)->Attribute("jid"));
-
-			// no resources supported
-			if (user.JabberResource().size()) {
-				continue;
-			}
-
-			// set friendly name
-			if (entity->Child(i)->Attribute("name")) {
-				user.SetFriendlyName(entity->Child(i)->Attribute("name"));
-			}
-			
-			// set subscription status
-			if (entity->Child(i)->Attribute("subscription")) {
-				user.SetSubscriptionStatus(entity->Child(i)->Attribute("subscription"));
-			}
-
-			// set ask
-			if (entity->Child(i)->Attribute("ask")) {
-				user.SetAsk(entity->Child(i)->Attribute("ask"));
-			}
-
-			// obtain a handle to the user (is there a new one?)
-			UserID *roster_user;
-			
-			if (user.IsUser()) {
-				roster_user = JRoster::Instance()->FindUser(JRoster::HANDLE, user.JabberHandle());
-			} else if (user.UserType() == UserID::TRANSPORT) {
-				roster_user = JRoster::Instance()->FindUser(JRoster::TRANSPORT_ID, user.TransportID());
-			} else {
-				continue;
-			}
-
-			// if we have duplicates, settle disputes
-			if (roster_user) {
-				// process if it's a removal
-				if (entity->Child(i)->Attribute("subscription") && !strcasecmp(entity->Child(i)->Attribute("subscription"), "remove")) {
-					// remove from the list
-					JRoster::Instance()->RemoveUser(roster_user);
-
-					continue;
-				}
-
-				// update the new roster item
-				*roster_user = user;
-			} else {
-				// create the user
-				roster_user = new UserID(entity->Child(i)->Attribute("jid"));
-
-				*roster_user = user;
-
-				// add to the list
-				JRoster::Instance()->AddRosterUser(roster_user);
-			}
-		}
-	}
-
-	JRoster::Instance()->Unlock();	
-
-	// update all RosterViews
-	JRoster::Instance()->RefreshRoster();
-	
-	_got_some_roster_info = true;
-	
-	if (_got_some_agent_info && _got_some_roster_info) {
-		_am_logged_in = true;
-		MessageRepeater::Instance()->PostMessage(JAB_GOT_SERVER_INFO);
-	}
-}
-
-void JabberSpeak::_ProcessPresence(XMLEntity *entity) {
-	JRoster *roster = JRoster::Instance();
-
-	int num_matches = 0;
-
-	// verify we have a username
-	if (entity->Attribute("from")) {
-		roster->Lock();
-
-		// circumvent groupchat presences
-		string room, server, user;
-		
-		// split it all out
-		int tokens = GenericFunctions::SeparateGroupSpecifiers(entity->Attribute("from"), room, server, user);
-
-		if (tokens == 3 && !TalkManager::Instance()->IsExistingWindowToGroup(TalkWindow::GROUP, room + '@' + server).empty()) {
-			BMessage msg;
-				msg.AddString("room", (room + '@' + server).c_str());
-				msg.AddString("server", server.c_str());
-				msg.AddString("username", user.c_str());
-
-			if (!entity->Attribute("type") || !strcasecmp(entity->Attribute("type"), "available")) {
-				msg.what = JAB_GROUP_CHATTER_ONLINE;
-			} else if (!strcasecmp(entity->Attribute("type"), "unavailable")) {
-				msg.what = JAB_GROUP_CHATTER_OFFLINE;
-			}
-
-			MessageRepeater::Instance()->PostMessage(&msg);
-
-			roster->Unlock();
-			return;
-		}
-
-		for (JRoster::ConstRosterIter i = roster->BeginIterator(); i != roster->EndIterator(); ++i) {
-			UserID *user = NULL;
-
-			if ((*i)->IsUser() && !strcasecmp(UserID(entity->Attribute("from")).JabberHandle().c_str(), (*i)->JabberHandle().c_str())) {
-				// found another match
-				++num_matches;
-
-				user = *i;
-
-				_ProcessUserPresence(user, entity);
-			} else if ((*i)->UserType() == UserID::TRANSPORT && !strcasecmp(UserID(entity->Attribute("from")).TransportID().c_str(), (*i)->TransportID().c_str())) {
-				// found another match
-				++num_matches;
-
-				user = *i;
-				_ProcessUserPresence(user, entity);
-			}
-		}
-		
-		if (num_matches == 0) {
-			UserID user(entity->Attribute("from"));
-			
-			_ProcessUserPresence(&user, entity);
-		}
-			
-		roster->Unlock();
-
-		// update all RosterViews
-		JRoster::Instance()->RefreshRoster();				
-	}
-}
-
-void JabberSpeak::_ProcessUserPresence(UserID *user, XMLEntity *entity) {
-	char buffer[4096];
-
+void JabberSpeak::_ProcessUserPresence(UserID *user,
+	gloox::Presence::PresenceType type, const std::string& message) {
+#if 0
 	// get best asker name
 	const char *asker;
 					
 	if (user && user->FriendlyName().size() > 0) {
 		// they have a friendly name
 		asker = user->FriendlyName().c_str();
-	} else if (entity->Attribute("from")) {
+	} else {
 		// they have a JID
-		asker = entity->Attribute("from");
-	} else {
-		// they have no identity (illegal case)
-		asker = "<unknown>";
-	}
+		asker = entity.from().full();
+	}full
+#endif
 
-	// get presence
-	const char *availability = NULL;
-
-	if (entity->Attribute("type")) {
-		availability = entity->Attribute("type");
-	} else {
-		availability = "available";
-	}
-				
 	// reflect presence
-	if (user && !strcasecmp(availability, "unavailable")) {
+	if (user && type == gloox::Presence::Unavailable) {
 		user->SetOnlineStatus(UserID::OFFLINE);
-	} else if (user && !strcasecmp(availability, "available")) {
+	} else if (user && type == gloox::Presence::Available) {
 		user->SetOnlineStatus(UserID::ONLINE);
+#if 0
+	// FIXME we should rather implement RosterManager instead of doing this ourselves
 	} else if (!strcasecmp(availability, "unsubscribe")) {
 		sprintf(buffer, "%s no longer wishes to know your online status.", asker);
 		ModalAlertFactory::NonModalAlert(buffer, "I feel so unloved.");
@@ -903,16 +618,18 @@ void JabberSpeak::_ProcessUserPresence(UserID *user, XMLEntity *entity) {
 			// presence is denied
 			_RejectPresence(entity->Attribute("from"));
 		}
+#endif
 	}
 
-	if (user && (!strcasecmp(availability, "available") || !strcasecmp(availability, "unavailable"))) {
+	if (user && (type == gloox::Presence::Unavailable
+			|| type == gloox::Presence::Available)) {
+#if 0
 		if (entity->Child("show") && entity->Child("show")->Data()) {
 			user->SetExactOnlineStatus(entity->Child("show")->Data());
 		}
+#endif
 
-		if (entity->Child("status") && entity->Child("status")->Data()) {
-			user->SetMoreExactOnlineStatus(entity->Child("status")->Data());
-		}
+		user->SetMoreExactOnlineStatus(message);
 	}
 }
 
@@ -967,7 +684,6 @@ void JabberSpeak::_ParseAgentList(XMLEntity *iq_agent_entity) {
 
 	if (_got_some_agent_info && _got_some_roster_info) {
 		_am_logged_in = true;
-		MessageRepeater::Instance()->PostMessage(JAB_GOT_SERVER_INFO);
 	}	
 }
 
@@ -1068,12 +784,14 @@ void JabberSpeak::SendConnect(string username, string password, string realname,
 	resume_thread(_connection_thread_id = spawn_thread(JabberSpeak::_SpawnConnectionThread, "connection_listener", B_LOW_PRIORITY, this));
 }
 
+
 int32 JabberSpeak::_SpawnConnectionThread(void *obj) {
 	((JabberSpeak *)obj)->_ConnectionThread();
-	
+
 	// Don't care about the return value
 	return 1;
 }
+
 
 string					
 JabberSpeak::GetRealServer()
@@ -1097,45 +815,17 @@ JabberSpeak::GetRealPort()
 	return 5222; //default jabber port.
 }	
 
+
 void JabberSpeak::_ConnectionThread() {
-	// now we have the data, let's process this user request
-	XMLEntity *entity;
-	char **atts = CreateAttributeMemory(6);
-
-	// connect to the server
-	while (!IsConnected()) {
-		// try to establish connection
-		Connect(GetRealServer().c_str(), GetRealPort(), true, _ssl_enabled);
-
-		if (IsConnected()) {
-			break;
-		}
-		
-		// wait
-		snooze(200000);
-	}
-
-	strcpy(atts[0], "to");
-	strcpy(atts[1], UserID(_curr_login).JabberServer().c_str());
-	strcpy(atts[2], "xmlns");
-	strcpy(atts[3], "jabber:client");
-	strcpy(atts[4], "xmlns:stream");
-	strcpy(atts[5], "http://etherx.jabber.org/streams"); // HARDCODE
-	
-	// construct XML tagset
-	entity = new XMLEntity("stream:stream", (const char **)atts);
-
-	// send XML command
-	char *str = entity->StartToString();
-	SendFiltered(str);
-	free(str);
-
-	// broadcast
-	MessageRepeater::Instance()->PostMessage(JAB_CONNECTING);
-
-	DestroyAttributeMemory(atts, 6);
-	delete entity;
+	gloox::JID jid(_curr_login);
+	gloox::Client* client = new gloox::Client(jid, _password);
+	client->registerConnectionListener(this);
+	client->rosterManager()->registerRosterListener(this);
+	puts("connect");
+	client->connect();
+	puts("connect ok");
 }
+
 
 void JabberSpeak::SendDisconnect() {
 	XMLEntity *end_stream;
@@ -1547,46 +1237,6 @@ void JabberSpeak::UnregisterWithAgent(string agent) {
 	JRoster::Instance()->Unlock();
 }
 
-void JabberSpeak::_SendAuthentication(string username, string password, string resource) {
-	XMLEntity   *entity_iq, *entity_query;
-	char **atts_iq    = CreateAttributeMemory(4);
-	char **atts_query = CreateAttributeMemory(2);
-
-	// assemble attributes;
-	strcpy(atts_iq[0], "id");
-
-	strcpy(atts_iq[1], GenerateUniqueID().c_str());
-
-	strcpy(atts_iq[2], "type");
-	strcpy(atts_iq[3], "set");
-
-	strcpy(atts_query[0], "xmlns");
-	strcpy(atts_query[1], "jabber:iq:auth");
-
-	// construct XML tagset
-	entity_iq    = new XMLEntity("iq", (const char **)atts_iq);
-	entity_query = new XMLEntity("query", (const char **)atts_query);
-
-	entity_iq->AddChild(entity_query);
-	
-	entity_query->AddChild("username", NULL, username.c_str());
-	entity_query->AddChild("password", NULL, password.c_str());
-	entity_query->AddChild("resource", NULL, resource.c_str());
-
-	// log command
-	_iq_map[atts_iq[1]] = LOGIN;
-	
-	// send XML command
-	char *str = entity_iq->ToString();
-	SendFiltered(str);
-	free(str);
-
-	DestroyAttributeMemory(atts_iq, 4);
-	DestroyAttributeMemory(atts_query, 2);
-	
-	delete entity_iq;
-}
-
 void JabberSpeak::_ProcessVersionRequest(string req_id, string req_from) {
 	XMLEntity   *entity_iq, *entity_query;
 	char **atts_iq    = CreateAttributeMemory(6);
@@ -1689,34 +1339,240 @@ void JabberSpeak::_SendAgentRequest() {
 	delete entity_agent;
 }
 
-void JabberSpeak::_SendRosterRequest() {
-	XMLEntity   *entity_roster;
-	char **atts = CreateAttributeMemory(4);
-	char **atts_query = CreateAttributeMemory(2);
+void
+JabberSpeak::onConnect()
+{
+	MessageRepeater::Instance()->PostMessage(JAB_LOGGED_IN);
+	//_SendAgentRequest();
+	_reconnecting = false;
+	//SendLastPresence();	
+}
 
-	// assemble attributes
-	strcpy(atts[0], "type");
-	strcpy(atts[1], "get");
-
-	strcpy(atts[2], "id");
-	strcpy(atts[3], GenerateUniqueID().c_str());
-
-	strcpy(atts_query[0], "xmlns");
-	strcpy(atts_query[1], "jabber:iq:roster");
-
-	// send XML command
-	entity_roster = new XMLEntity("iq", (const char **)atts);
-	entity_roster->AddChild("query", (const char **)atts_query, NULL);
+void
+JabberSpeak::onDisconnect(__attribute__((unused)) gloox::ConnectionError e)
+{
+	puts("onDisconnect");
+	Disconnect();
 	
-	// log command
-	_iq_map[atts[3]] = ROSTER;
+	// reset XMLReader
+	XMLReader::Reset();
 
-	char *str = entity_roster->ToString();
-	SendFiltered(str);
-	free(str);
-
-	DestroyAttributeMemory(atts, 4);
-	DestroyAttributeMemory(atts_query, 2);
+	if (_am_logged_in) {
+		// automatic reconnection
+		_reconnecting = true;
 	
-	delete entity_roster;
+		MessageRepeater::Instance()->PostMessage(JAB_RECONNECTING);
+
+		_got_some_agent_info     = false;
+		_got_some_roster_info    = false;
+		_am_logged_in            = false;
+
+		// reset networking
+		Reset(true);
+
+		SendConnect();
+	}
+}
+
+bool
+JabberSpeak::onTLSConnect(__attribute__((unused)) const gloox::CertInfo& info)
+{
+	return true;
+}
+
+
+void
+JabberSpeak::handleItemAdded(const gloox::JID&)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
+}
+
+
+void
+JabberSpeak::handleItemSubscribed(const gloox::JID&)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
+}
+
+
+void
+JabberSpeak::handleItemRemoved(const gloox::JID&)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
+}
+
+
+void
+JabberSpeak::handleItemUpdated(const gloox::JID& jid)
+{
+	printf("%s(%s)\n", __PRETTY_FUNCTION__, jid.full().c_str());
+}
+
+
+void
+JabberSpeak::handleItemUnsubscribed(const gloox::JID&)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
+}
+
+
+void
+JabberSpeak::handleRoster(const gloox::Roster& roster)
+{
+	JRoster::Instance()->Lock();
+
+	for (auto item: roster) {
+		UserID user(item.first);
+		user.SetFriendlyName(item.second->name());
+		user.SetSubscriptionStatus(item.second->subscription());
+		// todo user.SetAsk(???)
+
+		// obtain a handle to the user (is there a new one?)
+		UserID *roster_user;
+			
+		if (user.IsUser()) {
+			roster_user = JRoster::Instance()->FindUser(JRoster::HANDLE, user.JabberHandle());
+		} else if (user.UserType() == UserID::TRANSPORT) {
+			roster_user = JRoster::Instance()->FindUser(JRoster::TRANSPORT_ID, user.TransportID());
+		} else {
+			continue;
+		}
+
+		// if we have duplicates, settle disputes
+		if (roster_user) {
+#if 0
+			// process if it's a removal
+			if (entity->Child(i)->Attribute("subscription") && !strcasecmp(entity->Child(i)->Attribute("subscription"), "remove")) {
+				// remove from the list
+				JRoster::Instance()->RemoveUser(roster_user);
+
+				continue;
+			}
+#endif
+
+			// update the new roster item
+			*roster_user = user;
+		} else {
+			// create the user
+			roster_user = new UserID(item.first);
+
+			*roster_user = user;
+
+			// add to the list
+			JRoster::Instance()->AddRosterUser(roster_user);
+		}
+	}
+
+	JRoster::Instance()->Unlock();	
+
+	// update all RosterViews
+	JRoster::Instance()->RefreshRoster();
+	
+	_got_some_roster_info = true;
+	
+	if (_got_some_agent_info && _got_some_roster_info) {
+		_am_logged_in = true;
+	}
+}
+
+
+void
+JabberSpeak::handleRosterPresence(const gloox::RosterItem& item,
+	const string& resource, gloox::Presence::PresenceType presenceType,
+	const string& message)
+{
+	JRoster *roster = JRoster::Instance();
+	int num_matches = 0;
+	const gloox::JID& jid = item.jidJID();
+
+	roster->Lock();
+
+	if (resource != "" && !TalkManager::Instance()->IsExistingWindowToGroup(
+		TalkWindow::GROUP, jid.bare()).empty())
+	{
+		BMessage msg;
+		msg.AddString("room", jid.bare().c_str());
+		msg.AddString("server", jid.server().c_str());
+		msg.AddString("username", jid.resource().c_str());
+
+		if (presenceType == gloox::Presence::Available) {
+			msg.what = JAB_GROUP_CHATTER_ONLINE;
+		} else if (presenceType == gloox::Presence::Unavailable) {
+			msg.what = JAB_GROUP_CHATTER_OFFLINE;
+		}
+		MessageRepeater::Instance()->PostMessage(&msg);
+		roster->Unlock();
+		return;
+	}
+	
+	for (JRoster::ConstRosterIter i = roster->BeginIterator();
+		i != roster->EndIterator(); ++i)
+	{
+		UserID *user = NULL;
+		if ((*i)->IsUser() && !strcasecmp(UserID(jid.full()).JabberHandle().c_str(),
+			(*i)->JabberHandle().c_str()))
+		{
+			// found another match
+			++num_matches;
+			user = *i;
+			_ProcessUserPresence(user, presenceType, message);
+		} else if ((*i)->UserType() == UserID::TRANSPORT
+			&& !strcasecmp(UserID(jid.full()).TransportID().c_str(),
+				(*i)->TransportID().c_str()))
+		{
+			// found another match
+			++num_matches;
+			user = *i;
+			_ProcessUserPresence(user, presenceType, message);
+		}
+	}
+	if (num_matches == 0) {
+#if 0
+		UserID user(jid.full());
+		ProcessUserPresence(&user, presence);
+#endif
+		puts("user not found");
+	}
+
+	roster->Unlock();
+
+	// update all RosterViews
+	JRoster::Instance()->RefreshRoster();				
+}
+
+
+void
+JabberSpeak::handleSelfPresence(const gloox::RosterItem&, const string&, gloox::Presence::PresenceType, const string&)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
+}
+
+
+bool
+JabberSpeak::handleSubscriptionRequest(const gloox::JID&, const string&)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
+	return false;
+}
+
+
+bool
+JabberSpeak::handleUnsubscriptionRequest(const gloox::JID&, const string&)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
+	return false;
+}
+
+
+void
+JabberSpeak::handleNonrosterPresence(const gloox::Presence&)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
+}
+
+
+void
+JabberSpeak::handleRosterError(const gloox::IQ&)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
 }

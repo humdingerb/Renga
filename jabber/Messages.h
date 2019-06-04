@@ -83,9 +83,7 @@
 
 // jabber
 #define JAB_CONNECT                     0x16000000
-#define JAB_CONNECTING                  0x16000001
 #define JAB_RECONNECTING                0x16000002
-#define JAB_GOT_SERVER_INFO             0x16000003
 #define JAB_RESET                       0x16001000
 #define JAB_DISCONNECT                  0x16002000
 #define JAB_DISCONNECTED                0x16003000

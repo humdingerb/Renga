@@ -90,8 +90,6 @@ BlabberMainWindow::~BlabberMainWindow() {
 }
 
 void BlabberMainWindow::MessageReceived(BMessage *msg) {
-	static bool reported_info = false;
-	
 	switch (msg->what) {
 		// channels
 		case JAB_A_CHANNEL: {
@@ -152,15 +150,6 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 
-		case JAB_CONNECTING: {
-			// we are connecting
-			// << ":" << JabberSpeak::Instance()->GetRealPort();
-			
-			//_status_view->SetMessage("contacting " + JabberSpeak::Instance()->GetRealServer() );
-
-			break;
-		}
-
 		case JAB_RECONNECTING: {
 			// we are connecting
 			_status_view->SetMessage("reconnecting");
@@ -168,17 +157,9 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 
-		case JAB_GOT_SERVER_INFO: {
-			if (!reported_info) {
-				_status_view->SetMessage("connected as " + JabberSpeak::Instance()->CurrentLogin());
-			}
-			
-			break;
-		}
-		
 		case JAB_LOGGED_IN: {
 			// we just logged in
-			_status_view->SetMessage("gathering agents, roster and presence info");
+			_status_view->SetMessage("connected as " + JabberSpeak::Instance()->CurrentLogin());
 
 			// save these settings
 			BlabberSettings::Instance()->SetData("last-realname", _login_realname->Text());

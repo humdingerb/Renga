@@ -63,7 +63,7 @@ add_executable(Jabber
 )
 
 target_link_libraries(Jabber
-	be crypto expat game network ssl tracker translation
+	be crypto expat game gloox network ssl tracker translation
 )
 
 add_custom_command(TARGET Jabber POST_BUILD 

@@ -26,7 +26,7 @@ UserID::UserID(std::string handle) {
 	SetOnlineStatus(UserID::UNKNOWN);
 	SetAsk("");
 	SetExactOnlineStatus("chat");
-	SetSubscriptionStatus("none");
+	SetSubscriptionStatus(gloox::S10nNone);
 }
 
 UserID::UserID(const UserID &copied_userid) {
@@ -97,12 +97,12 @@ const std::string UserID::MoreExactOnlineStatus() const {
 	}
 }
 
-const std::string UserID::SubscriptionStatus() const {
+gloox::SubscriptionType UserID::SubscriptionStatus() const {
 	return _subscription_status;
 }
 
 bool UserID::HaveSubscriptionTo() const {
-	return (SubscriptionStatus() == "to" || SubscriptionStatus() == "both");
+	return (SubscriptionStatus() == gloox::S10nTo || SubscriptionStatus() == gloox::S10nBoth);
 }
 
 bool UserID::IsUser() const {
@@ -273,13 +273,8 @@ void UserID::SetMoreExactOnlineStatus(std::string more_exact_status) {
 	_more_exact_status = more_exact_status;
 }
 
-void UserID::SetSubscriptionStatus(std::string status) {
-	// only set legal status
-	if (status == "none" || status == "to" || status == "from" || status == "both") {
-		_subscription_status = status;
-	} else {
-		return;
-	}
+void UserID::SetSubscriptionStatus(gloox::SubscriptionType status) {
+	_subscription_status = status;
 
 	// changing subscription may change status
 	if (!HaveSubscriptionTo()) {
