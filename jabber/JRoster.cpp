@@ -150,12 +150,14 @@ void JRoster::SetUserStatus(string username, UserID::online_status status) {
 	RefreshRoster();
 }
 
-const UserID::online_status JRoster::UserStatus(string username) {
+UserID::online_status JRoster::UserStatus(string username) {
 	UserID *user = FindUser(COMPLETE_HANDLE, username);
 	
 	if (user != NULL) {
 		return user->OnlineStatus();
 	}
+
+	return UserID::UNKNOWN;
 }
 
 JRoster::ConstRosterIter JRoster::BeginIterator() {

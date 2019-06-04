@@ -54,7 +54,7 @@ PortTalker::~PortTalker() {
 	_instance = NULL;
 }
 
-bool PortTalker::Connect(const char *hostname, const int port, bool keep_alive, bool useSSL) {
+bool PortTalker::Connect(const char *hostname, const int port, __attribute__((unused)) bool keep_alive, bool useSSL) {
 	// connect to socket
 
 	//safety: if there is already a _plug defined, we delete it first.

@@ -1318,7 +1318,7 @@ void JabberSpeak::SendMessage(const TalkWindow::talk_type type, const UserID *us
 	delete entity;
 }
 
-void JabberSpeak::SendMessage(const TalkWindow::talk_type type, string group_room, string message) {
+void JabberSpeak::SendMessage(__attribute__((unused)) const TalkWindow::talk_type type, string group_room, string message) {
 	XMLEntity   *entity;
 	char **atts = CreateAttributeMemory(4);
 

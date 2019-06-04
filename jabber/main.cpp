@@ -10,7 +10,7 @@
 	#include "BlabberApp.h"
 #endif
 
-int main(int argc, char **argv) {
+int main(__attribute__((unused)) int argc, char **argv) {
 	// record app location
 	AppLocation::Instance()->SetExecutableCall(argv[0]);
 	

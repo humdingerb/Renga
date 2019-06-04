@@ -42,7 +42,7 @@ public:
 	bool                         ExistingUserObject(const UserID *comparing_user);
 
 	void                         SetUserStatus(std::string username, UserID::online_status status);
-	const UserID::online_status  UserStatus(std::string username);
+	UserID::online_status        UserStatus(std::string username);
 
 	ConstRosterIter              BeginIterator();
 	ConstRosterIter              EndIterator();

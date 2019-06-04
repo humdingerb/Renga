@@ -111,7 +111,7 @@ void XMLReader::_OnStartTag(const char *name, const char **atts) {
 	OnStartTag(_curr_entity);
 }
 
-void XMLReader::_OnEndTag(const char *name) {
+void XMLReader::_OnEndTag(__attribute__((unused)) const char *name) {
 	// Add existing character data to entity
 	if (_curr_character_data.size() > 0)
 		_curr_entity->SetCharacterData(_curr_character_data.c_str());

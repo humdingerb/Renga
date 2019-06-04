@@ -71,7 +71,7 @@ void SplitPane::AttachedToWindow(){
 /*******************************************************
 *   If we are being resized. Fix the stuff we need to fix
 *******************************************************/
-void SplitPane::FrameResized(float width, float height){
+void SplitPane::FrameResized(__attribute__((unused)) float width, __attribute__((unused)) float height){
    SetBarPosition(((align == B_VERTICAL) ? Bounds().Width() : Bounds().Height()) - last_pos);
 
    Update();
@@ -81,7 +81,7 @@ void SplitPane::FrameResized(float width, float height){
 /*******************************************************
 *   The main draw stuff here. basicly just the slider
 *******************************************************/
-void SplitPane::Draw(BRect f){
+void SplitPane::Draw(__attribute__((unused)) BRect f){
    SetHighColor(160,160,160);
 
    if(align == B_VERTICAL){
@@ -258,7 +258,7 @@ void SplitPane::MouseDown(BPoint where){
 *   If we unclick then stop dragging or whatever it is 
 *   we are doing
 *******************************************************/
-void SplitPane::MouseUp(BPoint where){
+void SplitPane::MouseUp(__attribute__((unused)) BPoint where){
    Draggin = false; // stop following mouse
 }
 
@@ -266,7 +266,9 @@ void SplitPane::MouseUp(BPoint where){
 *   If the mouse moves while we dragg. Then follow it
 *   Also Invalidate so we update the views
 *******************************************************/
-void SplitPane::MouseMoved(BPoint where,uint32 info,const BMessage *m){
+void SplitPane::MouseMoved(BPoint where, __attribute__((unused)) uint32 info,
+		__attribute__((unused)) const BMessage *m)
+{
    if(Draggin){
       switch(align){
       case B_HORIZONTAL:
@@ -450,14 +452,6 @@ bool SplitPane::IsViewOneDetachable(){
 *******************************************************/
 bool SplitPane::IsViewTwoDetachable(){
    return VTwoDetachable;
-}
-
-/*******************************************************
-*   Tells the view if the user is alowed to open the 
-*   configuration window for the slider.
-*******************************************************/
-void SplitPane::SetEditable(bool b){
-   //ADD CODE HERE YNOP
 }
 
 /*******************************************************

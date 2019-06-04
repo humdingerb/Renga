@@ -85,7 +85,7 @@ RosterItem::RosterItem(const UserID *userid)
 RosterItem::~RosterItem() {
 }
 
-void RosterItem::DrawItem(BView *owner, BRect frame, bool complete) {
+void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete) {
 	// protection
 	if (StalePointer()) {
 		return;

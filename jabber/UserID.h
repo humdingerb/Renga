@@ -21,12 +21,12 @@ public:
 
 	UserID              &operator=(const UserID &rhs);
 
-	const user_type      UserType() const;
+	      user_type      UserType() const;
 	const std::string    Handle() const;
 	const std::string    FriendlyName() const;
 
 	const std::string    Ask() const;
-	const online_status  OnlineStatus() const;
+	      online_status  OnlineStatus() const;
 	const std::string    ExactOnlineStatus() const;
 	const std::string    MoreExactOnlineStatus() const;
 	const std::string    SubscriptionStatus() const;

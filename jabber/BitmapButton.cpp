@@ -24,7 +24,7 @@ BitmapButton::~BitmapButton() {
 	delete _disabled_state;
 }
 
-void BitmapButton::Draw(BRect update_frame) {
+void BitmapButton::Draw(__attribute__((unused)) BRect update_frame) {
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 

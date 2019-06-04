@@ -53,7 +53,7 @@ UserID &UserID::operator=(const UserID &rhs) {
 	return *this;
 }
 
-const UserID::user_type UserID::UserType() const {
+UserID::user_type UserID::UserType() const {
 	return _user_type;
 }
 
@@ -69,7 +69,7 @@ const std::string UserID::Ask() const {
 	return _ask;
 }
 
-const UserID::online_status UserID::OnlineStatus() const {
+UserID::online_status UserID::OnlineStatus() const {
 	if (_status == UNKNOWN && Ask() == "subscribe") {
 		return UNACCEPTED;
 	} else {

@@ -23,7 +23,7 @@ RotateChatFilter::RotateChatFilter(TalkWindow *window)
 	_window = window;
 }
 
-filter_result RotateChatFilter::Filter(BMessage *message, BHandler **target) {
+filter_result RotateChatFilter::Filter(BMessage *message, __attribute__((unused)) BHandler **target) {
 	int8 byte;
 	message->FindInt8("byte", &byte);
 

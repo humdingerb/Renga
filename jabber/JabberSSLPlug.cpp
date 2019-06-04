@@ -29,9 +29,9 @@ JabberSSLPlug::~JabberSSLPlug()
 {
 	if (bio)
 		BIO_free_all(bio);
-    
-    if (ctx)
-    	SSL_CTX_free(ctx);
+
+	if (ctx)
+		SSL_CTX_free(ctx);
 
 	bio = NULL;
 	ctx = NULL;

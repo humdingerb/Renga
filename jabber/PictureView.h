@@ -16,8 +16,6 @@ public:
 	
 private:
 	BBitmap *_bitmap;
-	float    _width;
-	float    _height;
 };
 
 #endif

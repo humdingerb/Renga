@@ -28,7 +28,7 @@ EditingFilter::EditingFilter(BTextView *view, TalkWindow *window)
 	_window = window;
 }
 
-filter_result EditingFilter::Filter(BMessage *message, BHandler **target) {
+filter_result EditingFilter::Filter(BMessage *message, __attribute__((unused)) BHandler **target) {
 	int32 modifiers;
 
 	int8 byte;

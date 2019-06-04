@@ -60,7 +60,6 @@ public:
 
 	void                AttachedToWindow();
 	RosterItem         *CurrentItemSelection();
-	void                KeyDown(const char *bytes, int32 len);
 	void                MouseDown(BPoint point);
 	void                RemoveSelected();
 	void                SelectionChanged();

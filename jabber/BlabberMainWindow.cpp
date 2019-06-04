@@ -120,7 +120,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			// switch out views
 			_login_login->MakeDefault(false);
 			BCardLayout* cl = (BCardLayout*)GetLayout();
-			//cl->SetVisibleItem((int32)0);
+			cl->SetVisibleItem((int32)0);
 
 			// connect with current username or register new account
 			JabberSpeak::Instance()->SendConnect(_login_username->Text(), _login_password->Text(), _login_realname->Text(), _ssl_enabled->Value(), _ssl_server->Text(), atoi(_ssl_port->Text()), _login_new_account->Value());
@@ -362,6 +362,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				break;
 			}
 		}
+		__attribute__ ((fallthrough));
 		
 		case JAB_OPEN_CHAT: {
 			// if there's a current selection, begin chat with that user
@@ -928,7 +929,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	AddChild(_login_full_view);
 
 	// login always hidden at start
-	cl->SetVisibleItem((int32)1);
+	cl->SetVisibleItem((int32)0);
 
 	// default
 	if(BlabberSettings::Instance()->Data("last-realname")) {
@@ -1070,9 +1071,8 @@ void BlabberMainWindow::ShowLogin() {
 		_login_username->MakeFocus(true);
 	}
 
-	puts("SHOW LOGIN");
 	BCardLayout* cl = (BCardLayout*)GetLayout();
-	//cl->SetVisibleItem(1);
+	cl->SetVisibleItem(1);
 }
 
 void BlabberMainWindow::SetCustomStatus(string status) {

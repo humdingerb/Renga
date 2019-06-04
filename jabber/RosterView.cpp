@@ -140,9 +140,6 @@ RosterItem *RosterView::CurrentItemSelection() {
 	}
 }
 
-void RosterView::KeyDown(const char *bytes, int32 len) {
-}
-
 void RosterView::MouseDown(BPoint point) {
 	// accept first click
 	Window()->Activate(true);
@@ -206,7 +203,7 @@ void RosterView::LinkTransport(const UserID *added_transport) {
 
 void RosterView::UnlinkUser(const UserID *removed_user) {
 	// does user exist
-	uint32 index = FindUser(removed_user);
+	int32 index = FindUser(removed_user);
 	
 	if (index >= 0) {
 		RemoveItem(index);	
@@ -215,7 +212,7 @@ void RosterView::UnlinkUser(const UserID *removed_user) {
 
 void RosterView::UnlinkTransport(const UserID *removed_transport) {
 	// does transport exist
-	uint32 index = FindTransport(removed_transport);
+	int32 index = FindTransport(removed_transport);
 	
 	if (index >= 0) {
 		RemoveItem(index);	

@@ -20,8 +20,6 @@ StatusView::~StatusView() {
 
 void StatusView::AttachedToWindow() {
 	// resize to connect to bottom of parent
-	BRect rect = Parent()->Bounds();
-
 	GetFontHeight(&_fh);
 
 	_height = _fh.ascent + _fh.descent + 1.0;
@@ -31,7 +29,7 @@ void StatusView::AttachedToWindow() {
 	SetExplicitSize(BSize(B_SIZE_UNSET, _height));
 }
 
-void StatusView::Draw(BRect rect) {
+void StatusView::Draw(__attribute__((unused)) BRect rect) {
 	// draw indent
 	SetHighColor(152, 152, 152, 255);
 	StrokeLine(BPoint(0.0, 0.0), BPoint(Bounds().Width(), 0.0));
@@ -55,6 +53,6 @@ const std::string StatusView::Message() const {
 	return _current_message;
 }
 
-const float StatusView::GetHeight() const {
+float StatusView::GetHeight() const {
 	return _height;
 }

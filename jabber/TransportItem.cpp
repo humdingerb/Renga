@@ -58,7 +58,7 @@ TransportItem::TransportItem(const UserID *userid)
 TransportItem::~TransportItem() {
 }
 
-void TransportItem::DrawItem(BView *owner, BRect frame, bool complete) {
+void TransportItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete) {
 	// protection
 	if (StalePointer()) {
 		return;

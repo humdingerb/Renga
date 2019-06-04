@@ -22,8 +22,8 @@ class XMLReader {
 		void                  Reset();
 		void			      FeedData(const char *data, int len); 
 
-		virtual void		  OnStartTag(XMLEntity *entity) {};
-		virtual void		  OnEndTag(XMLEntity *entity) {};
+		virtual void		  OnStartTag(__attribute__((unused)) XMLEntity *entity) {};
+		virtual void		  OnEndTag(__attribute__((unused)) XMLEntity *entity) {};
 		virtual void		  OnEndEntity(XMLEntity *entity) { delete entity; }
 
 	protected:

@@ -4,8 +4,8 @@
 PictureView::PictureView(const char *filename, uint32 flags)
 	: BView(NULL, flags) {
 	_bitmap = NULL;
-	_width  = 0.0;
-	_height = 0.0;
+	float width  = 0.0f;
+	float height = 0.0f;
 
 	// transparency
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -16,14 +16,14 @@ PictureView::PictureView(const char *filename, uint32 flags)
 	if (_bitmap) {
 		BRect frame(_bitmap->Bounds());
 
-		_width  = frame.Width();
-		_height = frame.Height();
+		width  = frame.Width();
+		height = frame.Height();
 	} else {
 		return;
 	}
 	
 	// finally, now that we know our filesize
-	ResizeTo(_width, _height);
+	SetExplicitSize(BSize(width, height));
 }
 
 PictureView::~PictureView() {
@@ -33,7 +33,7 @@ PictureView::~PictureView() {
 void PictureView::AttachedToWindow() {
 }
 
-void PictureView::Draw(BRect frame) {
+void PictureView::Draw(__attribute__((unused)) BRect frame) {
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 

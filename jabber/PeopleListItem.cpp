@@ -27,7 +27,7 @@ PeopleListItem::PeopleListItem(std::string whoami, std::string user)
 PeopleListItem::~PeopleListItem() {
 }
 
-void PeopleListItem::DrawItem(BView *owner, BRect frame, bool complete) {
+void PeopleListItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete) {
 	// text characteristics
 	owner->SetFont(be_plain_font);
 	owner->SetFontSize(11.0);

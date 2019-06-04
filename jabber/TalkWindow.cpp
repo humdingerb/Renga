@@ -1593,7 +1593,7 @@ int TalkWindow::CountHyperlinks(string message) {
 	find2 = message.find("www.", curr_pos);
 	if (find2 != string::npos && (link_start == string::npos || find2 < link_start)) {
 		// ignore if it's not at the beginning or has no whitespace
-		if ((find2 - 1) >= 0 && isalnum(message[find2 - 1])) {
+		if (find2 > 0 && isalnum(message[find2 - 1])) {
 			// do nothing
  		} else if (isspace(message[find2 + 4]) || message[find2 + 4] == '.') {
 			// do nothing
@@ -1605,7 +1605,7 @@ int TalkWindow::CountHyperlinks(string message) {
 	find3 = message.find("ftp.", curr_pos);
 	if (find3 != string::npos && (link_start == string::npos || find3 < link_start)) {
 		// ignore if it's not at the beginning or has no whitespace
-		if ((find3 - 1) >= 0 && isalnum(message[find3 - 1])) {
+		if (find3 > 0 && isalnum(message[find3 - 1])) {
 			// do nothing
  		} else if (isspace(message[find3 + 4]) || message[find3 + 4] == '.') {
 			// do nothing
@@ -1648,7 +1648,7 @@ int TalkWindow::CountHyperlinks(string message) {
 		find2 = message.find("www.", curr_pos);
 		if (find2 != string::npos && (link_start == string::npos || find2 < link_start)) {
 			// ignore if it's not at the beginning or has no whitespace
-			if ((find2 - 1) >= 0 && isalnum(message[find2 - 1])) {
+			if (find2 > 0 && isalnum(message[find2 - 1])) {
 				// do nothing
 	 		} else if (isspace(message[find2 + 4]) || message[find2 + 4] == '.') {
 				// do nothing
@@ -1660,7 +1660,7 @@ int TalkWindow::CountHyperlinks(string message) {
 		find3 = message.find("ftp.", curr_pos);
 		if (find3 != string::npos && (link_start == string::npos || find3 < link_start)) {
 			// ignore if it's not at the beginning or has no whitespace
-			if ((find3 - 1) >= 0 && isalnum(message[find3 - 1])) {
+			if (find3 > 0 && isalnum(message[find3 - 1])) {
 				// do nothing
 	 		} else if (isspace(message[find3 + 4]) || message[find3 + 4] == '.') {
 				// do nothing
@@ -1706,7 +1706,7 @@ void TalkWindow::GenerateHyperlinkText(string message, text_run standard, text_r
 	find2 = message.find("www.", curr_pos);
 	if (find2 != string::npos && (link_start == string::npos || find2 < link_start)) {
 		// ignore if it's not at the beginning or has no whitespace
-		if ((find2 - 1) >= 0 && isalnum(message[find2 - 1])) {
+		if (find2 > 0 && isalnum(message[find2 - 1])) {
 			// do nothing
  		} else if (isspace(message[find2 + 4]) || message[find2 + 4] == '.') {
 			// do nothing
@@ -1718,7 +1718,7 @@ void TalkWindow::GenerateHyperlinkText(string message, text_run standard, text_r
 	find3 = message.find("ftp.", curr_pos);
 	if (find3 != string::npos && (link_start == string::npos || find3 < link_start)) {
 		// ignore if it's not at the beginning or has no whitespace
-		if ((find3 - 1) >= 0 && isalnum(message[find3 - 1])) {
+		if (find3 > 0 && isalnum(message[find3 - 1])) {
 			// do nothing
  		} else if (isspace(message[find3 + 4]) || message[find3 + 4] == '.') {
 			// do nothing
@@ -1775,7 +1775,7 @@ void TalkWindow::GenerateHyperlinkText(string message, text_run standard, text_r
 		find2 = message.find("www.", curr_pos);
 		if (find2 != string::npos && (link_start == string::npos || find2 < link_start)) {
 			// ignore if it's not at the beginning or has no whitespace
-			if ((find2 - 1) >= 0 && isalnum(message[find2 - 1])) {
+			if (find2 > 0 && isalnum(message[find2 - 1])) {
 				// do nothing
 	 		} else if (isspace(message[find2 + 4]) || message[find2 + 4] == '.') {
 				// do nothing
@@ -1787,7 +1787,7 @@ void TalkWindow::GenerateHyperlinkText(string message, text_run standard, text_r
 		find3 = message.find("ftp.", curr_pos);
 		if (find3 != string::npos && (link_start == string::npos || find3 < link_start)) {
 			// ignore if it's not at the beginning or has no whitespace
-			if ((find3 - 1) >= 0 && isalnum(message[find3 - 1])) {
+			if (find3 > 0 && isalnum(message[find3 - 1])) {
 				// do nothing
 	 		} else if (isspace(message[find3 + 4]) || message[find3 + 4] == '.') {
 				// do nothing
@@ -1874,7 +1874,7 @@ void TalkWindow::RemoveGroupChatter(string username) {
 
 void TalkWindow::RevealPreviousHistory() {
 	// boundary
-	if (_chat_index == 49 || _chat_index == (_chat_history.size() - 1)) {
+	if (_chat_index == 49 || _chat_index == ((int)_chat_history.size() - 1)) {
 		return;
 	}
 

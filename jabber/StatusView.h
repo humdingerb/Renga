@@ -20,7 +20,7 @@ public:
 	void				SetMessage(std::string message);
 	const std::string	Message() const;
 
-	const float			GetHeight() const;
+	float				GetHeight() const;
 
 private:
 	std::string		_current_message;

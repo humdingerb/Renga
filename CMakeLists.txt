@@ -4,8 +4,7 @@ cmake_minimum_required (VERSION 2.8)
 project(Jabber)
 
 add_definitions('-g')
-add_definitions('-Wall')
-add_definitions('-Wno-multichar')
+add_definitions('-Wall' '-Wextra' '-Werror' '-Wno-multichar')
 #add_definitions('-std=c++11')
 
 include_directories(shared/split-pane)
