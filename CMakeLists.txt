@@ -72,6 +72,14 @@ add_custom_command(TARGET Jabber POST_BUILD
 		-a PiNG:1:jabber-title ${CMAKE_SOURCE_DIR}/resources/graphics/jabber-title.png
 		-a PiNG:2:bulb-normal  ${CMAKE_SOURCE_DIR}/resources/graphics/bulb-normal.png
 		-a PiNG:3:bulb-big     ${CMAKE_SOURCE_DIR}/resources/graphics/bulb-big.png
+		-a PiNG:4:away-online  ${CMAKE_SOURCE_DIR}/resources/icons/away-online.png
+		-a PiNG:5:online       ${CMAKE_SOURCE_DIR}/resources/icons/online.png
+		-a PiNG:6:offline      ${CMAKE_SOURCE_DIR}/resources/icons/offline.png
+		-a PiNG:7:unknown      ${CMAKE_SOURCE_DIR}/resources/icons/unknown.png
+		-a PiNG:8:aol          ${CMAKE_SOURCE_DIR}/resources/icons/aol.png
+		-a PiNG:9:icq          ${CMAKE_SOURCE_DIR}/resources/icons/icq.png
+		-a PiNG:10:yahoo       ${CMAKE_SOURCE_DIR}/resources/icons/yahoo.png
+		-a PiNG:11:msn         ${CMAKE_SOURCE_DIR}/resources/icons/msn.png
 	COMMAND mimeset -f ${CMAKE_BINARY_DIR}/Jabber
 	DEPENDS jabber/Resource.rdef
 )

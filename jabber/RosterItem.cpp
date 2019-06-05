@@ -30,55 +30,14 @@ RosterItem::RosterItem(const UserID *userid)
 
 	// intitialize static members
 	if (_offline_icon == NULL) {
-		std::string graphic;
-
-		// generate path for home icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/away-online.png");
-
-		// load graphic
-		_kinda_online_icon = BTranslationUtils::GetBitmap(graphic.c_str());
-
-		// generate path for home icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/online.png");
-
-		// load graphic
-		_online_icon = BTranslationUtils::GetBitmap(graphic.c_str());
-
-		// generate path for away icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/offline.png");
-
-		// load graphic
-		_offline_icon = BTranslationUtils::GetBitmap(graphic.c_str());
-
-		// generate path for away icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/unknown.png");
-
-		// load graphic
-		_unknown_icon = BTranslationUtils::GetBitmap(graphic.c_str());
-
-		// generate path for AOL icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/aol.png");
-
-		// load graphic
-		_aol_icon = BTranslationUtils::GetBitmap(graphic.c_str());
-
-		// generate path for ICQ icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/icq.png");
-
-		// load graphic
-		_icq_icon = BTranslationUtils::GetBitmap(graphic.c_str());
-
-		// generate path for Yahoo! icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/yahoo.png");
-
-		// load graphic
-		_yahoo_icon = BTranslationUtils::GetBitmap(graphic.c_str());
-
-		// generate path for MSN icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/msn.png");
-
-		// load graphic
-		_msn_icon = BTranslationUtils::GetBitmap(graphic.c_str());
+		_kinda_online_icon = BTranslationUtils::GetBitmap('PiNG', "away-online");
+		_online_icon = BTranslationUtils::GetBitmap('PiNG', "online");
+		_offline_icon = BTranslationUtils::GetBitmap('PiNG', "offline");
+		_unknown_icon = BTranslationUtils::GetBitmap('PiNG', "unknown");
+		_aol_icon = BTranslationUtils::GetBitmap('PiNG', "aol");
+		_icq_icon = BTranslationUtils::GetBitmap('PiNG', "icq");
+		_yahoo_icon = BTranslationUtils::GetBitmap('PiNG', "yahoo");
+		_msn_icon = BTranslationUtils::GetBitmap('PiNG', "msn");
 	}
 }
 

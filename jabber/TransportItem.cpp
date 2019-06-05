@@ -33,25 +33,9 @@ TransportItem::TransportItem(const UserID *userid)
 
 	// intitialize static members
 	if (_offline_icon == NULL) {
-		std::string graphic;
-
-		// generate path for home icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/online.png");
-
-		// load graphic
-		_online_icon = BTranslationUtils::GetBitmap(graphic.c_str());
-
-		// generate path for away icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/offline.png");
-
-		// load graphic
-		_offline_icon = BTranslationUtils::GetBitmap(graphic.c_str());
-
-		// generate path for away icon
-		graphic = AppLocation::Instance()->AbsolutePath("resources/icons/unknown.png");
-
-		// load graphic
-		_unknown_icon = BTranslationUtils::GetBitmap(graphic.c_str());
+		_online_icon = BTranslationUtils::GetBitmap('PiNG', "online");
+		_offline_icon = BTranslationUtils::GetBitmap('PiNG', "offline");
+		_unknown_icon = BTranslationUtils::GetBitmap('PiNG', "unknown");
 	}
 }
 
