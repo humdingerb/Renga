@@ -48,9 +48,6 @@ BlabberApp::BlabberApp()
 	// display opening window
 	BlabberMainWindow::Instance()->Show();
 
-	// start up the network queue
-	JabberSpeak::Instance()->Run();
-
 	// launch initial login process
 	JabberSpeak::Instance()->SendConnect();
 }
@@ -61,10 +58,8 @@ BlabberApp::~BlabberApp() {
 	MessageRepeater::Instance()->Quit();
 
 	// take down the network queue
-	JabberSpeak::Instance()->Lock();
-	JabberSpeak::Instance()->Quit();
+	delete JabberSpeak::Instance();
 	
 	// clean up the settings module
 	delete BlabberSettings::Instance();
-	
 }

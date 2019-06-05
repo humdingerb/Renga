@@ -46,15 +46,10 @@ add_executable(Jabber
 	 jabber/JRoster.cpp
 	 jabber/SoundSystem.cpp
 	 jabber/GenericFunctions.cpp
-	 jabber/BitmapButton.cpp
 	 jabber/FileItem.cpp
 	 jabber/StatusView.cpp
 	 jabber/PictureView.cpp
 	 jabber/MessageRepeater.cpp
-	 jabber/KeepAlive.cpp
-	 jabber/PortTalker.cpp
-	 jabber/JabberSSLPlug.cpp
-	 jabber/JabberSocketPlug.cpp
 	 jabber/FileXMLReader.cpp
 	 jabber/AppLocation.cpp
 	 shared/split-pane/SplitPane.cpp
@@ -63,7 +58,7 @@ add_executable(Jabber
 )
 
 target_link_libraries(Jabber
-	be crypto expat game gloox network ssl tracker translation
+	be expat game gloox tracker translation
 )
 
 add_custom_command(TARGET Jabber POST_BUILD 

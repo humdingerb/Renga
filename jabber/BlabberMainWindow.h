@@ -36,10 +36,6 @@
 	#include <interface/Window.h>
 #endif
 
-#ifndef BITMAP_BUTTON_H
-	#include "BitmapButton.h"
-#endif
-
 #ifndef PICTURE_VIEW_H
 	#include "PictureView.h"
 #endif
@@ -145,8 +141,6 @@ private:
 
 	RosterView               *_roster;
 	BScrollView              *_roster_scroller;
-	
-	BitmapButton             *_add_buddy, *_remove_buddy, *_send_chat, *_send_message;
 };
 
 #endif

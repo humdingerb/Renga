@@ -15,12 +15,11 @@
 #include "Agent.h"
 #include "AgentList.h"
 #include "BlabberSettings.h"
-#include "PortTalker.h"
 #include "TalkWindow.h"
 #include "UserID.h"
 #include "XMLReader.h"
 
-class JabberSpeak : public PortTalker, public BLooper, public XMLReader,
+class JabberSpeak : public XMLReader,
 	public gloox::ConnectionListener, public gloox::RosterListener
 {
 public:
@@ -35,11 +34,9 @@ public:
 	static JabberSpeak      *Instance();
 	                        ~JabberSpeak();
 
-	void                     Reset(bool leave_network_alone = false);
+	void                     Reset();
 	void                     JabberSpeakReset();
  
-	void                     MessageReceived(BMessage *msg);
-
 	// OUTGOING COMMUNICATION
 	char                   **CreateAttributeMemory(int num_items);
 	void                     DestroyAttributeMemory(char **atts, int num_items);
@@ -107,7 +104,6 @@ private:
 
 	// OUTGOING COMMUNICATION
 	void					_ProcessVersionRequest(string req_id, string req_from);
-	void                    _SendAgentRequest();
 
 	// INCOMING COMMUNICATION
 	void                    _ProcessRegistration(XMLEntity *iq_register_entity);

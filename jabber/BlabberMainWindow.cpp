@@ -175,8 +175,6 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 		
 		case JAB_DISCONNECT: {
-			JabberSpeak::Instance()->OnDisconnect(NULL, NULL);
-
 			JabberSpeak::Instance()->SendDisconnect();
 			_status_view->SetMessage("disconnecting");
 			JabberSpeak::Instance()->Reset();
@@ -564,22 +562,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 		
-		case PortTalker::RESOLVING_HOSTNAME: {
-			char buffer[1024];
-			
-			sprintf(buffer, "resolving hostname %s", msg->FindString("hostname"));
-			_status_view->SetMessage(buffer);
-			break;
-		}		
-
-		case PortTalker::CONNECTING_TO_HOST: {
-			char buffer[1024];
-			
-			sprintf(buffer, "connecting to host %s", msg->FindString("hostname"));
-			_status_view->SetMessage(buffer);
-			break;
-		}		
-
+#if 0
 		case PortTalker::COULD_NOT_RESOLVE_HOSTNAME: {
 			char buffer[1024];
 			
@@ -591,6 +574,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			
 			break;
 		}
+#endif
 
 		case JAB_ROTATE_CHAT_FORWARD: {
 			TalkManager::Instance()->RotateToNextWindow(NULL, TalkManager::ROTATE_FORWARD);

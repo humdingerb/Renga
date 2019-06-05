@@ -44,42 +44,28 @@ JabberSpeak *JabberSpeak::Instance() {
 }
 
 JabberSpeak::JabberSpeak()
-	: PortTalker(), BLooper(), XMLReader() {
+	: XMLReader() {
 	_registering_new_account = false;
 	
 	// create semaphore
 	_xml_reader_lock = create_sem(1, "xml reader semaphore");
-
-	// add self to message family
-	MessageRepeater::Instance()->AddTarget(this);
-
-	// direct PortTalker functionality at self
-	SetTargetLooper(MessageRepeater::Instance());
 
 	// grab a handle to the settings now for convenience later
 	_blabber_settings = BlabberSettings::Instance();
 }
 
 JabberSpeak::~JabberSpeak() {
-	// remove self from message family
-	MessageRepeater::Instance()->RemoveTarget(this);
-
 	// destroy semaphore
 	delete_sem(_xml_reader_lock);
 
 	_instance = NULL;
 }
 
-void JabberSpeak::Reset(bool leave_network_alone) {
+void JabberSpeak::Reset() {
 	if (!_reconnecting) {
 		BlabberMainWindow::Instance()->Lock();
 		BlabberMainWindow::Instance()->ShowLogin();
 		BlabberMainWindow::Instance()->Unlock();
-	}
-	
-	// reset networking
-	if (!leave_network_alone) {
-		Disconnect();
 	}
 	
 	// reset XMLReader
@@ -118,21 +104,6 @@ void JabberSpeak::JabberSpeakReset() {
 //////////////////////////////////////////////////
 // STANDARD METHODS
 //////////////////////////////////////////////////
-
-void JabberSpeak::MessageReceived(BMessage *msg) {
-	switch (msg->what) {
-		case PortTalker::DATA: {
-			const char *buffer = msg->FindString("data");
-			int len            = msg->FindInt32("length");
-			
-			LockXMLReader();
-			FeedData(buffer, len);
-			UnlockXMLReader();
-
-			break;
-		}
-	}
-}
 
 char **JabberSpeak::CreateAttributeMemory(int num_items) {
 	char **atts;
@@ -391,17 +362,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 					_ProcessVersionRequest(iq_id, iq_from);
 				}
 			}
-
-/*
-			// get the intent of the IQ message
-			if (_iq_map.count(iq_id) > 0) {
-				// process based on the intent
-				iq_intent intent = _iq_map[iq_id];
-
-
-				// remove the item from the list of pending IQs
-				_iq_map.erase(iq_id);
-			} */
 		}
 
 		// IQ messages can be disposed of after use
@@ -512,7 +472,6 @@ void JabberSpeak::_SendTransportRegistrationInformation(Agent *agent, string key
 	
 	// send XML command
 	char *str = entity_iq->ToString();
-	SendFiltered(str);
 	free(str);
 
 	DestroyAttributeMemory(atts_iq, 6);
@@ -552,7 +511,6 @@ void JabberSpeak::_SendTransportUnregistrationInformation(Agent *agent, string k
 	
 	// send XML command
 	char *str = entity_iq->ToString();
-	SendFiltered(str);
 	free(str);
 	
 	DestroyAttributeMemory(atts_iq, 6);
@@ -702,7 +660,6 @@ void JabberSpeak::_AcceptPresence(string username) {
 
 	// send XML command
 	char *str = entity->ToString();
-	SendFiltered(str);
 	free(str);
 	
 	DestroyAttributeMemory(atts, 4);
@@ -724,7 +681,6 @@ void JabberSpeak::_RejectPresence(string username) {
 
 	// send XML command
 	char *str = entity->ToString();
-	SendFiltered(str);
 	free(str);
 	
 	DestroyAttributeMemory(atts, 4);
@@ -835,7 +791,6 @@ void JabberSpeak::SendDisconnect() {
 	end_stream = new XMLEntity("stream:stream", NULL);
 	
 	char *str = end_stream->EndToString();
-	SendFiltered(str);
 	free(str);
 
 	delete end_stream;
@@ -861,7 +816,6 @@ void JabberSpeak::SendSubscriptionRequest(string username) {
 	
 	// send XML command
 	char *str = entity->ToString();
-	SendFiltered(str);
 	free(str);
 	
 	DestroyAttributeMemory(atts, 6);
@@ -885,7 +839,6 @@ void JabberSpeak::SendUnsubscriptionRequest(string username) {
 
 	// send XML command
 	char *str = entity->ToString();
-	SendFiltered(str);
 	free(str);
 	
 	DestroyAttributeMemory(atts, 6);
@@ -922,7 +875,6 @@ void JabberSpeak::AddToRoster(const UserID *new_user) {
 
 	// send XML command
 	char *str = entity->ToString();
-	SendFiltered(str);
 	free(str);
 	
 	DestroyAttributeMemory(atts, 2);
@@ -967,7 +919,6 @@ void JabberSpeak::RemoveFromRoster(const UserID *removed_user) {
 
 	// send XML command
 	char *str = entity->ToString();
-	SendFiltered(str);
 	free(str);
 	
 	DestroyAttributeMemory(atts, 4);
@@ -1000,7 +951,6 @@ void JabberSpeak::SendMessage(const TalkWindow::talk_type type, const UserID *us
 
 	// send XML command
 	char *str = entity->ToString();
-	SendFiltered(str);
 	free(str);
 
 	DestroyAttributeMemory(atts, 4);
@@ -1008,35 +958,14 @@ void JabberSpeak::SendMessage(const TalkWindow::talk_type type, const UserID *us
 	delete entity;
 }
 
-void JabberSpeak::SendMessage(__attribute__((unused)) const TalkWindow::talk_type type, string group_room, string message) {
-	XMLEntity   *entity;
-	char **atts = CreateAttributeMemory(4);
-
-	// assemble attributes;
-	strcpy(atts[0], "to");
-	strcpy(atts[1], group_room.c_str());
-	strcpy(atts[2], "type");
-	strcpy(atts[3], "groupchat");
-	
-	// construct XML tagset
-	entity = new XMLEntity("message", (const char **)atts);
-
-	entity->AddChild("body", NULL, message.c_str());
-
-	// send XML command
-	char *str = entity->ToString();
-	SendFiltered(str);
-	free(str);
-
-	DestroyAttributeMemory(atts, 4);
-	
-	delete entity;
+void JabberSpeak::SendMessage(__attribute__((unused)) const TalkWindow::talk_type type, __attribute__((unused)) string group_room, __attribute__((unused)) string message) {
+	puts(__PRETTY_FUNCTION__);
 }
 
 void JabberSpeak::SendPresence(string show, string status) {
 	if (show.empty()) {
 		// quick version
-		SendFiltered("<presence/>");
+		//SendFiltered("<presence/>");
 	} else {
 		// detailed version
 		XMLEntity *entity = new XMLEntity("presence", NULL);
@@ -1050,7 +979,6 @@ void JabberSpeak::SendPresence(string show, string status) {
 		}
 
 		char *str = entity->ToString();
-		SendFiltered(str);
 		free(str);
 
 		delete entity;
@@ -1111,7 +1039,6 @@ void JabberSpeak::SendGroupPresence(string _group_room, string _group_username) 
 	
 	// send XML command
 	char *str = entity_presence->ToString();
-	SendFiltered(str);
 	free(str);
 
 	DestroyAttributeMemory(atts_presence, 2);
@@ -1137,7 +1064,6 @@ void JabberSpeak::SendGroupUnvitation(string _group_room, string _group_username
 	
 	// send XML command
 	char *str = entity_presence->ToString();
-	SendFiltered(str);
 	free(str);
 
 	DestroyAttributeMemory(atts_presence, 4);
@@ -1176,7 +1102,6 @@ void JabberSpeak::_SendUserRegistration(string username, string password, string
 	
 	// send XML command
 	char *str = entity_iq->ToString();
-	SendFiltered(str);
 	free(str);
 
 	DestroyAttributeMemory(atts_iq, 4);
@@ -1211,7 +1136,6 @@ void JabberSpeak::RegisterWithAgent(string agent) {
 	_iq_map[atts[3]] = REGISTER;
 	
 	char *str = entity->ToString();
-	SendFiltered(str);
 	free(str);
 
 	DestroyAttributeMemory(atts, 6);
@@ -1298,7 +1222,6 @@ void JabberSpeak::_ProcessVersionRequest(string req_id, string req_from) {
 
 	// send XML command
 	char *str = entity_iq->ToString();
-	SendFiltered(str);
 	free(str);
 
 	DestroyAttributeMemory(atts_iq, 6);
@@ -1307,43 +1230,10 @@ void JabberSpeak::_ProcessVersionRequest(string req_id, string req_from) {
 	delete entity_iq;
 }
 
-void JabberSpeak::_SendAgentRequest() {
-	XMLEntity   *entity_agent;
-	char **atts = CreateAttributeMemory(4);
-	char **atts_query = CreateAttributeMemory(2);
-
-	// assemble attributes;
-	strcpy(atts[0], "type");
-	strcpy(atts[1], "get");
-
-	strcpy(atts[2], "id");
-	strcpy(atts[3], GenerateUniqueID().c_str());
-
-	strcpy(atts_query[0], "xmlns");
-	strcpy(atts_query[1], "jabber:iq:agents");
-
-	// send XML command
-	entity_agent = new XMLEntity("iq", (const char **)atts);
-	entity_agent->AddChild("query", (const char **)atts_query, NULL);
-
-	// log command
-	_iq_map[atts[3]] = AGENTS;
-	
-	char *str = entity_agent->ToString();
-	SendFiltered(str);
-	free(str);
-
-	DestroyAttributeMemory(atts, 4);
-	DestroyAttributeMemory(atts_query, 2);
-	
-	delete entity_agent;
-}
-
 void
 JabberSpeak::onConnect()
 {
 	MessageRepeater::Instance()->PostMessage(JAB_LOGGED_IN);
-	//_SendAgentRequest();
 	_reconnecting = false;
 	//SendLastPresence();	
 }
@@ -1352,7 +1242,6 @@ void
 JabberSpeak::onDisconnect(__attribute__((unused)) gloox::ConnectionError e)
 {
 	puts("onDisconnect");
-	Disconnect();
 	
 	// reset XMLReader
 	XMLReader::Reset();
@@ -1368,7 +1257,7 @@ JabberSpeak::onDisconnect(__attribute__((unused)) gloox::ConnectionError e)
 		_am_logged_in            = false;
 
 		// reset networking
-		Reset(true);
+		Reset();
 
 		SendConnect();
 	}
@@ -1377,6 +1266,7 @@ JabberSpeak::onDisconnect(__attribute__((unused)) gloox::ConnectionError e)
 bool
 JabberSpeak::onTLSConnect(__attribute__((unused)) const gloox::CertInfo& info)
 {
+	// TODO verify certificate
 	return true;
 }
 
