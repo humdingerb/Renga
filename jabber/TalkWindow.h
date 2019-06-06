@@ -26,7 +26,6 @@
 #include "ChatTextView.h"
 #include "ChatWidget.h"
 #include "EditingFilter.h"
-#include "SplitPane.h"
 #include "StatusView.h"
 #include "UserID.h"
 
@@ -90,7 +89,6 @@ private:
 	BView              *_full_view;
 
 	StatusView         *_status_view;
-	BBox               *_sending;
 	
 	BMenuBar           *_menubar;
 	BMenu              *_file_menu;
@@ -137,8 +135,6 @@ private:
 
 	BListView          *_people;
 	
-	SplitPane          *_split_talk;
-	SplitPane          *_split_group_people;
 	BScrollView        *_scrolled_chat_pane;
 	BBox               *_chat_pane;
 	BScrollView        *_scrolled_people_pane;

@@ -2,90 +2,34 @@
 // Blabber [TalkWindow.cpp]
 //////////////////////////////////////////////////
 
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
+#include <cstdio>
+#include <ctime>
 
-#ifndef _CTIME
-	#include <ctime>
-#endif
+#include <Box.h>
+#include <be_apps/NetPositive/NetPositive.h>
+#include <GridView.h>
+#include <GroupLayout.h>
+#include <GroupView.h>
+#include <LayoutBuilder.h>
+#include <Roster.h>
+#include <storage/Path.h>
+#include <SplitView.h>
 
-#ifndef _BOX_H
-	#include <interface/Box.h>
-#endif
-
-#ifndef _NETPOSITIVE_H
-	#include <be_apps/NetPositive/NetPositive.h>
-#endif
-
-#ifndef _ROSTER_H
-	#include <Roster.h>
-#endif
-
-#ifndef _PATH_H
-	#include <storage/Path.h>
-#endif
-
-#ifndef APP_LOCATION_H
-	#include "AppLocation.h"
-#endif
-
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef COMMAND_MESSAGE_H
-	#include "CommandMessage.h"
-#endif
-
-#ifndef GENERIC_FUNCTIONS_H
-	#include "GenericFunctions.h"
-#endif
-
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
-
-#ifndef MESSAGE_REPEATER_H
-	#include "MessageRepeater.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef PEOPLE_LIST_ITEM_H
-	#include "PeopleListItem.h"
-#endif
-
-#ifndef PREFERENCES_WINDOW_H
-	#include "PreferencesWindow.h"
-#endif
-
-#ifndef ROTATE_CHAT_FILTER_H
-	#include "RotateChatFilter.h"
-#endif
-
-#ifndef SOUND_SYSTEM_H
-	#include "SoundSystem.h"
-#endif
-
-#ifndef TALK_LIST_ITEM_H
-	#include "TalkListItem.h"
-#endif
-
-#ifndef TALK_MANAGER_H
-	#include "TalkManager.h"
-#endif
-
-#ifndef TALK_WINDOW_H
-	#include "TalkWindow.h"
-#endif
-
-#ifndef FIND_DIRECTORY_H
-	#include <FindDirectory.h>
-#endif
-
+#include "AppLocation.h"
+#include "BlabberSettings.h"
+#include "CommandMessage.h"
+#include "GenericFunctions.h"
+#include "JabberSpeak.h"
+#include "MessageRepeater.h"
+#include "Messages.h"
+#include "PeopleListItem.h"
+#include "PreferencesWindow.h"
+#include "RotateChatFilter.h"
+#include "SoundSystem.h"
+#include "TalkListItem.h"
+#include "TalkManager.h"
+#include "TalkWindow.h"
+#include <FindDirectory.h>
 #include <malloc.h>
 #include <stdlib.h>
 
@@ -96,7 +40,9 @@ float TalkWindow::x_placement_offset = -100;
 float TalkWindow::y_placement_offset = -100;
 
 TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, string group_username, bool follow_focus_rules)
-	: BWindow(BRect(0, 0, 0, 0), "<talk window>", B_DOCUMENT_WINDOW, B_AVOID_FOCUS) {
+	: BWindow(BRect(0, 0, 0, 0), "<talk window>", B_DOCUMENT_WINDOW,
+		B_AUTO_UPDATE_SIZE_LIMITS)
+{
 	_am_logging = false;
 	_log        = NULL;
 	_chat_index = -1;
@@ -114,9 +60,6 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 		_current_status = user->OnlineStatus();
 	}
 
-	// set size constraints
-	SetSizeLimits(272, 3000, 220, 3000);
-	
 	// generate a thread ID
 	_thread = GenericFunctions::GenerateUniqueID();
 
@@ -143,67 +86,7 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 		_am_logging = (0 != _log);
 	}
 	
-	// determine window size
-	BRect rect;
-
-	float login_window_width;
-	float login_window_height;
-
-	if (_type == TalkWindow::MESSAGE && BlabberSettings::Instance()->Data("message-window-width")) {
-		login_window_width = atof(BlabberSettings::Instance()->Data("message-window-width"));
-	} else {
-		if (_type == TalkWindow::GROUP) {
-			login_window_width = 500;
-		} else {
-			login_window_width = 272;
-		}
-	}
-	
-	if (_type == TalkWindow::MESSAGE && BlabberSettings::Instance()->Data("message-window-height")) {
-		login_window_height = atof(BlabberSettings::Instance()->Data("message-window-height"));
-	} else {
-		if (_type == TalkWindow::GROUP) {
-			login_window_height = 400;
-		} else {
-			login_window_height = 279;
-		}
-	}
-
-	// create window frame position
-	rect = GenericFunctions::CenteredFrame(login_window_width, login_window_height);
-
-	// calculate based on offsets and adjust
-	rect.OffsetBy(x_placement_offset, y_placement_offset);
-
-	if (x_placement_offset < 100.0) {
-		x_placement_offset += 25.0;
-	} else {
-		x_placement_offset = -100.0;
-	}
-
-	if (y_placement_offset < 100.0) {
-		y_placement_offset += 25.0;
-	} else {
-		y_placement_offset = -100.0;
-	}
-
-	// set it
-	ResizeTo(rect.Width(), rect.Height());
-	MoveTo(rect.LeftTop());
-	
-	// encompassing view
-	rect = Bounds();
-	rect.OffsetTo(B_ORIGIN);
-
-	_full_view = new BView(rect, "main-full", B_FOLLOW_ALL, B_WILL_DRAW);
-	_full_view->SetViewColor(216, 216, 216, 255);
-
-	rect = Bounds();
-
-	// menubar (top of buddy window)
-	rect.bottom = rect.top + 18;
-
-	_menubar = new BMenuBar(rect, "menubar");
+	_menubar = new BMenuBar("menubar");
 
 	// FILE MENU
 	_file_menu = new BMenu("File");
@@ -358,55 +241,25 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 
 	// status bar
 	_status_view = new StatusView();
-	_status_view->SetViewColor(216, 216, 216, 255);
-	_status_view->SetLowColor(216, 216, 216, 255);
+	_status_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	// chat controls
-	rect.top = rect.bottom + 1;
-	rect.bottom = Bounds().bottom;
-	rect.InsetBy(5.0, 5.0);
-	rect.bottom -= 140.0;
-	
-	// conversation control
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-
-	BRect text_rect(rect);
-	text_rect.OffsetTo(B_ORIGIN);
-	text_rect.InsetBy(2.0, 2.0);
-	
-	_chat          = new ChatTextView(rect, "chat", text_rect, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
-	_chat_scroller = new BScrollView("chat_scroller", _chat, B_FOLLOW_ALL, B_WILL_DRAW, false, true);
+	_chat          = new ChatTextView("chat", B_WILL_DRAW | B_FRAME_EVENTS);
+	_chat_scroller = new BScrollView("chat_scroller", _chat, B_WILL_DRAW, false, true);
 	_chat->TargetedByScrollView(_chat_scroller);
 	_chat->SetFontSize(12.0);
 	_chat->SetWordWrap(true);
 	_chat->SetStylable(true);
 	_chat->MakeEditable(false);
 
-	// box
-	rect.OffsetBy(-1.0, rect.Height() + 4.0);
-	rect.bottom = Bounds().bottom - 5.0 - _status_view->GetHeight();
-	rect.right += B_V_SCROLL_BAR_WIDTH + 3.0;
-	rect.OffsetTo(1.0, 1.0);
-	
-	_sending = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM);
-	_sending->SetLabel("Communicate");
+	BGridView* _sending = new BGridView("communicate");
 		
 	// message control
-	rect.OffsetTo(B_ORIGIN);
-	rect.InsetBy(6.0, 16.0);
-	rect.bottom = rect.top + 62.0;
-	
-	text_rect = rect;
-	text_rect.OffsetTo(B_ORIGIN);
-	text_rect.InsetBy(2.0, 2.0);
-
 	rgb_color sent = {0, 0, 0, 255};
-
 	BFont black_11(be_plain_font);
 	black_11.SetSize(11.0);
 	
 	_message          = new BetterTextView("message", &black_11, &sent, B_WILL_DRAW);
-	_message_scroller = new BScrollView("message_scroller", _message, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW, false, false);
+	_message_scroller = new BScrollView("message_scroller", _message, B_WILL_DRAW, false, false);
 	_message->TargetedByScrollView(_message_scroller);
 	_message->SetWordWrap(true);
 
@@ -417,34 +270,20 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	AddCommonFilter(new RotateChatFilter(this));
 
 	// send button
-	rect.OffsetBy(_message_scroller->Bounds().Width() - 65.0, _message_scroller->Bounds().Height() + 7.0);
-	rect.right = rect.left + 50;
-	rect.bottom = rect.top + 18.0;
-
-	_send_message = new BButton(rect, "send", "Send", new BMessage(JAB_CHAT_SENT), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	_send_message = new BButton("send", "Send", new BMessage(JAB_CHAT_SENT));
 	_send_message->MakeDefault(true);
 	_send_message->SetTarget(this);
 	
 	// add alt-enter note
-	rect.left = 3.0;
-	rect.right = 180.0;
-	rect.bottom = rect.top + 18.0;
-	rect.OffsetBy(0.0, -7.0);
 
-	_command_enter = new BCheckBox(rect, NULL, "Newlines allowed?", new BMessage(NEWLINE_TOGGLE), B_FOLLOW_BOTTOM);
+	_command_enter = new BCheckBox(NULL, "Newlines allowed?", new BMessage(NEWLINE_TOGGLE));
 	_command_enter->SetValue(BlabberSettings::Instance()->Tag("last-command-enter"));
-	
-	rect.OffsetBy(0.0, 17.0);
-	rect.bottom += 5.0;
-	
-	text_rect = rect;
-	text_rect.OffsetTo(B_ORIGIN);
 	
 	rgb_color note = {0, 0, 0, 255};
 	BFont black_8(be_plain_font);
 	black_8.SetSize(8.0);
 
-	_enter_note = new BTextView(rect, NULL, text_rect, &black_8, &note, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
+	_enter_note = new BTextView(NULL, &black_8, &note, B_WILL_DRAW);
 	_enter_note->SetViewColor(216, 216, 216, 255);
 	_enter_note->MakeEditable(false);
 	_enter_note->MakeSelectable(false);
@@ -452,67 +291,45 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	// post message
 	PostMessage(NEWLINE_TOGGLE);
 
-	_sending->AddChild(_message_scroller);
-	_sending->AddChild(_send_message);
-	_sending->AddChild(_enter_note);
-	_sending->AddChild(_command_enter);
+	BLayoutBuilder::Grid<>(_sending)
+		.Add(_message_scroller, 0, 0, 1, 3)
+		.Add(_send_message,     1, 0, 1, 1)
+		.Add(_command_enter,    1, 1, 1, 1)
+		.Add(_enter_note,       1, 2, 1, 1)
+	.End();
 	
 	// handle splits
-	rect = _sending->Bounds();
-	rect.InsetBy(-3.0, -3.0);
+	BSplitView* _split_talk = new BSplitView(B_VERTICAL);
+	_split_talk->AddChild(_chat_scroller);
+	_split_talk->AddChild(_sending);
+	_split_talk->SetItemWeight(0, 3, false);
+	_split_talk->SetItemWeight(1, 1, false);
+	_split_talk->SetSpacing(0);
 	
-	BView *chatting_view = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
+	_people = new BListView(NULL, B_SINGLE_SELECTION_LIST);
+	_scrolled_people_pane = new BScrollView(NULL, _people, 0, false, true, B_PLAIN_BORDER);
 
-	chatting_view->AddChild(_sending);
-	chatting_view->SetViewColor(216, 216, 216);
-	
-	rect = Bounds();
-		rect.top = 22.0;
-		rect.bottom -= _status_view->GetHeight() + 3.0;
-	
-	if (_type == GROUP) {
-		rect.right -= 80.0;
-	}
-	
-	_split_talk = new SplitPane(rect, _chat_scroller, chatting_view, B_FOLLOW_TOP_BOTTOM | B_FOLLOW_LEFT_RIGHT);
-	_split_talk->SetAlignment(B_HORIZONTAL);
-	_split_talk->SetMinSizeTwo(_sending->Bounds().Height() + 2.0);
-	_split_talk->SetBarThickness(6.0);
-	_split_talk->SetBarAlignmentLocked(true);
-	_split_talk->SetViewInsetBy(2.0);
-	
-	if (_type == GROUP) {
-		rect = Bounds();
-			rect.top = 22.0;
-			rect.bottom -= _status_view->GetHeight() + 3.0;
+	BSplitView* _split_group_people = new BSplitView(B_HORIZONTAL);
+	_split_group_people->AddChild(_split_talk);
+	_split_group_people->AddChild(_scrolled_people_pane);
+	_split_group_people->SetItemWeight(0, 3, false);
+	_split_group_people->SetItemWeight(1, 1, false);
+	_split_group_people->SetSpacing(0);
 
-		BRect people_rect = Bounds();
-			people_rect.left = rect.right + 1.0;
-
-		_people = new BListView(people_rect, NULL, B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM);
-		_scrolled_people_pane = new BScrollView(NULL, _people, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, 0, false, true, B_PLAIN_BORDER);
-
-		_split_group_people = new SplitPane(rect, _split_talk, _scrolled_people_pane, B_FOLLOW_ALL);
-		_split_group_people->SetAlignment(B_VERTICAL);
-		_split_group_people->SetMinSizeOne(300.0);
-		_split_group_people->SetMinSizeTwo(100.0);
-		_split_group_people->SetBarThickness(6.0);
-		_split_group_people->SetBarAlignmentLocked(true);
-		_split_group_people->SetBarPosition(400);
+	if (_type != GROUP) {
+		_split_group_people->SetItemCollapsed(1, true);
+		_split_group_people->SetSplitterSize(0);
 	}	
 	
 	// add GUI components to BView
-	AddChild(_full_view);
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
+	layout->SetSpacing(0);
 
-	_full_view->AddChild(_menubar);
-	_full_view->AddChild(_status_view);
+	AddChild(_menubar);
+	AddChild(_split_group_people);
+	AddChild(_status_view);
 
-	if (_type == GROUP) {
-		_full_view->AddChild(_split_group_people);
-	} else {
-		_full_view->AddChild(_split_talk);
-	}
-	
 	_message->MakeFocus(true);
 	
 	// generate window title
@@ -617,6 +434,8 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	Lock();
 	AddToTalk("", message.c_str(), OTHER);
 	Unlock();
+
+	CenterOnScreen();
 }
 
 TalkWindow::~TalkWindow() {

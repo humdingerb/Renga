@@ -10,16 +10,17 @@
 #include <be_apps/NetPositive/NetPositive.h>
 #include <Roster.h>
 
-ChatTextView::ChatTextView(BRect frame, const char *name, BRect text_rect,
-	uint32 resizing_mode, uint32 flags)
-	: BTextView(frame, name, text_rect, resizing_mode, flags)
+ChatTextView::ChatTextView(const char *name, uint32 flags)
+	: BTextView(name, flags)
 {
+	SetExplicitMinSize(BSize(300, 250));
 }
 
-ChatTextView::ChatTextView(BRect frame, const char *name, BRect text_rect,
-	const BFont *font, const rgb_color *color, uint32 resizing_mode, uint32 flags)
-	: BTextView(frame, name, text_rect, font, color, resizing_mode, flags)
+ChatTextView::ChatTextView(const char *name,
+	const BFont *font, const rgb_color *color, uint32 flags)
+	: BTextView(name, font, color, flags)
 {
+	SetExplicitMinSize(BSize(300, 250));
 }
 
 void ChatTextView::MouseDown(BPoint pt)

@@ -13,33 +13,25 @@ StatusView::StatusView(const char *name)
 	// set font
 	SetFont(be_plain_font);
 	SetFontSize(9.0);
+
+	GetFontHeight(&_fh);
+	_height = _fh.ascent + _fh.descent + 1.0;
+	if (_height <  B_V_SCROLL_BAR_WIDTH)
+		_height = B_V_SCROLL_BAR_WIDTH;
+	SetExplicitSize(BSize(B_SIZE_UNSET, _height));
+	SetExplicitMinSize(BSize(B_SIZE_UNSET, _height));
 }
 
 StatusView::~StatusView() {
 }
 
 void StatusView::AttachedToWindow() {
-	// resize to connect to bottom of parent
-	GetFontHeight(&_fh);
-
-	_height = _fh.ascent + _fh.descent + 1.0;
-	
-	if (_height <  B_V_SCROLL_BAR_WIDTH)
-		_height = B_V_SCROLL_BAR_WIDTH;
-	SetExplicitSize(BSize(B_SIZE_UNSET, _height));
 }
 
 void StatusView::Draw(__attribute__((unused)) BRect rect) {
-	// draw indent
-	SetHighColor(152, 152, 152, 255);
-	StrokeLine(BPoint(0.0, 0.0), BPoint(Bounds().Width(), 0.0));
-
-	SetHighColor(255, 255, 255, 255);
-	StrokeLine(BPoint(0.0, 1.0), BPoint(Bounds().Width(), 1.0));
-
 	// draw name
 	SetHighColor(0, 0, 0, 255);
-	DrawString(_current_message.c_str(), BPoint(5, _height));
+	DrawString(_current_message.c_str(), BPoint(5, _height - 3));
 }
 
 void StatusView::SetMessage(std::string message) {
