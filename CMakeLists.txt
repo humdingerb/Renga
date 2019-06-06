@@ -52,7 +52,6 @@ add_executable(Jabber
 	 jabber/MessageRepeater.cpp
 	 jabber/FileXMLReader.cpp
 	 jabber/AppLocation.cpp
-	 shared/split-pane/SplitPane.cpp
 	 jabber/XMLEntity.cpp
 	 jabber/XMLReader.cpp
 )

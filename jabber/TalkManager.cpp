@@ -116,7 +116,9 @@ TalkWindow *TalkManager::CreateTalkSession(const TalkWindow::talk_type type, con
 	return window;
 }
 
-void TalkManager::ProcessMessageData(XMLEntity *entity) {
+void
+TalkManager::handleMessage(const gloox::Message &msg, __attribute__((unused)) gloox::MessageSession *session)
+{
 	TalkWindow::talk_type type;
 	string                thread_id;
 	string                sender;
@@ -128,33 +130,26 @@ void TalkManager::ProcessMessageData(XMLEntity *entity) {
 	string                group_username;
 
 	// must be content to continue
-	if (!entity->Child("body") || !entity->Child("body")->Data()) {
-		return;
-	}
-
-	// must be sender to continue
-	if (!entity->Attribute("from")) {
+	if (msg.body() == "") {
 		return;
 	}
 
 	// configure type
-	if (!entity->Attribute("type") || !strcasecmp(entity->Attribute("type"), "normal")) {
+	if (msg.subtype() == gloox::Message::Normal) {
 		if (BlabberSettings::Instance()->Tag("convert-messages-to-chat")) {
 			type = TalkWindow::CHAT;
 		} else {
 			type = TalkWindow::MESSAGE;
 		}
-	} else if (!strcasecmp(entity->Attribute("type"), "chat")) {
+	} else if (msg.subtype() == gloox::Message::Chat) {
 		type = TalkWindow::CHAT;
-	} else if (!strcasecmp(entity->Attribute("type"), "groupchat")) {
+	} else if (msg.subtype() == gloox::Message::Groupchat) {
 		type = TalkWindow::GROUP;
-	} else if (!strcasecmp(entity->Attribute("type"), "error")) {
+	} else if (msg.subtype() == gloox::Message::Error) {
 		char buffer[2048];
 		
-		if (entity->Child("error")) {
-			sprintf(buffer, "An error occurred when you tried sending a message to %s.  The reason is as follows:\n\n%s", entity->Attribute("from"), entity->Child("error")->Data());
-			ModalAlertFactory::Alert(buffer, "Oh, well.", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		}
+		sprintf(buffer, "An error occurred when you tried sending a message to %s.  The reason is as follows:\n\n%s", msg.from().full().c_str(), msg.body().c_str());
+		ModalAlertFactory::Alert(buffer, "Oh, well.", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		
 		return;
 	} else {
@@ -163,12 +158,10 @@ void TalkManager::ProcessMessageData(XMLEntity *entity) {
 	}
 
 	// configure sender
-	sender = entity->Attribute("from");
+	sender = msg.from().full();
 
 	// configure thread ID
-	if (entity->Child("thread")) {
-		thread_id = entity->Child("thread")->Data();
-	}
+	thread_id = msg.thread();
 
 	if (type == TalkWindow::CHAT && _talk_map.count(thread_id) == 0) {
 		// is there a window with the same sender already open? (only for chat)
@@ -253,12 +246,12 @@ void TalkManager::ProcessMessageData(XMLEntity *entity) {
 
 		if (type == TalkWindow::GROUP) {
 			if (group_username.empty()) {
-				window->AddToTalk("System:", entity->Child("body")->Data(), TalkWindow::OTHER);
+				window->AddToTalk("System:", msg.body(), TalkWindow::OTHER);
 			} else {
-				window->NewMessage(group_username, entity->Child("body")->Data());
+				window->NewMessage(group_username, msg.body());
 			}
 		} else {
-			window->NewMessage(entity->Child("body")->Data());
+			window->NewMessage(msg.body());
 		}
 		window->Unlock();
 	}

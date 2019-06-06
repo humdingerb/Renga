@@ -7,6 +7,9 @@
 #ifndef TALK_MANAGER_H
 #define TALK_MANAGER_H
 
+#include <gloox/messagehandler.h>
+#include <gloox/message.h>
+
 #include <map>
 #include <string>
 
@@ -14,7 +17,8 @@
 #include "TalkWindow.h"
 #include "XMLEntity.h"
 
-class TalkManager {
+// FIXME could we replace this with MessageSessionHandler?
+class TalkManager : public gloox::MessageHandler {
 public:
 	typedef  std::map<std::string, TalkWindow *>                   TalkMap;
 	typedef  std::map<std::string, TalkWindow *>::iterator         TalkIter;
@@ -29,7 +33,7 @@ public:
 	TalkWindow          *CreateTalkSession(const TalkWindow::talk_type type, const UserID *user,
 				std::string group_room, std::string group_username, 
 				std::string thread = GenericFunctions::GenerateUniqueID(), bool sound_on_new = false);
-	void                 ProcessMessageData(XMLEntity *entity);	
+	void                 handleMessage (const gloox::Message &msg, gloox::MessageSession *session) final;
 
 	std::string          IsExistingWindowToUser(TalkWindow::talk_type type, std::string username);
 	std::string          IsExistingWindowToGroup(TalkWindow::talk_type type, std::string group_room);

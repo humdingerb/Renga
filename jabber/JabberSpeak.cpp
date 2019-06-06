@@ -214,11 +214,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 		return;
 	}
 
-	// handle messages
-	if (entity->IsCompleted() && !strcasecmp(entity->Name(), "message")) {
-		TalkManager::Instance()->ProcessMessageData(entity);
-	}
-
 	// convert non-ID'd IQs to query indexed calls
 	if (entity->IsCompleted() && !strcasecmp(entity->Name(), "iq") && !entity->Attribute("id")) {
 		// get access to query tag
@@ -777,6 +772,7 @@ void JabberSpeak::_ConnectionThread() {
 	gloox::Client* client = new gloox::Client(jid, _password);
 	client->registerConnectionListener(this);
 	client->rosterManager()->registerRosterListener(this);
+	client->registerMessageHandler(TalkManager::Instance());
 	puts("connect");
 	client->connect();
 	puts("connect ok");
