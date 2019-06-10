@@ -2,7 +2,6 @@
 // Blabber [JabberSpeak.cpp]
 //////////////////////////////////////////////////
 
-#include <gloox/client.h>
 #include <gloox/jid.h>
 #include <gloox/rostermanager.h>
 
@@ -47,17 +46,11 @@ JabberSpeak::JabberSpeak()
 	: XMLReader() {
 	_registering_new_account = false;
 	
-	// create semaphore
-	_xml_reader_lock = create_sem(1, "xml reader semaphore");
-
 	// grab a handle to the settings now for convenience later
 	_blabber_settings = BlabberSettings::Instance();
 }
 
 JabberSpeak::~JabberSpeak() {
-	// destroy semaphore
-	delete_sem(_xml_reader_lock);
-
 	_instance = NULL;
 }
 
@@ -155,29 +148,9 @@ const string JabberSpeak::CurrentLogin() const {
 	return _curr_login;
 }
 
-void JabberSpeak::LockXMLReader() {
-	acquire_sem(_xml_reader_lock);
-}
-
-void JabberSpeak::UnlockXMLReader() {
-	release_sem(_xml_reader_lock);
-}
-
 //////////////////////////////////////////////////
 // INCOMING COMMUNICATION
 //////////////////////////////////////////////////
-
-void JabberSpeak::OnStartTag(XMLEntity *entity) {
-	OnTag(entity);
-}
-
-void JabberSpeak::OnEndTag(XMLEntity *entity) {
-	OnTag(entity);
-}
-
-void JabberSpeak::OnEndEntity(XMLEntity *entity) {
-	OnTag(entity);
-}
 
 void JabberSpeak::OnTag(XMLEntity *entity) {
 	char buffer[4096]; // general buffer space
@@ -191,14 +164,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 			// create account
 			_SendUserRegistration(UserID(_curr_login).JabberUsername(), _password, UserID(_curr_login).JabberResource());
 		}
-	}
-
-	// handle connection error
-	if (entity->IsCompleted() && !strcasecmp(entity->Name(), "stream:error")) {
-		sprintf(buffer, "An error has occurred between the client and server for the following reason:\n\n%s\n\nJabber for Haiku must shut down now. :-(", entity->Data());
-		ModalAlertFactory::Alert(buffer, "Drats!", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
-		
-		exit(1);
 	}
 
 	// handle disconnection
@@ -769,12 +734,12 @@ JabberSpeak::GetRealPort()
 
 void JabberSpeak::_ConnectionThread() {
 	gloox::JID jid(_curr_login);
-	gloox::Client* client = new gloox::Client(jid, _password);
-	client->registerConnectionListener(this);
-	client->rosterManager()->registerRosterListener(this);
-	client->registerMessageHandler(TalkManager::Instance());
+	fClient = new gloox::Client(jid, _password);
+	fClient->registerConnectionListener(this);
+	fClient->rosterManager()->registerRosterListener(this);
+	fClient->registerMessageHandler(TalkManager::Instance());
 	puts("connect");
-	client->connect();
+	fClient->connect();
 	puts("connect ok");
 }
 
@@ -924,35 +889,17 @@ void JabberSpeak::RemoveFromRoster(const UserID *removed_user) {
 	delete entity;
 }
 
-void JabberSpeak::SendMessage(const TalkWindow::talk_type type, const UserID *user, string message, string thread_id) {
-	XMLEntity   *entity;
-	char **atts = CreateAttributeMemory(4);
 
-	// assemble attributes;
-	strcpy(atts[0], "to");
-	strcpy(atts[1], user->Handle().c_str());
-	strcpy(atts[2], "type");
-
-	if (type == TalkWindow::CHAT) {
-		strcpy(atts[3], "chat");
-	} else {
-		strcpy(atts[3], "normal");
-	}
-	
-	// construct XML tagset
-	entity = new XMLEntity("message", (const char **)atts);
-
-	entity->AddChild("body", NULL, message.c_str());
-	entity->AddChild("thread", NULL, thread_id.c_str());
-
-	// send XML command
-	char *str = entity->ToString();
-	free(str);
-
-	DestroyAttributeMemory(atts, 4);
-	
-	delete entity;
+void JabberSpeak::SendMessage(const TalkWindow::talk_type type,
+	const UserID *user, string body, string thread_id)
+{
+	gloox::Message message(type == TalkWindow::CHAT ?
+			gloox::Message::Chat : gloox::Message::Normal,
+		gloox::JID(user->JabberCompleteHandle()), body, gloox::EmptyString,
+		thread_id);
+	fClient->send(message);
 }
+
 
 void JabberSpeak::SendMessage(__attribute__((unused)) const TalkWindow::talk_type type, __attribute__((unused)) string group_room, __attribute__((unused)) string message) {
 	puts(__PRETTY_FUNCTION__);

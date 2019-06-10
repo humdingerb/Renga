@@ -6,6 +6,7 @@
 #ifndef JABBER_SPEAK_H
 #define JABBER_SPEAK_H
 
+#include <gloox/client.h>
 #include <gloox/connectionlistener.h>
 #include <gloox/rosterlistener.h>
 
@@ -59,20 +60,12 @@ public:
 	void	                 UnregisterWithAgent(string agent);
 	
 	// INCOMING COMMUNICATION
-	void		             OnStartTag(XMLEntity *entity);
-	void		             OnEndTag(XMLEntity *entity);
-	void		             OnEndEntity(XMLEntity *entity);
 	void                     OnTag(XMLEntity *entity);
 
 	// SELECTORS
 	const string             CurrentRealName() const;
 	const string             CurrentLogin() const;
 
-	// SEMAPHORE ON XMLReader
-	void                     LockXMLReader();
-	void                     UnlockXMLReader();
-	
-	
 	string					GetRealServer();
 	int						GetRealPort();
 
@@ -143,8 +136,7 @@ private:
 	// threading
 	thread_id                _connection_thread_id;
 
-	// XMLReader lock
-	sem_id                   _xml_reader_lock;
+	gloox::Client*			fClient;
 };
 
 #endif
