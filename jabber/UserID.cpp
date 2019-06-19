@@ -24,7 +24,6 @@ UserID::UserID(std::string handle) {
 
 	// bare defaults
 	SetOnlineStatus(UserID::UNKNOWN);
-	SetAsk("");
 	SetExactOnlineStatus("chat");
 	SetSubscriptionStatus(gloox::S10nNone);
 }
@@ -33,7 +32,6 @@ UserID::UserID(const UserID &copied_userid) {
 	SetHandle(copied_userid.Handle());
 	SetFriendlyName(copied_userid.FriendlyName());
 
-	SetAsk(copied_userid.Ask());
 	SetSubscriptionStatus(copied_userid.SubscriptionStatus());
 	SetOnlineStatus(copied_userid.OnlineStatus());
 	SetExactOnlineStatus(copied_userid.ExactOnlineStatus());
@@ -47,7 +45,6 @@ UserID &UserID::operator=(const UserID &rhs) {
 	SetHandle(rhs.Handle());
 	SetFriendlyName(rhs.FriendlyName());
 
-	SetAsk(rhs.Ask());
 	SetSubscriptionStatus(rhs.SubscriptionStatus());
 
 	return *this;
@@ -65,12 +62,8 @@ const std::string UserID::FriendlyName() const {
 	return _friendly_name;
 }
 
-const std::string UserID::Ask() const {
-	return _ask;
-}
-
 UserID::online_status UserID::OnlineStatus() const {
-	if (_status == UNKNOWN && Ask() == "subscribe") {
+	if (_status == UNKNOWN && (SubscriptionStatus() == gloox::S10nNoneOut || SubscriptionStatus() == gloox::S10nNoneOutIn || SubscriptionStatus() == gloox::S10nFromOut)) {
 		return UNACCEPTED;
 	} else {
 		return _status;
@@ -229,10 +222,6 @@ void UserID::SetHandle(std::string handle) {
 
 void UserID::SetFriendlyName(std::string friendly_name) {
 	_friendly_name = friendly_name;
-}
-
-void UserID::SetAsk(std::string status) {
-	_ask = status;
 }
 
 void UserID::SetOnlineStatus(online_status status) {

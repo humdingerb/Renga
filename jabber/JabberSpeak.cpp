@@ -1238,7 +1238,16 @@ JabberSpeak::handleItemRemoved(const gloox::JID&)
 void
 JabberSpeak::handleItemUpdated(const gloox::JID& jid)
 {
-	printf("%s(%s)\n", __PRETTY_FUNCTION__, jid.full().c_str());
+	gloox::RosterItem* item = fClient->rosterManager()->getRosterItem(jid);
+	UserID* roster_user = JRoster::Instance()->FindUser(JRoster::HANDLE, jid.full());
+	if (roster_user) {
+		roster_user->SetSubscriptionStatus(item->subscription());
+		printf("%s(%s)\n", __PRETTY_FUNCTION__, jid.full().c_str());
+		printf("   name %s\n", item->name().c_str());
+		printf("   onln %d\n", item->online());
+	} else {
+		printf("%s(%s) user not found\n", __PRETTY_FUNCTION__, jid.full().c_str());
+	}
 }
 
 
@@ -1375,9 +1384,12 @@ JabberSpeak::handleRosterPresence(const gloox::RosterItem& item,
 
 
 void
-JabberSpeak::handleSelfPresence(const gloox::RosterItem&, const string&, gloox::Presence::PresenceType, const string&)
+JabberSpeak::handleSelfPresence(const gloox::RosterItem&, const string& resource, gloox::Presence::PresenceType, const string& msg)
 {
-	printf("%s\n", __PRETTY_FUNCTION__);
+	// TODO this gets called for giving us our current presence and message,
+	// and also for all other resources, so we can know that the same user
+	// is also online elsewhere
+	printf("%s(%s, %s)\n", __PRETTY_FUNCTION__, resource.c_str(), msg.c_str());
 }
 
 

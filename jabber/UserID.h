@@ -27,7 +27,6 @@ public:
 	const std::string    Handle() const;
 	const std::string    FriendlyName() const;
 
-	const std::string    Ask() const;
 	      online_status  OnlineStatus() const;
 	const std::string    ExactOnlineStatus() const;
 	const std::string    MoreExactOnlineStatus() const;
@@ -54,7 +53,6 @@ public:
 	void                 SetHandle(std::string handle);
 	void                 SetFriendlyName(std::string friendly_name);
 
-	void                 SetAsk(std::string status);
 	void                 SetOnlineStatus(online_status status);
 	void                 SetExactOnlineStatus(std::string exact_status);
 	void                 SetMoreExactOnlineStatus(std::string exact_status);
@@ -68,7 +66,6 @@ private:
 	std::string          _friendly_name;
 	std::string          _service;
 
-	std::string          _ask;
 	online_status        _status;
 	std::string          _exact_status;
 	std::string          _more_exact_status;
