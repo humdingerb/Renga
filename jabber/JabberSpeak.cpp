@@ -43,7 +43,10 @@ JabberSpeak *JabberSpeak::Instance() {
 }
 
 JabberSpeak::JabberSpeak()
-	: XMLReader() {
+	: XMLReader()
+	, fClient(NULL)
+	, fBookmarks(NULL)
+{
 	_registering_new_account = false;
 	
 	// grab a handle to the settings now for convenience later
@@ -52,6 +55,8 @@ JabberSpeak::JabberSpeak()
 
 JabberSpeak::~JabberSpeak() {
 	_instance = NULL;
+
+	delete fBookmarks;
 }
 
 void JabberSpeak::Reset() {
@@ -61,9 +66,6 @@ void JabberSpeak::Reset() {
 		BlabberMainWindow::Instance()->Unlock();
 	}
 	
-	// reset XMLReader
-	XMLReader::Reset();
-
 	if (!_reconnecting) {
 		TalkManager::Instance()->Reset();
 	}
@@ -758,52 +760,18 @@ void JabberSpeak::SendDisconnect() {
 }
 
 void JabberSpeak::SendSubscriptionRequest(string username) {
-	XMLEntity *entity;
-	
-	char **atts = CreateAttributeMemory(6);
-	
-	// assemble attributes
-	strcpy(atts[0], "to");
-	strcpy(atts[1], username.c_str());
-	strcpy(atts[2], "type");
-	strcpy(atts[3], "subscribe");
-	strcpy(atts[4], "id");
-	strcpy(atts[5], GenerateUniqueID().c_str());
-
-	entity = new XMLEntity("presence", (const char **)atts);
+	gloox::Subscription subscription(gloox::Subscription::Subscribe,
+		gloox::JID(username));
+	fClient->send(subscription);
 
 	// log command
-	_iq_map[atts[5]] = LOGIN;
-	
-	// send XML command
-	char *str = entity->ToString();
-	free(str);
-	
-	DestroyAttributeMemory(atts, 6);
-	delete entity;
+	_iq_map[subscription.id()] = LOGIN;
 }
 
 void JabberSpeak::SendUnsubscriptionRequest(string username) {
-	XMLEntity *entity;
-	
-	char **atts = CreateAttributeMemory(6);
-	
-	// assemble attributes
-	strcpy(atts[0], "to");
-	strcpy(atts[1], username.c_str());
-	strcpy(atts[2], "type");
-	strcpy(atts[3], "unsubscribe");
-	strcpy(atts[4], "id");
-	strcpy(atts[5], GenerateUniqueID().c_str());
-
-	entity = new XMLEntity("presence", (const char **)atts);
-
-	// send XML command
-	char *str = entity->ToString();
-	free(str);
-	
-	DestroyAttributeMemory(atts, 6);
-	delete entity;
+	gloox::Subscription subscription(gloox::Subscription::Unsubscribe,
+		gloox::JID(username));
+	fClient->send(subscription);
 }
 
 void JabberSpeak::AddToRoster(const UserID *new_user) {
@@ -816,9 +784,11 @@ void JabberSpeak::AddToRoster(const UserID *new_user) {
 	// assemble attributes
 	strcpy(atts[0], "type");
 	strcpy(atts[1], "set");
+	entity = new XMLEntity("iq", (const char **)atts);
 
 	strcpy(atts_query[0], "xmlns");
 	strcpy(atts_query[1], "jabber:iq:roster");
+	entity_query = new XMLEntity("query", (const char **)atts_query);
 
 	strcpy(atts_item[0], "jid");
 	strcpy(atts_item[1], new_user->Handle().c_str());
@@ -826,18 +796,11 @@ void JabberSpeak::AddToRoster(const UserID *new_user) {
 	strcpy(atts_item[3], new_user->FriendlyName().c_str());
 	strcpy(atts_item[4], "subscription");
 	strcpy(atts_item[5], "to");
-
-	entity = new XMLEntity("iq", (const char **)atts);
-	entity_query = new XMLEntity("query", (const char **)atts_query);
 	entity_item = new XMLEntity("item", (const char **)atts_item);
 
 	entity_query->AddChild(entity_item);
 	entity->AddChild(entity_query);
 
-	// send XML command
-	char *str = entity->ToString();
-	free(str);
-	
 	DestroyAttributeMemory(atts, 2);
 	DestroyAttributeMemory(atts_query, 2);
 	DestroyAttributeMemory(atts_item, 6);
@@ -967,51 +930,21 @@ void JabberSpeak::SendLastPresence() {
 }
 
 void JabberSpeak::SendGroupPresence(string _group_room, string _group_username) {
-	XMLEntity             *entity_presence;
-	char **atts_presence = CreateAttributeMemory(2);
-
 	// assemble group ID
 	string group_presence = _group_room + "/" + _group_username;	
 	
-	// assemble attributes;
-	strcpy(atts_presence[0], "to");
-	strcpy(atts_presence[1], group_presence.c_str());
-
-	// construct XML tagset
-	entity_presence = new XMLEntity("presence", (const char **)atts_presence);
-	
-	// send XML command
-	char *str = entity_presence->ToString();
-	free(str);
-
-	DestroyAttributeMemory(atts_presence, 2);
-	
-	delete entity_presence;
+	// Send presence Stanza
+	gloox::Presence presence(gloox::Presence::Available, gloox::JID(group_presence));
+	fClient->send(presence);
 }
 
 void JabberSpeak::SendGroupUnvitation(string _group_room, string _group_username) {
-	XMLEntity             *entity_presence;
-	char **atts_presence = CreateAttributeMemory(4);
-
 	// assemble group ID
 	string group_presence = _group_room + "/" + _group_username;	
 	
-	// assemble attributes;
-	strcpy(atts_presence[0], "to");
-	strcpy(atts_presence[1], group_presence.c_str());
-	strcpy(atts_presence[2], "type");
-	strcpy(atts_presence[3], "unavailable");
-
-	// construct XML tagset
-	entity_presence = new XMLEntity("presence", (const char **)atts_presence);
-	
-	// send XML command
-	char *str = entity_presence->ToString();
-	free(str);
-
-	DestroyAttributeMemory(atts_presence, 4);
-	
-	delete entity_presence;
+	// Send presence Stanza
+	gloox::Presence presence(gloox::Presence::Unavailable, gloox::JID(group_presence));
+	fClient->send(presence);
 }
 
 void JabberSpeak::_SendUserRegistration(string username, string password, string resource) {
@@ -1118,12 +1051,10 @@ void JabberSpeak::_ProcessVersionRequest(string req_id, string req_from) {
 
 	strcpy(atts_iq[4], "type");
 	strcpy(atts_iq[5], "result");
+	entity_iq    = new XMLEntity("iq", (const char **)atts_iq);
 
 	strcpy(atts_query[0], "xmlns");
 	strcpy(atts_query[1], "jabber:iq:version");
-
-	// construct XML tagset
-	entity_iq    = new XMLEntity("iq", (const char **)atts_iq);
 	entity_query = new XMLEntity("query", (const char **)atts_query);
 
 	entity_iq->AddChild(entity_query);
@@ -1179,6 +1110,11 @@ JabberSpeak::onConnect()
 	MessageRepeater::Instance()->PostMessage(JAB_LOGGED_IN);
 	_reconnecting = false;
 	//SendLastPresence();	
+	
+	// Request for bookmarks
+	fBookmarks = new gloox::BookmarkStorage(fClient);
+	fBookmarks->registerBookmarkHandler(this);
+	fBookmarks->requestBookmarks();
 }
 
 void
@@ -1267,7 +1203,6 @@ JabberSpeak::handleRoster(const gloox::Roster& roster)
 		UserID user(item.first);
 		user.SetFriendlyName(item.second->name());
 		user.SetSubscriptionStatus(item.second->subscription());
-		// todo user.SetAsk(???)
 
 		// obtain a handle to the user (is there a new one?)
 		UserID *roster_user;
@@ -1420,4 +1355,26 @@ void
 JabberSpeak::handleRosterError(const gloox::IQ&)
 {
 	printf("%s\n", __PRETTY_FUNCTION__);
+}
+
+
+void
+JabberSpeak::handleBookmarks(const gloox::BookmarkList& bList,
+                             const gloox::ConferenceList& cList)
+{
+	printf("%s\n", __PRETTY_FUNCTION__);
+
+	for (auto i: bList) {
+		printf("%s -> %s\n", i.name.c_str(), i.url.c_str());
+	}
+
+	for (auto i: cList) {
+		if (i.autojoin) {
+			TalkManager::Instance()->CreateTalkSession(TalkWindow::GROUP, NULL,
+				i.jid.c_str(), i.nick.c_str());
+		} else {
+			printf("%s -> jid %s nick %s pwd %s autojoin %d\n", i.name.c_str(),
+				i.jid.c_str(), i.nick.c_str(), i.password.c_str(), i.autojoin);
+		}
+	}
 }

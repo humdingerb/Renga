@@ -6,6 +6,8 @@
 #ifndef JABBER_SPEAK_H
 #define JABBER_SPEAK_H
 
+#include <gloox/bookmarkhandler.h>
+#include <gloox/bookmarkstorage.h>
 #include <gloox/client.h>
 #include <gloox/connectionlistener.h>
 #include <gloox/rosterlistener.h>
@@ -21,7 +23,8 @@
 #include "XMLReader.h"
 
 class JabberSpeak : public XMLReader,
-	public gloox::ConnectionListener, public gloox::RosterListener
+	public gloox::ConnectionListener, public gloox::RosterListener,
+	public gloox::BookmarkHandler
 {
 public:
 	enum iq_intent {LOGIN, ROSTER, AGENTS, REGISTER, SEND_REGISTER, UNREGISTER, SEND_UNREGISTER, NEW_USER, MESSAGE, CHAT};
@@ -87,6 +90,9 @@ public:
 	void 					handleNonrosterPresence(const gloox::Presence&) final;
 	void 					handleRosterError(const gloox::IQ&) final;
 
+	void 					handleBookmarks(const gloox::BookmarkList& bList,
+										    const gloox::ConferenceList& cList) final;
+
 protected:
 	// CREATORS
 	                         JabberSpeak();
@@ -137,6 +143,7 @@ private:
 	thread_id                _connection_thread_id;
 
 	gloox::Client*			fClient;
+	gloox::BookmarkStorage* fBookmarks;
 };
 
 #endif
