@@ -868,64 +868,32 @@ void JabberSpeak::SendMessage(__attribute__((unused)) const TalkWindow::talk_typ
 	puts(__PRETTY_FUNCTION__);
 }
 
-void JabberSpeak::SendPresence(string show, string status) {
-	if (show.empty()) {
-		// quick version
-		//SendFiltered("<presence/>");
-	} else {
-		// detailed version
-		XMLEntity *entity = new XMLEntity("presence", NULL);
-		
-		// add show information
-		entity->AddChild("show", NULL, show.c_str());
-
-		// add status information
-		if (!status.empty()) {
-			entity->AddChild("status", NULL, status.c_str());
-		}
-
-		char *str = entity->ToString();
-		free(str);
-
-		delete entity;
-	}
+void JabberSpeak::SendPresence(gloox::Presence::PresenceType type, string status) {
+	gloox::Presence presence(type, gloox::JID(), status);
+	fClient->send(presence);
 }
 
 void JabberSpeak::SendLastPresence() {
 	bool last_used_custom   = BlabberSettings::Instance()->Tag("last-used-custom-status");
-	const char *last_status = BlabberSettings::Instance()->Data("last-custom-exact-status");
+	gloox::Presence::PresenceType last_status = (gloox::Presence::PresenceType)atoi(
+		BlabberSettings::Instance()->Data("last-custom-exact-status"));
 	const char *last_custom_status = BlabberSettings::Instance()->Data("last-custom-more-exact-status");
 
-	// do we have statuses?
-	if (last_status) {
-		if (last_used_custom) {
-			SendPresence(last_status, last_custom_status);
-			BlabberMainWindow::Instance()->SetCustomStatus(last_custom_status);
-		} else {
-			if (!strcasecmp(last_status, "chat")) {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_AVAILABLE_FOR_CHAT);
-			} else if (!strcasecmp(last_status, "away")) {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_AWAY_TEMPORARILY);
-			} else if (!strcasecmp(last_status, "xa")) {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_AWAY_EXTENDED);
-			} else if (!strcasecmp(last_status, "dnd")) {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_DO_NOT_DISTURB);
-			} else if (!strcasecmp(last_status, "school")) {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_SCHOOL);
-			} else if (!strcasecmp(last_status, "work")) {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_WORK);
-			} else if (!strcasecmp(last_status, "lunch")) {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_LUNCH);
-			} else if (!strcasecmp(last_status, "dinner")) {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_DINNER);
-			} else if (!strcasecmp(last_status, "sleep")) {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_SLEEP);
-			} else {
-				BlabberMainWindow::Instance()->PostMessage(BLAB_AVAILABLE_FOR_CHAT);
-			}
-		}
+	if (last_used_custom) {
+		SendPresence(last_status, last_custom_status);
+		BlabberMainWindow::Instance()->SetCustomStatus(last_custom_status);
 	} else {
-		BlabberMainWindow::Instance()->PostMessage(BLAB_AVAILABLE_FOR_CHAT);
+		if (last_status == gloox::Presence::Chat) {
+			BlabberMainWindow::Instance()->PostMessage(BLAB_AVAILABLE_FOR_CHAT);
+		} else if (last_status == gloox::Presence::Away) {
+			BlabberMainWindow::Instance()->PostMessage(BLAB_AWAY_TEMPORARILY);
+		} else if (last_status == gloox::Presence::XA) {
+			BlabberMainWindow::Instance()->PostMessage(BLAB_AWAY_EXTENDED);
+		} else if (last_status == gloox::Presence::DND) {
+			BlabberMainWindow::Instance()->PostMessage(BLAB_DO_NOT_DISTURB);
+		} else {
+			BlabberMainWindow::Instance()->PostMessage(BLAB_AVAILABLE_FOR_CHAT);
+		}
 	}
 }
 

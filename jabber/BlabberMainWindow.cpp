@@ -467,7 +467,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_AVAILABLE_FOR_CHAT: {
-			JabberSpeak::Instance()->SendPresence();
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::Chat);
 			_chat_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "chat");
@@ -477,7 +477,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_DO_NOT_DISTURB: {
-			JabberSpeak::Instance()->SendPresence("dnd");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::DND);
 			_dnd_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "dnd");
@@ -487,7 +487,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_AWAY_TEMPORARILY: {
-			JabberSpeak::Instance()->SendPresence("away");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::Away);
 			_away_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "away");
@@ -497,7 +497,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_AWAY_EXTENDED: {
-			JabberSpeak::Instance()->SendPresence("xa");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA);
 			_xa_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "xa");
@@ -507,7 +507,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_SCHOOL: {
-			JabberSpeak::Instance()->SendPresence("xa", "Off to School");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, "Off to School");
 			_school_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "school");
@@ -517,7 +517,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_WORK: {
-			JabberSpeak::Instance()->SendPresence("xa", "Busy at Work");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, "Busy at Work");
 			_work_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "work");
@@ -527,7 +527,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_LUNCH: {
-			JabberSpeak::Instance()->SendPresence("away", "Lunch");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::Away, "Lunch");
 			_lunch_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "lunch");
@@ -537,7 +537,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_DINNER: {
-			JabberSpeak::Instance()->SendPresence("away", "Dinner");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::Away, "Dinner");
 			_dinner_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "dinner");
@@ -547,7 +547,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_SLEEP: {
-			JabberSpeak::Instance()->SendPresence("xa", "Sleeping");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, "Sleeping");
 			_sleep_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "sleep");

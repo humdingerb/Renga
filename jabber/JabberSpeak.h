@@ -10,6 +10,7 @@
 #include <gloox/bookmarkstorage.h>
 #include <gloox/client.h>
 #include <gloox/connectionlistener.h>
+#include <gloox/presence.h>
 #include <gloox/rosterlistener.h>
 
 #include <map>
@@ -53,7 +54,7 @@ public:
 	void                     RemoveFromRoster(const UserID *removed_user);
 	void                     SendMessage(const TalkWindow::talk_type type, const UserID *user, string message, string thread_id);
 	void                     SendMessage(const TalkWindow::talk_type type, string group_room, string message);
-	void                     SendPresence(string show = "", string status = "");
+	void                     SendPresence(gloox::Presence::PresenceType = gloox::Presence::Probe, string status = "");
 	void                     SendLastPresence();
 	void	                 SendGroupPresence(string _group_room, string _group_username);
 	void	                 SendGroupUnvitation(string _group_room, string _group_username);

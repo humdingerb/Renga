@@ -2,55 +2,19 @@
 // Blabber [SendTalkWindow.cpp]
 //////////////////////////////////////////////////
 
-#ifndef CUSTOM_STATUS_WINDOW_H
-	#include "CustomStatusWindow.h"
-#endif
-
+#include "CustomStatusWindow.h"
 #include <InterfaceKit.h>
-
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
-
-#ifndef _BOX_H
-	#include <interface/Box.h>
-#endif
-
-#ifndef _BUTTON_H
-	#include <interface/Button.h>
-#endif
-
-#ifndef _STRING_VIEW_H
-	#include <interface/StringView.h>
-#endif
-
-#ifndef APP_LOCATION_H
-	#include "AppLocation.h"
-#endif
-
-#ifndef BLABBER_MAIN_WINDOW_H
-	#include "BlabberMainWindow.h"
-#endif
-
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef GENERIC_FUNCTIONS_H
-	#include "GenericFunctions.h"
-#endif
-
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef PICTURE_VIEW_H
-	#include "PictureView.h"
-#endif
+#include <cstdio>
+#include <interface/Box.h>
+#include <interface/Button.h>
+#include <interface/StringView.h>
+#include "AppLocation.h"
+#include "BlabberMainWindow.h"
+#include "BlabberSettings.h"
+#include "GenericFunctions.h"
+#include "JabberSpeak.h"
+#include "Messages.h"
+#include "PictureView.h"
 
 CustomStatusWindow *CustomStatusWindow::_instance = NULL;
 
@@ -191,16 +155,16 @@ void CustomStatusWindow::MessageReceived(BMessage *msg) {
 		//// JAB_OK
 		case JAB_OK: {
 			if (_chat->Value()) {
-				JabberSpeak::Instance()->SendPresence("chat", _handle->Text());
+				JabberSpeak::Instance()->SendPresence(gloox::Presence::Chat, _handle->Text());
 				BlabberSettings::Instance()->SetData("last-custom-exact-status", "chat");
 			} else if (_away->Value()) {
-				JabberSpeak::Instance()->SendPresence("away", _handle->Text());
+				JabberSpeak::Instance()->SendPresence(gloox::Presence::Away, _handle->Text());
 				BlabberSettings::Instance()->SetData("last-custom-exact-status", "away");
 			} else if (_xa->Value()) {
-				JabberSpeak::Instance()->SendPresence("xa", _handle->Text());
+				JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, _handle->Text());
 				BlabberSettings::Instance()->SetData("last-custom-exact-status", "xa");
 			} else if (_dnd->Value()) {
-				JabberSpeak::Instance()->SendPresence("dnd", _handle->Text());
+				JabberSpeak::Instance()->SendPresence(gloox::Presence::DND, _handle->Text());
 				BlabberSettings::Instance()->SetData("last-custom-exact-status", "dnd");
 			}			
 	
