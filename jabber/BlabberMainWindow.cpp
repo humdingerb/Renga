@@ -951,7 +951,7 @@ bool BlabberMainWindow::ValidateLogin() {
 	}
 
 	// validity of username
-	UserID username(_login_username->Text());
+	UserID username(gloox::JID(_login_username->Text()));
 
 	if (username.WhyNotValidJabberHandle().size()) {
 		char buffer[1024];

@@ -18,7 +18,7 @@
 	#include "UserID.h"
 #endif
 
-UserID::UserID(std::string handle) {
+UserID::UserID(gloox::JID handle) {
 	// initialize values
 	SetHandle(handle);
 
@@ -55,7 +55,7 @@ UserID::user_type UserID::UserType() const {
 }
 
 const std::string UserID::Handle() const {
-	return _handle;
+	return _handle.full();
 }
 
 const std::string UserID::FriendlyName() const {
@@ -161,16 +161,7 @@ const std::string UserID::TransportPassword() const {
 
 void UserID::StripJabberResource() {
 	if (WhyNotValidJabberHandle().size()) {
-		// strip off last / if it's there
-		std::string::size_type last_slash = _handle.rfind("/");
-
-		if (last_slash != std::string::npos) {
-			// remove it
-			_handle.erase(last_slash);
-
-			// reset handle to cause reparse
-			SetHandle(_handle);
-		}
+		_handle.setResource("");
 	}
 }
 
@@ -188,31 +179,20 @@ std::string UserID::WhyNotValidJabberHandle() {
 		return "Jabber ID username part must not be longer than 255 characters.";
 	}
 
-	// verify ASCII charactership of entire login
-	for (uint i=0; i<_handle.size(); ++i) {
-		if (int(_handle[i]) < 33) {
-			return "Jabber ID must not contain unprintable characters.";
-		}
-
-		if (isspace(int(_handle[i]))) {
-			return "Jabber ID must not contain whitespace.";
-		}
-
-		if (iscntrl(int(_handle[i]))) {
-			return "Jabber ID must not contain control characters.";
-		}
-	}
-
 	// verify ASCII charactership of abbreviated username
 	if (_jabber_username.find_first_of(":@<>'\"&") != std::string::npos) {
 		return "Jabber ID username part must not contain any of the following characters in the handle: @<>:'\"&";
+	}
+
+	if (!_handle) {
+		return "Jabber ID could not be parsed for an unkonwn reason";
 	}
 
 	// no errors found
 	return "";
 }
 
-void UserID::SetHandle(std::string handle) {
+void UserID::SetHandle(gloox::JID handle) {
 	// initialize values
 	_handle = handle;
 
@@ -276,152 +256,13 @@ void UserID::SetSubscriptionStatus(gloox::SubscriptionType status) {
 }
 
 void UserID::_ProcessHandle() {
-	////////// Split into Jabber pieces
-	{
-		size_t squigly_pos, slash_pos;
-
-		// reset split values
-		_jabber_username  = "";
-		_jabber_server    = "";
-		_jabber_resource  = "";
-
-		// extract abbreviated username (text between start of username and @)
-		squigly_pos = _handle.find("@");
-
-		if (squigly_pos != std::string::npos && squigly_pos != 0) {
-			// extract the abbreviated username
-			_jabber_username = _handle.substr(0, squigly_pos);
-		} else {
-			goto FINISH_JABBER_PARSE;
-		}
-
-		// is there still reason to go on (is there more text)?
-		if ((_handle.size() - 1) != squigly_pos) {
-			// extract server name (text between @ and /)
-			slash_pos = _handle.find("/", squigly_pos);
-
-			if (slash_pos == std::string::npos) {
-				// all the rest is the server name (there is no resource)
-				_jabber_server = _handle.substr(squigly_pos + 1, _handle.size() - squigly_pos);
-			} else {
-				// extract server name
-				_jabber_server = _handle.substr(squigly_pos + 1, slash_pos - squigly_pos - 1);
-
-				// extract resource name
-				_jabber_resource = _handle.substr(slash_pos + 1, _handle.size() - slash_pos - 1);
-			}
-		}
-	}
-
-	FINISH_JABBER_PARSE:;
-
-	////////// Split into Transport pieces
-	{
-		uint slash_pos, arguments_pos;
-
-		// reset split values
-		_transport_id        = "";
-		_transport_username  = "";
-		_transport_password  = "";
-
-		// extract transport ID (text between start of ID and / - i.e., aim.jabber.org)
-		slash_pos = _handle.find("/registered");
-
-		if (slash_pos != std::string::npos) {
-			slash_pos = _handle.find("/register");
-		}
-
-		if (slash_pos != std::string::npos && slash_pos != 0) {
-			// extract the abbreviated username
-			_transport_id = _handle.substr(0, slash_pos);
-		} else {
-			goto FINISH_TRANSPORT_PARSE;
-		}
-
-		// does this agent exist?
-		Agent *agent = AgentList::Instance()->GetAgentByID(_transport_id);
-
-		if (!agent) {
-			goto FINISH_TRANSPORT_PARSE;
-		}
-
-		// this agent is registered
-		agent->SetRegisteredFlag(true);
-
-		// advance to username
-		arguments_pos = slash_pos + 12;
-
-		// is there still reason to go on (is there more text)?
-		if ((_handle.size() - 1) > arguments_pos) {
-			// clip off the name/value pairs
-			std::string pairs = _handle.substr(arguments_pos);
-			pairs += "&";
-
-			// iterate through and parse out individual name/value pairs
-			while(pairs.size()) {
-				uint amp_pos = pairs.find("&");
-
-				// if there's another segment of data
-				if (amp_pos != std::string::npos) {
-					// extract data
-					std::string name_value = pairs.substr(0, amp_pos);
-
-					// find =
-					uint equal_pos = name_value.find("=");
-
-					if (equal_pos != std::string::npos) {
-						// extract key and value separately
-						std::string key   = name_value.substr(0, equal_pos);
-						std::string value = name_value.substr(equal_pos + 1, name_value.size() - equal_pos - 1);
-
-						if (key.size() && value.size()) {
-							if (key == "name" || key == "uin") {
-								agent->SetUsername(value);
-							}
-
-							if (key == "pass") {
-								agent->SetPassword(value);
-							}
-						}
-					}
-
-					// prune off segment
-					pairs.erase(0, amp_pos + 1);
-				} else {
-					break;
-				}
-			}
-		}
-	}
-
-	FINISH_TRANSPORT_PARSE:;
+	// reset split values
+	_jabber_username  = _handle.username();
+	_jabber_server    = _handle.server();
+	_jabber_resource  = _handle.resource();
 
 	if (_jabber_username.size() && _jabber_server.size()) {
 		_user_type = JABBER;
-
-		// is this pure Jabber or external?
-		Agent *agent = AgentList::Instance()->GetAgentByID(_jabber_server);
-
-		if (agent) {
-			// determine type
-			if (agent->Service() == "aim") {
-				_user_type = AIM;
-			}
-
-			if (agent->Service() == "yahoo") {
-				_user_type = YAHOO;
-			}
-
-			if (agent->Service() == "icq") {
-				_user_type = ICQ;
-			}
-
-			if (agent->Service() == "msn") {
-				_user_type = MSN;
-			}
-		}
-	} else if (_transport_id.size()) {
-		_user_type = TRANSPORT;
 	} else {
 		_user_type = INVALID;
 	}

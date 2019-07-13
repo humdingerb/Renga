@@ -8,6 +8,7 @@
 #define USER_ID_H
 
 #include <gloox/gloox.h>
+#include <gloox/jid.h>
 
 #include <string>
 
@@ -17,7 +18,7 @@ public:
 	enum user_type      {INVALID, JABBER, AIM, ICQ, YAHOO, MSN, TRANSPORT};
 
 public:
-          	             UserID(std::string username);
+          	             UserID(gloox::JID username);
           	             UserID(const UserID &copied_userid);
 	virtual             ~UserID();
 
@@ -50,7 +51,7 @@ public:
 	std::string          WhyNotValidJabberHandle();
 
 	// MANIPULATORS
-	void                 SetHandle(std::string handle);
+	void                 SetHandle(gloox::JID handle);
 	void                 SetFriendlyName(std::string friendly_name);
 
 	void                 SetOnlineStatus(online_status status);
@@ -62,7 +63,7 @@ private:
 	void                 _ProcessHandle();
 
 	// identification
-	std::string          _handle;
+	gloox::JID           _handle;
 	std::string          _friendly_name;
 	std::string          _service;
 
