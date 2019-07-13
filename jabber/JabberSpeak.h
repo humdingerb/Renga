@@ -12,6 +12,7 @@
 #include <gloox/connectionlistener.h>
 #include <gloox/presence.h>
 #include <gloox/rosterlistener.h>
+#include <gloox/softwareversion.h>
 
 #include <map>
 #include <string>
@@ -103,7 +104,7 @@ private:
 	void                    _ConnectionThread();
 
 	// OUTGOING COMMUNICATION
-	void					_ProcessVersionRequest(string req_id, string req_from);
+	void					_ProcessVersionRequest(void);
 
 	// INCOMING COMMUNICATION
 	void                    _ProcessRegistration(XMLEntity *iq_register_entity);

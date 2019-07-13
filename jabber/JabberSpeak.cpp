@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////
 
 #include <gloox/jid.h>
+#include <gloox/disco.h>
 #include <gloox/registration.h>
 #include <gloox/rostermanager.h>
 
@@ -287,22 +288,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 
 				// remove the item from the list of pending IQs
 				_iq_map.erase(iq_id);
-			}
-		}
-
-		// handle verion request
-		if (!strcasecmp(entity->Attribute("type"), "get")) {
-			string iq_from;   
-			if (entity->Attribute("from")) {
-				iq_from = entity->Attribute("from");
-			}
-		
-			// get access to query tag
-			XMLEntity *query = entity->Child("query");
-			if (query && query->Attribute("xmlns")) {
-				if (!strcasecmp(query->Attribute("xmlns"), "jabber:iq:version")) {
-					_ProcessVersionRequest(iq_id, iq_from);
-				}
 			}
 		}
 
@@ -688,6 +673,7 @@ void JabberSpeak::_ConnectionThread() {
 	fClient->registerConnectionListener(this);
 	fClient->rosterManager()->registerRosterListener(this);
 	fClient->registerMessageHandler(TalkManager::Instance());
+	_ProcessVersionRequest();
 	puts("connect");
 	fClient->connect();
 	puts("connect ok");
@@ -857,31 +843,7 @@ void JabberSpeak::UnregisterWithAgent(string agent) {
 	JRoster::Instance()->Unlock();
 }
 
-void JabberSpeak::_ProcessVersionRequest(string req_id, string req_from) {
-	XMLEntity   *entity_iq, *entity_query;
-	char **atts_iq    = CreateAttributeMemory(6);
-	char **atts_query = CreateAttributeMemory(2);
-
-	// assemble attributes;
-	strcpy(atts_iq[0], "id");
-	strcpy(atts_iq[1], req_id.c_str());
-
-	strcpy(atts_iq[2], "to");
-	strcpy(atts_iq[3], req_from.c_str());
-
-	strcpy(atts_iq[4], "type");
-	strcpy(atts_iq[5], "result");
-	entity_iq    = new XMLEntity("iq", (const char **)atts_iq);
-
-	strcpy(atts_query[0], "xmlns");
-	strcpy(atts_query[1], "jabber:iq:version");
-	entity_query = new XMLEntity("query", (const char **)atts_query);
-
-	entity_iq->AddChild(entity_query);
-	
-	entity_query->AddChild("name", NULL, "Jabber");
-	entity_query->AddChild("version", NULL, APP_VERSION);
-
+void JabberSpeak::_ProcessVersionRequest(void) {
 	string strVersion("Haiku");
 	BPath path;
 	if (find_directory(B_BEOS_LIB_DIRECTORY, &path) == B_OK) {
@@ -896,32 +858,42 @@ void JabberSpeak::_ProcessVersionRequest(string req_id, string req_from) {
 				B_APP_VERSION_KIND) == B_OK
 			&& versionInfo.short_info[0] != '\0')
 				strVersion = versionInfo.short_info;
-	}
 
-	string os_info;
-	utsname uname_info;
-	if (uname(&uname_info) == 0) {
-		os_info = uname_info.sysname;
-		long revision = 0;
-		if (sscanf(uname_info.version, "r%ld", &revision) == 1) {
-			char version[16];
-			snprintf(version, sizeof(version), "%ld", revision);
-			os_info += " ( " + strVersion + " Rev. ";
-			os_info += version;
-			os_info += ")";
+		if (strVersion == "Walter")
+			strVersion = "Haiku";
+
+		BString appVersion;
+		appVersion << " " << versionInfo.major << "." << versionInfo.middle;
+		if (versionInfo.minor > 0)
+			appVersion << "." << versionInfo.minor;
+
+		// Add the version variety
+		const char* variety = NULL;
+		switch (versionInfo.variety) {
+			case B_DEVELOPMENT_VERSION:
+				variety = "development";
+				break;
+			case B_ALPHA_VERSION:
+				variety = "alpha";
+				break;
+			case B_BETA_VERSION:
+				variety = "beta";
+				break;
+			case B_GAMMA_VERSION:
+				variety = "gamma";
+				break;
+			case B_GOLDEN_MASTER_VERSION:
+				variety = "gold master";
+				break;
 		}
+
+		if (variety)
+			appVersion << "-" << variety;
+
+		strVersion += appVersion;
 	}
 
-	entity_query->AddChild("os", NULL, os_info.c_str());
-
-	// send XML command
-	char *str = entity_iq->ToString();
-	free(str);
-
-	DestroyAttributeMemory(atts_iq, 6);
-	DestroyAttributeMemory(atts_query, 2);
-	
-	delete entity_iq;
+	fClient->disco()->setVersion("Jabber4Haiku", APP_VERSION, strVersion);
 }
 
 void
@@ -1182,9 +1154,9 @@ void
 JabberSpeak::handleBookmarks(const gloox::BookmarkList& bList,
                              const gloox::ConferenceList& cList)
 {
-	printf("%s\n", __PRETTY_FUNCTION__);
-
 	for (auto i: bList) {
+		printf("%s\n", __PRETTY_FUNCTION__);
+
 		printf("%s -> %s\n", i.name.c_str(), i.url.c_str());
 	}
 
@@ -1193,6 +1165,8 @@ JabberSpeak::handleBookmarks(const gloox::BookmarkList& bList,
 			TalkManager::Instance()->CreateTalkSession(TalkWindow::GROUP, NULL,
 				i.jid.c_str(), i.nick.c_str());
 		} else {
+			printf("%s\n", __PRETTY_FUNCTION__);
+
 			printf("%s -> jid %s nick %s pwd %s autojoin %d\n", i.name.c_str(),
 				i.jid.c_str(), i.nick.c_str(), i.password.c_str(), i.autojoin);
 		}
