@@ -278,7 +278,7 @@ void UserID::SetSubscriptionStatus(gloox::SubscriptionType status) {
 void UserID::_ProcessHandle() {
 	////////// Split into Jabber pieces
 	{
-		uint squigly_pos, slash_pos;
+		size_t squigly_pos, slash_pos;
 
 		// reset split values
 		_jabber_username  = "";

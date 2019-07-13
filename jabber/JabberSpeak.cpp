@@ -122,27 +122,6 @@ void JabberSpeak::DestroyAttributeMemory(char **atts, int num_items) {
 	free(atts);
 }
 
-string JabberSpeak::GenerateUniqueID() {
-	static long counter = 0;
-
-	// element #1: PID of process (same through application run-time)
-	pid_t pid = getpid();
-	
-	// element #2: seconds since Jan. 1, 1970 (new value every second)
-	time_t secs = time(NULL);
-	
-	// element #3: private counter (new value every call)
-	++counter;
-	
-	// glue number together
-	char buffer[100];
-	
-	sprintf(buffer, "%lu:%lu:%lu", pid, secs, counter);
-	
-	// return value
-	return string(buffer);
-}
-
 const string JabberSpeak::CurrentRealName() const {
 	return _curr_realname;
 }
@@ -188,7 +167,7 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 		XMLEntity *query = entity->Child("query");
 		
 		if (query && query->Attribute("xmlns")) {
-			string unique_id = GenerateUniqueID();
+			string unique_id = GenericFunctions::GenerateUniqueID();
 			
 			if (!strcasecmp(query->Attribute("xmlns"), "jabber:iq:roster")) {
 				 iq_id = unique_id;
@@ -408,7 +387,7 @@ void JabberSpeak::_SendTransportRegistrationInformation(Agent *agent, string key
 	// assemble attributes;
 	strcpy(atts_iq[0], "id");
 
-	strcpy(atts_iq[1], GenerateUniqueID().c_str());
+	strcpy(atts_iq[1], GenericFunctions::GenerateUniqueID().c_str());
 
 	strcpy(atts_iq[2], "type");
 	strcpy(atts_iq[3], "set");
@@ -449,7 +428,7 @@ void JabberSpeak::_SendTransportUnregistrationInformation(Agent *agent, string k
 
 	// assemble attributes;
 	strcpy(atts_iq[0], "id");
-	strcpy(atts_iq[1], GenerateUniqueID().c_str());
+	strcpy(atts_iq[1], GenericFunctions::GenerateUniqueID().c_str());
 
 	strcpy(atts_iq[2], "type");
 	strcpy(atts_iq[3], "set");
@@ -837,7 +816,7 @@ void JabberSpeak::RegisterWithAgent(string agent) {
 	strcpy(atts[1], "get");
 
 	strcpy(atts[2], "id");
-	strcpy(atts[3], GenerateUniqueID().c_str());
+	strcpy(atts[3], GenericFunctions::GenerateUniqueID().c_str());
 
 	strcpy(atts[4], "to");
 	strcpy(atts[5], AgentList::Instance()->GetAgentByService(agent)->JID().c_str());

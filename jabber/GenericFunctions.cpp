@@ -64,7 +64,7 @@ std::string GenericFunctions::GenerateUniqueID() {
 	// glue number together
 	char buffer[100];
 
-	sprintf(buffer, "%lu:%lu:%lu", pid, secs, counter);
+	sprintf(buffer, "%" B_PRIu32 ":%lu:%lu", pid, secs, counter);
 
 	// return value
 	return std::string(buffer);

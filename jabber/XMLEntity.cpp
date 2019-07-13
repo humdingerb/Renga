@@ -333,7 +333,7 @@ void XMLEntity::SetCompleted(bool is_complete) {
 }
 
 string XMLEntity::EscapeText(string text) {
-	unsigned int replacement;
+	size_t replacement;
 
 	replacement = 0;
 	while ((replacement = text.find("&", replacement)) != string::npos) {
@@ -354,7 +354,7 @@ string XMLEntity::EscapeText(string text) {
 }
 
 string XMLEntity::DeEscapeText(string text) {
-	unsigned int replacement;
+	size_t replacement;
 
 	replacement = 0;
 	while ((replacement = text.find("&amp;", replacement)) != string::npos) {
