@@ -2,41 +2,19 @@
 // Blabber [TalkManager.cpp]
 //////////////////////////////////////////////////
 
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
+#include <gloox/instantmucroom.h>
 
-#ifndef _WINDOW_H
-	#include <interface/Window.h>
-#endif
+#include <cstdio>
 
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
+#include <interface/Window.h>
 
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
-
-#ifndef MESSAGE_REPEATER_H
-	#include "MessageRepeater.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
-
-#ifndef SOUND_SYSTEM_H
-	#include "SoundSystem.h"
-#endif
-
-#ifndef TALK_MANAGER_H
-	#include "TalkManager.h"
-#endif
+#include "BlabberSettings.h"
+#include "JabberSpeak.h"
+#include "MessageRepeater.h"
+#include "Messages.h"
+#include "ModalAlertFactory.h"
+#include "SoundSystem.h"
+#include "TalkManager.h"
 
 TalkManager *TalkManager::_instance = NULL;
 
@@ -59,8 +37,10 @@ TalkManager::~TalkManager() {
 	_instance = NULL;
 }
 
-TalkWindow *TalkManager::CreateTalkSession(const TalkWindow::talk_type type, const UserID *user, string group_room, string group_username, string thread, bool sound_on_new) {
-	
+TalkWindow *TalkManager::CreateTalkSession(const TalkWindow::talk_type type,
+	const UserID* user, string group_room, string group_username,
+	string thread, bool sound_on_new)
+{
 	TalkWindow *window = NULL;
 	
 	// is there a window already?
@@ -108,8 +88,12 @@ TalkWindow *TalkManager::CreateTalkSession(const TalkWindow::talk_type type, con
 		// add it to the known list BUGBUG we need to remove this when window closes
 		_talk_map[thread] = window;
 
-		// send presence
-		JabberSpeak::Instance()->SendGroupPresence(group_room, group_username);
+		// FIXME we need to free this when leaving the room!
+		gloox::JID jid(group_room);
+		jid.setResource(group_username);
+		fprintf(stderr, "TRY TO JOIN MUC %s\n", group_room.c_str());
+		(new gloox::InstantMUCRoom(JabberSpeak::Instance()->GlooxClient(),
+			jid, this))->join();
 	}
 	
 	// return a reference as well
@@ -117,7 +101,8 @@ TalkWindow *TalkManager::CreateTalkSession(const TalkWindow::talk_type type, con
 }
 
 void
-TalkManager::handleMessage(const gloox::Message &msg, __attribute__((unused)) gloox::MessageSession *session)
+TalkManager::handleMessage(const gloox::Message &msg,
+	__attribute__((unused)) gloox::MessageSession *session)
 {
 	TalkWindow::talk_type type;
 	string                thread_id;
@@ -169,43 +154,7 @@ TalkManager::handleMessage(const gloox::Message &msg, __attribute__((unused)) gl
 			thread_id = IsExistingWindowToUser(type, sender);
 		}
 	} else if (type == TalkWindow::GROUP) {
-		// separate room and server
-		string::size_type at_pos = sender.find("@");
-
-		if (at_pos != string::npos) {
-			// get group room
-			group_room = sender.substr(0, at_pos);
-			
-			// clear out text
-			sender = sender.substr(at_pos + 1);
-			
-			// now pare out server and username
-			string::size_type slash_pos = sender.find("/");
-			
-			if (slash_pos != string::npos) {
-				// get server
-				group_server = sender.substr(0, slash_pos);
-
-				// clear out text
-				group_username = sender.substr(slash_pos + 1);
-
-				// create identity
-				group_identity = group_room + '@' + group_server;
-			} else {
-				// get server
-				group_server = sender.substr(0, slash_pos);
-
-				// create identity
-				group_identity = group_room + '@' + group_server;
-			}
-		} else {
-			return;
-		}
-		
-		// is there a window with the same sender already open? (only for chat)
-		if (!IsExistingWindowToGroup(type, group_identity).empty()) {
-			thread_id = IsExistingWindowToGroup(type, group_identity);
-		}
+		fprintf(stderr, "received group message at %s\n", __PRETTY_FUNCTION__);
 	}
 
 	// create new thread ID
@@ -358,4 +307,121 @@ void TalkManager::RotateToNextWindow(TalkWindow *current, rotation direction) {
 void TalkManager::Reset() {
 	MessageRepeater::Instance()->PostMessage(JAB_CLOSE_TALKS);
 	_talk_map.clear();
+}
+
+
+void
+TalkManager::handleMUCParticipantPresence(gloox::MUCRoom *room,
+							const gloox::MUCRoomParticipant participant,
+							const gloox::Presence &presence)
+{
+	BMessage msg;
+	BString fullRoom;
+	fullRoom.SetToFormat("%s@%s", room->name().c_str(), room->service().c_str());
+	msg.AddString("room", fullRoom);
+	msg.AddString("server", room->service().c_str());
+	msg.AddString("username", participant.nick->resource().c_str());
+	if (presence.subtype() == gloox::Presence::Available) {
+		msg.what = JAB_GROUP_CHATTER_ONLINE;
+	} else if (presence.subtype() == gloox::Presence::Unavailable) {
+		msg.what = JAB_GROUP_CHATTER_OFFLINE;
+	}
+	MessageRepeater::Instance()->PostMessage(&msg);
+}
+
+
+void
+TalkManager::handleMUCMessage(gloox::MUCRoom *room,
+	const gloox::Message &msg, bool priv __attribute__((unused)))
+{
+	string thread_id;
+	TalkWindow *window = NULL;
+
+	string group_room;
+	string group_server;
+	string group_username;
+	string group_identity;
+
+	// get group room
+	group_room = room->name();
+			
+	// clear out text
+	group_username = msg.from().resource();
+			
+	// get server
+	group_server = room->service();
+
+	// create identity
+	group_identity = group_room + '@' + group_server;
+		
+	// is there a window with the same sender already open? (only for chat)
+	if (!IsExistingWindowToGroup(TalkWindow::GROUP, group_identity).empty()) {
+		thread_id = IsExistingWindowToGroup(TalkWindow::GROUP, group_identity);
+	} else {
+		fprintf(stderr, "Failed to find chat window\n");
+		return;
+	}
+	window = _talk_map[thread_id];
+	// submit the chat
+	if (window) {
+		window->Lock();
+
+		if (group_username.empty()) {
+			window->AddToTalk("System:", msg.body(), TalkWindow::OTHER);
+		} else {
+			window->NewMessage(group_username, msg.body());
+		}
+		window->Unlock();
+	}
+}
+
+
+bool
+TalkManager::handleMUCRoomCreation(gloox::MUCRoom *room __attribute__((unused)))
+{
+	fprintf(stderr, "%s\n", __PRETTY_FUNCTION__);
+	return false;
+}
+
+
+void
+TalkManager::handleMUCSubject(gloox::MUCRoom *room __attribute__((unused)),
+							const std::string &nick __attribute__((unused)),
+							const std::string &subject __attribute__((unused)))
+{
+	fprintf(stderr, "%s\n", __PRETTY_FUNCTION__);
+}
+
+
+void
+TalkManager::handleMUCInviteDecline(gloox::MUCRoom *room __attribute__((unused)),
+							const gloox::JID &invitee __attribute__((unused)),
+							const std::string &reason __attribute__((unused)))
+{
+	fprintf(stderr, "%s\n", __PRETTY_FUNCTION__);
+}
+
+
+void
+TalkManager::handleMUCError(gloox::MUCRoom *room,
+							gloox::StanzaError error)
+{
+	fprintf(stderr, "%s(%p, %d)\n", __PRETTY_FUNCTION__, room, error);
+}
+
+
+void
+TalkManager::handleMUCInfo(gloox::MUCRoom *room __attribute__((unused)), int features __attribute__((unused)),
+							const std::string &name __attribute__((unused)),
+							const gloox::DataForm *infoForm __attribute__((unused)))
+{
+	fprintf(stderr, "%s\n", __PRETTY_FUNCTION__);
+}
+
+
+void
+TalkManager::handleMUCItems(gloox::MUCRoom *room __attribute__((unused)),
+							const gloox::Disco::ItemList &items __attribute__((unused)))
+{
+	fprintf(stderr, "%s\n", __PRETTY_FUNCTION__);
 }

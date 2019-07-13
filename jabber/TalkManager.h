@@ -9,6 +9,7 @@
 
 #include <gloox/messagehandler.h>
 #include <gloox/message.h>
+#include <gloox/mucroomhandler.h>
 
 #include <map>
 #include <string>
@@ -18,7 +19,7 @@
 #include "XMLEntity.h"
 
 // FIXME could we replace this with MessageSessionHandler?
-class TalkManager : public gloox::MessageHandler {
+class TalkManager : public gloox::MessageHandler, gloox::MUCRoomHandler {
 public:
 	typedef  std::map<std::string, TalkWindow *>                   TalkMap;
 	typedef  std::map<std::string, TalkWindow *>::iterator         TalkIter;
@@ -30,7 +31,7 @@ public:
 	static TalkManager  *Instance();
       	                ~TalkManager();
 
-	TalkWindow          *CreateTalkSession(const TalkWindow::talk_type type, const UserID *user,
+	TalkWindow          *CreateTalkSession(const TalkWindow::talk_type type, const UserID* user,
 				std::string group_room, std::string group_username, 
 				std::string thread = GenericFunctions::GenerateUniqueID(), bool sound_on_new = false);
 	void                 handleMessage (const gloox::Message &msg, gloox::MessageSession *session) final;
@@ -44,6 +45,26 @@ public:
 	
 	void                 Reset();
 	
+	// MUC handlers from gloox
+	void				handleMUCParticipantPresence(gloox::MUCRoom *room,
+							const gloox::MUCRoomParticipant participant,
+							const gloox::Presence &presence);
+	void				handleMUCMessage(gloox::MUCRoom *room,
+							const gloox::Message &msg, bool priv);
+	bool				handleMUCRoomCreation(gloox::MUCRoom *room);
+	void				handleMUCSubject(gloox::MUCRoom *room,
+							const std::string &nick,
+							const std::string &subject);
+	void				handleMUCInviteDecline(gloox::MUCRoom *room,
+							const gloox::JID &invitee,
+							const std::string &reason);
+	void				handleMUCError(gloox::MUCRoom *room,
+							gloox::StanzaError error);
+	void				handleMUCInfo(gloox::MUCRoom *room, int features,
+							const std::string &name,
+							const gloox::DataForm *infoForm);
+	void				handleMUCItems(gloox::MUCRoom *room,
+							const gloox::Disco::ItemList &items);
 protected:
  	                     TalkManager();
 

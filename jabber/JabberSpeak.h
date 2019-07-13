@@ -57,7 +57,6 @@ public:
 	void                     SendMessage(const TalkWindow::talk_type type, string group_room, string message);
 	void                     SendPresence(gloox::Presence::PresenceType = gloox::Presence::Probe, string status = "");
 	void                     SendLastPresence();
-	void	                 SendGroupPresence(string _group_room, string _group_username);
 	void	                 SendGroupUnvitation(string _group_room, string _group_username);
 
 	void                     _SendUserRegistration(string username, string password, string resource);
@@ -94,6 +93,7 @@ public:
 
 	void 					handleBookmarks(const gloox::BookmarkList& bList,
 										    const gloox::ConferenceList& cList) final;
+	gloox::Client* 			GlooxClient() { return fClient; }
 
 protected:
 	// CREATORS

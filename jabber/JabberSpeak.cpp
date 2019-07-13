@@ -7,6 +7,8 @@
 #include <gloox/registration.h>
 #include <gloox/rostermanager.h>
 
+#include "../support/LogHandler.h"
+
 #include "JabberSpeak.h"
 #include <cstdio>
 #include <Roster.h>
@@ -285,14 +287,8 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 				if (intent == UNREGISTER) {
 					_ProcessUnregistration(entity);
 				}
-
-				// remove the item from the list of pending IQs
-				_iq_map.erase(iq_id);
 			}
 		}
-
-		// IQ messages can be disposed of after use
-		// BUGBUG need a way of doing this, otherwise expanding memory occurs
 	}
 }
 
@@ -670,13 +666,13 @@ JabberSpeak::GetRealPort()
 void JabberSpeak::_ConnectionThread() {
 	gloox::JID jid(_curr_login);
 	fClient = new gloox::Client(jid, _password);
+	fClient->logInstance().registerLogHandler(gloox::LogLevelDebug,
+		gloox::LogAreaXmlOutgoing, new LogHandler);
 	fClient->registerConnectionListener(this);
 	fClient->rosterManager()->registerRosterListener(this);
 	fClient->registerMessageHandler(TalkManager::Instance());
 	_ProcessVersionRequest();
-	puts("connect");
 	fClient->connect();
-	puts("connect ok");
 }
 
 
@@ -761,15 +757,6 @@ void JabberSpeak::SendLastPresence() {
 			BlabberMainWindow::Instance()->PostMessage(BLAB_AVAILABLE_FOR_CHAT);
 		}
 	}
-}
-
-void JabberSpeak::SendGroupPresence(string _group_room, string _group_username) {
-	// assemble group ID
-	string group_presence = _group_room + "/" + _group_username;	
-	
-	// Send presence Stanza
-	gloox::Presence presence(gloox::Presence::Available, gloox::JID(group_presence));
-	fClient->send(presence);
 }
 
 void JabberSpeak::SendGroupUnvitation(string _group_room, string _group_username) {
@@ -1047,7 +1034,7 @@ JabberSpeak::handleRoster(const gloox::Roster& roster)
 
 void
 JabberSpeak::handleRosterPresence(const gloox::RosterItem& item,
-	const string& resource, gloox::Presence::PresenceType presenceType,
+	const string& resource __attribute__((unused)), gloox::Presence::PresenceType presenceType,
 	const string& message)
 {
 	JRoster *roster = JRoster::Instance();
@@ -1056,24 +1043,6 @@ JabberSpeak::handleRosterPresence(const gloox::RosterItem& item,
 
 	roster->Lock();
 
-	if (resource != "" && !TalkManager::Instance()->IsExistingWindowToGroup(
-		TalkWindow::GROUP, jid.bare()).empty())
-	{
-		BMessage msg;
-		msg.AddString("room", jid.bare().c_str());
-		msg.AddString("server", jid.server().c_str());
-		msg.AddString("username", jid.resource().c_str());
-
-		if (presenceType == gloox::Presence::Available) {
-			msg.what = JAB_GROUP_CHATTER_ONLINE;
-		} else if (presenceType == gloox::Presence::Unavailable) {
-			msg.what = JAB_GROUP_CHATTER_OFFLINE;
-		}
-		MessageRepeater::Instance()->PostMessage(&msg);
-		roster->Unlock();
-		return;
-	}
-	
 	for (JRoster::ConstRosterIter i = roster->BeginIterator();
 		i != roster->EndIterator(); ++i)
 	{
