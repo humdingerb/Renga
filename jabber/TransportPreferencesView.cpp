@@ -170,7 +170,11 @@ void TransportPreferencesView::AttachedToWindow() {
 	enter_note->SetViewColor(216, 216, 216, 255);
 	enter_note->MakeEditable(false);
 	enter_note->MakeSelectable(false);
-	enter_note->SetText("Note: Transports serve as the means by which Jabber communicates with external chat systems such as AOL and ICQ.  They are add-on components to the Jabber server you are logged on to and thus can be ERRATIC and/or BUGGY.  If you are having trouble with a transport, it is likely the server's fault and not Jabber for Haiku.");
+	enter_note->SetText("Note: Transports serve as the means by which Jabber "
+		"communicates with external chat systems such as AOL and ICQ.  They "
+		"are add-on components to the Jabber server you are logged on to and "
+		"thus can be ERRATIC and/or BUGGY.  If you are having trouble with a "
+		"transport, it is likely the server's fault and not Renga.");
 
 	_surrounding->AddChild(enter_note);
 	_surrounding->AddChild(_agent_list);

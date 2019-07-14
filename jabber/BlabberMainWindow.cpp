@@ -647,7 +647,7 @@ bool BlabberMainWindow::QuitRequested() {
 }
 
 BlabberMainWindow::BlabberMainWindow(BRect frame)
-	: BWindow(frame, "Jabber", B_DOCUMENT_WINDOW, 0) {
+	: BWindow(frame, "Renga", B_DOCUMENT_WINDOW, 0) {
 
 	// editing filter for taksing
 	AddCommonFilter(new RotateChatFilter(NULL));
@@ -675,7 +675,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_disconnect_item = new BMenuItem("Log Off", new BMessage(JAB_DISCONNECT));
 		_disconnect_item->SetShortcut('B', 0);
 
-		_about_item      = new BMenuItem("About Jabber for Haiku", new BMessage(JAB_ABOUT));
+		_about_item      = new BMenuItem("About Renga" B_UTF8_ELLIPSIS, new BMessage(JAB_ABOUT));
 
 		_quit_item = new BMenuItem("Quit", new BMessage(JAB_QUIT));
 		_quit_item->SetShortcut('Q', 0);

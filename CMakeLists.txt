@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 # projectname is the same as the main-executable
-project(Jabber)
+project(Renga)
 
 add_definitions('-g')
 add_definitions('-Wall' '-Wextra' '-Werror' '-Wno-multichar')
@@ -9,7 +9,7 @@ add_definitions('-Wall' '-Wextra' '-Werror' '-Wno-multichar')
 
 include_directories(shared/split-pane)
 
-add_executable(Jabber
+add_executable(Renga
 	 jabber/Agent.cpp
 	 jabber/CommandMessage.cpp
 	 jabber/UserID.cpp
@@ -56,13 +56,13 @@ add_executable(Jabber
 	 jabber/XMLReader.cpp
 )
 
-target_link_libraries(Jabber
+target_link_libraries(Renga
 	be expat game gloox tracker translation
 )
 
-add_custom_command(TARGET Jabber POST_BUILD 
+add_custom_command(TARGET Renga POST_BUILD 
 	COMMAND rc -o Resource.rsrc ${CMAKE_SOURCE_DIR}/jabber/Resource.rdef
-	COMMAND xres -o ${CMAKE_BINARY_DIR}/Jabber Resource.rsrc
+	COMMAND xres -o ${CMAKE_BINARY_DIR}/Renga Resource.rsrc
 		-a PiNG:1:jabber-title ${CMAKE_SOURCE_DIR}/resources/graphics/jabber-title.png
 		-a PiNG:2:bulb-normal  ${CMAKE_SOURCE_DIR}/resources/graphics/bulb-normal.png
 		-a PiNG:3:bulb-big     ${CMAKE_SOURCE_DIR}/resources/graphics/bulb-big.png
@@ -74,8 +74,8 @@ add_custom_command(TARGET Jabber POST_BUILD
 		-a PiNG:9:icq          ${CMAKE_SOURCE_DIR}/resources/icons/icq.png
 		-a PiNG:10:yahoo       ${CMAKE_SOURCE_DIR}/resources/icons/yahoo.png
 		-a PiNG:11:msn         ${CMAKE_SOURCE_DIR}/resources/icons/msn.png
-	COMMAND mimeset -f ${CMAKE_BINARY_DIR}/Jabber
+	COMMAND mimeset -f ${CMAKE_BINARY_DIR}/Renga
 	DEPENDS jabber/Resource.rdef
 )
 
-install(TARGETS Jabber RUNTIME DESTINATION apps/)
+install(TARGETS Renga RUNTIME DESTINATION apps/)

@@ -1,6 +1,6 @@
-Jabber4Haiku is a free XMPP client for Haiku.
+Renga is a free XMPP client for Haiku.
 
-![Screenshot](Jabber4Haiku.png)
+![Screenshot](Renga.png)
 
 <hr></hr>
 Features:

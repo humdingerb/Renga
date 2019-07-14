@@ -212,25 +212,25 @@ TalkWindow::TalkWindow(talk_type type, const UserID *user, string group_room, st
 	// HELP MENU
 	_help_menu = new BMenu("Help");
 
-		_jabber_org_item = new BMenuItem("Jabber.org", new BMessage(JAB_JABBER_ORG));
-		_riv_item = new BMenuItem("OsDrawer Web site", new BMessage(JAB_RIV));
-		_jabber_central_org_item = new BMenuItem("JabberCentral.org", new BMessage(JAB_JABBER_CENTRAL_ORG));
-		_jabber_view_com_item = new BMenuItem("JabberView.com", new BMessage(JAB_JABBER_VIEW_COM));
-		_user_guide_item = new BMenuItem("Jabber for Haiku Manual", new BMessage(JAB_USER_GUIDE));
-		_faq_item = new BMenuItem("Jabber for Haiku FAQ", new BMessage(JAB_FAQ));
-		BMessage* haiku_channel = new BMessage(JAB_A_CHANNEL);
-		haiku_channel->AddString("channel", "haiku-os@conference.jabber.org");
-		_beos_user_item = new BMenuItem("Haiku Users Directory", haiku_channel);
+		//_jabber_org_item = new BMenuItem("Jabber.org", new BMessage(JAB_JABBER_ORG));
+		//_riv_item = new BMenuItem("OsDrawer Web site", new BMessage(JAB_RIV));
+		//_jabber_central_org_item = new BMenuItem("JabberCentral.org", new BMessage(JAB_JABBER_CENTRAL_ORG));
+		//_jabber_view_com_item = new BMenuItem("JabberView.com", new BMessage(JAB_JABBER_VIEW_COM));
+		_user_guide_item = new BMenuItem("Renga Manual", new BMessage(JAB_USER_GUIDE));
+		_faq_item = new BMenuItem("Renga FAQ", new BMessage(JAB_FAQ));
+		//BMessage* haiku_channel = new BMessage(JAB_A_CHANNEL);
+		//haiku_channel->AddString("channel", "haiku-os@conference.jabber.org");
+		//_beos_user_item = new BMenuItem("Haiku Users Directory", haiku_channel);
 
 	_help_menu->AddItem(_user_guide_item);
 	_help_menu->AddItem(_faq_item);
-	_help_menu->AddItem(_beos_user_item);
-	_help_menu->AddSeparatorItem();
-	_help_menu->AddItem(_riv_item);
-	_help_menu->AddSeparatorItem();
-	_help_menu->AddItem(_jabber_org_item);
-	_help_menu->AddItem(_jabber_central_org_item);
-	_help_menu->AddItem(_jabber_view_com_item);
+	//_help_menu->AddItem(_beos_user_item);
+	//_help_menu->AddSeparatorItem();
+	//_help_menu->AddItem(_riv_item);
+	//_help_menu->AddSeparatorItem();
+	//_help_menu->AddItem(_jabber_org_item);
+	//_help_menu->AddItem(_jabber_central_org_item);
+	//_help_menu->AddItem(_jabber_view_com_item);
 	_help_menu->SetTargetForItems(this);
 
 	_menubar->AddItem(_file_menu);

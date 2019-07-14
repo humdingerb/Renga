@@ -880,7 +880,7 @@ void JabberSpeak::_ProcessVersionRequest(void) {
 		strVersion += appVersion;
 	}
 
-	fClient->disco()->setVersion("Jabber4Haiku", APP_VERSION, strVersion);
+	fClient->disco()->setVersion("Renga", APP_VERSION, strVersion);
 }
 
 void

@@ -34,8 +34,6 @@ BlabberSettings::BlabberSettings(const char *filename)
 	FileXMLReader::file_status status = FileStatus();
 	
 	if (status == FileXMLReader::FILE_NOT_FOUND) {
-		// first time user perhaps?
-//		ModalAlertFactory::NonModalAlert("It appears that this is your first time using Jabber for Haiku.", "Your welcome!");
        SetDefaultTagsValue();
 	} else if (status == FileXMLReader::FILE_CORRUPTED) {
 		// back up their settings
