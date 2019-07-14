@@ -47,7 +47,7 @@ public:
 	char                   **CreateAttributeMemory(int num_items);
 	void                     DestroyAttributeMemory(char **atts, int num_items);
 	static string            GenerateUniqueID();
-	void                     SendConnect(string username = "", string password = "", string realname = "", bool ssl_enabled = false, string ssl_server = "", int32 ssl_port = 0, bool is_new_account = false, bool suppress_auto_connect = false);
+	void                     SendConnect(string username = "", string password = "", string realname = "", bool is_new_account = false, bool suppress_auto_connect = false);
 	void                     SendDisconnect();
 	void                     SendSubscriptionRequest(string username); 
 	void                     SendUnsubscriptionRequest(string username);
@@ -119,10 +119,6 @@ private:
 	string                  _curr_realname;
 	string                  _curr_login;
 	string                  _password;
-	
-	string					_ssl_server;
-	int32					_ssl_port;
-	bool					_ssl_enabled;
 	
 	bool                    _am_logged_in;
 	bool                    _registering_new_account;

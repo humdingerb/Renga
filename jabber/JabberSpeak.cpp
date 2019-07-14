@@ -88,9 +88,6 @@ void JabberSpeak::JabberSpeakReset() {
 	_curr_realname           = "";
 	_curr_login              = "";
 	_password                = "";
-	_ssl_server				 = "";
-	_ssl_port				 = 0;
-	_ssl_enabled			 = false;
 	_am_logged_in            = false;
 	_registering_new_account = false;
 	_reconnecting            = false;
@@ -405,7 +402,7 @@ void JabberSpeak::_RejectPresence(string username) {
 // OUTGOING COMMUNICATION
 //////////////////////////////////////////////////
 
-void JabberSpeak::SendConnect(string username, string password, string realname, bool ssl_enabled, string ssl_server, int32 ssl_port, bool is_new_account, bool suppress_auto_connect) {
+void JabberSpeak::SendConnect(string username, string password, string realname, bool is_new_account, bool suppress_auto_connect) {
 	_registering_new_account = is_new_account;
 
 	// if there's another application instance running, suppress auto-login
@@ -426,14 +423,10 @@ void JabberSpeak::SendConnect(string username, string password, string realname,
 			realname = (_blabber_settings->Data("last-realname")) ? _blabber_settings->Data("last-realname") : "";
 			username = (_blabber_settings->Data("last-login")) ? _blabber_settings->Data("last-login") : "";
 			password = (_blabber_settings->Data("last-password")) ? _blabber_settings->Data("last-password") : "";
-			ssl_server = (_blabber_settings->Data("last-ssl_server")) ? _blabber_settings->Data("last-ssl_server") : "";
-			ssl_enabled = (_blabber_settings->Data("last-ssl_enabled")) ? atoi(_blabber_settings->Data("last-ssl_enabled")) : false;
-			ssl_port = (_blabber_settings->Data("last-ssl_port")) ? atoi(_blabber_settings->Data("last-ssl_port")) : 0;		
 		}
 
 		// if we still don't have all the data, query for it
-		if (username.size() == 0 || password.size() == 0 || UserID(username).JabberServer().size() == 0
-			|| (ssl_enabled && ( ssl_server.size() == 0 || ssl_port <= 0) ) ) {
+		if (username.size() == 0 || password.size() == 0 || UserID(username).JabberServer().size() == 0) {
 			BlabberMainWindow::Instance()->Lock();
 			BlabberMainWindow::Instance()->ShowLogin();
 			BlabberMainWindow::Instance()->Unlock();
@@ -445,9 +438,6 @@ void JabberSpeak::SendConnect(string username, string password, string realname,
 	_curr_realname = realname;
 	_curr_login    = username;
 	_password      = password;
-	_ssl_server	   = ssl_server;
-	_ssl_port	   = ssl_port;
-	_ssl_enabled   = ssl_enabled;
 
 	// PLACEHOLDER
 	// spawn listener thread (communication from remote machine)
@@ -466,22 +456,12 @@ int32 JabberSpeak::_SpawnConnectionThread(void *obj) {
 string					
 JabberSpeak::GetRealServer()
 {
-	if (_ssl_enabled && _ssl_server.size() >0 && _ssl_port >0 )
-	{
-		return _ssl_server;
-	}
-	
 	return UserID(_curr_login).JabberServer();
 }
 
 int	
 JabberSpeak::GetRealPort()
 {
-	if (_ssl_enabled && _ssl_server.size() >0 && _ssl_port >0 )
-	{
-		return _ssl_port;
-	}
-	
 	return 5222; //default jabber port.
 }	
 

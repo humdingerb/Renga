@@ -42,8 +42,6 @@
 #include <stdlib.h>
 
 
-#define SSL_ENABLED	'ssle'
-
 BlabberMainWindow *BlabberMainWindow::_instance = NULL;
 
 BlabberMainWindow *BlabberMainWindow::Instance() {
@@ -120,7 +118,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			cl->SetVisibleItem((int32)0);
 
 			// connect with current username or register new account
-			JabberSpeak::Instance()->SendConnect(_login_username->Text(), _login_password->Text(), _login_realname->Text(), _ssl_enabled->Value(), _ssl_server->Text(), atoi(_ssl_port->Text()), _login_new_account->Value());
+			JabberSpeak::Instance()->SendConnect(_login_username->Text(), _login_password->Text(), _login_realname->Text(), _login_new_account->Value());
 
 			break;
 		}
@@ -143,7 +141,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_CONNECT: {
 			_status_view->SetMessage("connecting");
-			JabberSpeak::Instance()->SendConnect("", "", "", "", 0, false,false, true);
+			JabberSpeak::Instance()->SendConnect("", "", "", false, true);
 
 			break;
 		}
@@ -163,9 +161,6 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			BlabberSettings::Instance()->SetData("last-realname", _login_realname->Text());
 			BlabberSettings::Instance()->SetData("last-login", _login_username->Text());
 			BlabberSettings::Instance()->SetData("last-password", _login_password->Text());
-			BlabberSettings::Instance()->SetData("last-ssl_server", _ssl_server->Text());
-			BlabberSettings::Instance()->SetData("last-ssl_port", _ssl_port->Text());
-			BlabberSettings::Instance()->SetIntData("last-ssl_enabled", _ssl_enabled->Value());
 			BlabberSettings::Instance()->SetTag("auto-login", _login_auto_login->Value());
 			BlabberSettings::Instance()->WriteToFile();
 
@@ -583,12 +578,6 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			TalkManager::Instance()->RotateToNextWindow(NULL, TalkManager::ROTATE_BACKWARD);
 			break;
 		}
-		
-		case SSL_ENABLED:
-		{
-			_ssl_port->SetEnabled(_ssl_enabled->Value());
-			_ssl_server->SetEnabled(_ssl_enabled->Value());
-		}
 		break;
 	}
 }
@@ -823,28 +812,6 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_login_password = new BTextControl(NULL, "Password: ", NULL, NULL);
 	_login_password->TextView()->HideTyping(true);
 	
-	// SSL Box
-	_ssl_enabled = new BCheckBox(NULL, "SSL", new BMessage(SSL_ENABLED));
-	BBox* _ssl_box=new BBox("box");
-	_ssl_box->SetLabel("Advanced settings");
-	
-	_ssl_server = new BTextControl(NULL, "Server: ", NULL, NULL);
-	_ssl_server->SetEnabled(false);
-	
-	_ssl_port = new BTextControl(NULL, "Port: ", NULL, NULL);
-	_ssl_port->SetEnabled(false);
-	
-	BGridView* v = new BGridView();
-	_ssl_box->AddChild(v);
-	BLayoutBuilder::Grid<>(v)
-		.SetInsets(B_USE_DEFAULT_SPACING)
-		.Add(_ssl_enabled, 0, 0)
-		.AddTextControl(_ssl_server, 0, 1)
-		.AddTextControl(_ssl_port, 0, 2)
-	.End();
-	
-	//end SSL Box
-	
 	_login_new_account = new BCheckBox(NULL, "Create this account!", NULL);
 
 	_login_auto_login = new BCheckBox(NULL, "Auto-login", NULL);
@@ -876,7 +843,6 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 			.AddTextControl(_login_username, 0, 1)
 			.AddTextControl(_login_password, 0, 2)
 		.End()
-		.Add(_ssl_box)
 		.AddGroup(B_HORIZONTAL)
 			.Add(_login_new_account)
 			.Add(_login_auto_login)
@@ -917,26 +883,6 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	} else {
 		_login_username->MakeFocus(true);
 	}
-	
-	//ssl support.
-	
-	_ssl_server->SetText(BlabberSettings::Instance()->Data("last-ssl_server"));
-	
-	if (BlabberSettings::Instance()->Data("last-ssl_port"))
-		_ssl_port->SetText(BlabberSettings::Instance()->Data("last-ssl_port"));
-	else
-		_ssl_port->SetText("5223");
-
-
-	if (BlabberSettings::Instance()->Data("last-ssl_enabled"))
-	{
-		int enabled = atoi(BlabberSettings::Instance()->Data("last-ssl_enabled"));
-		_ssl_enabled->SetValue(enabled);
-		
-		_ssl_port->SetEnabled(_ssl_enabled->Value());
-		_ssl_server->SetEnabled(_ssl_enabled->Value());
-	}
-
 }
 
 bool BlabberMainWindow::ValidateLogin() {
@@ -987,17 +933,6 @@ bool BlabberMainWindow::ValidateLogin() {
 		_login_password->MakeFocus(true);
 
 		return false;
-	}
-
-	//TODO if ssl is enabled, check the server is not empty and the port is valid. (>0)
-	int port = 0;
-	if (_ssl_port->Text())
-		port = atoi(_ssl_port->Text());
-	
-	if (_ssl_enabled->Value() && (!strcmp(_ssl_server->Text(), "") || port <=0 ) )
-	{
-		ModalAlertFactory::Alert("You enabled SSL. Please specify a valid server name and port.", "Sorry!", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
-		return false;		
 	}
 
 	return true;
