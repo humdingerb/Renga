@@ -2,46 +2,24 @@
 // Blabber [BlabberApp.cpp]
 //////////////////////////////////////////////////
 
-#ifndef __CSTDLIB__
-	#include <cstdlib>
-#endif
+#include <cstdlib>
 
 #include <InterfaceKit.h>
 
-#ifndef BLABBER_APP_H
-	#include "BlabberApp.h"
-#endif
+#include "BlabberApp.h"
 
-#ifndef BLABBER_MAIN_WINDOW_H
-	#include "BlabberMainWindow.h"
-#endif
+#include "AboutWindow.h"
+#include "BlabberMainWindow.h"
+#include "BlabberSettings.h"
+#include "JabberSpeak.h"
+#include "MessageRepeater.h"
+#include "ModalAlertFactory.h"
 
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
-
-#ifndef MESSAGE_REPEATER_H
-	#include "MessageRepeater.h"
-#endif
-
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
-
-// remove as soon as we decide to drop R5 support...
-#ifdef __BEOS__
-const char* kAppMIMEType = "application/jabber";
-#else
 const char* kAppMIMEType = "application/x-vnd.Haiku-Jabber";
-#endif
 
 BlabberApp::BlabberApp()
-	: BApplication(kAppMIMEType) {
-	
+	: BApplication(kAppMIMEType)
+{
 	// launch the message repeater looper
 	MessageRepeater::Instance()->Run();
 
@@ -62,4 +40,12 @@ BlabberApp::~BlabberApp() {
 	
 	// clean up the settings module
 	delete BlabberSettings::Instance();
+}
+
+
+void
+BlabberApp::AboutRequested()
+{
+	AboutWindow::Instance()->Show();
+	AboutWindow::Instance()->Activate();
 }

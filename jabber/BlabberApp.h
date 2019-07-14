@@ -18,6 +18,8 @@ class BlabberApp : public BApplication {
 public:
 	 BlabberApp();
 	~BlabberApp();
+
+	void AboutRequested() override;
 	
 private:
 	 BlabberMainWindow *_blabber_main_window;

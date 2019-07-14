@@ -6,7 +6,6 @@
 
 #include <InterfaceKit.h>
 #include <be_apps/NetPositive/NetPositive.h>
-#include "AboutWindow.h"
 #include "AppLocation.h"
 #include "BlabberSettings.h"
 #include "BuddyWindow.h"
@@ -126,9 +125,8 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 		
-		case JAB_ABOUT: {
-			AboutWindow::Instance()->Show();
-			AboutWindow::Instance()->Activate();
+		case B_ABOUT_REQUESTED: {
+			be_app->PostMessage(B_ABOUT_REQUESTED);
 			break;
 		}
 
@@ -675,7 +673,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_disconnect_item = new BMenuItem("Log Off", new BMessage(JAB_DISCONNECT));
 		_disconnect_item->SetShortcut('B', 0);
 
-		_about_item      = new BMenuItem("About Renga" B_UTF8_ELLIPSIS, new BMessage(JAB_ABOUT));
+		_about_item      = new BMenuItem("About Renga" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED));
 
 		_quit_item = new BMenuItem("Quit", new BMessage(JAB_QUIT));
 		_quit_item->SetShortcut('Q', 0);
