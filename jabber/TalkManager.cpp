@@ -37,21 +37,21 @@ TalkManager::~TalkManager() {
 	_instance = NULL;
 }
 
-TalkWindow *TalkManager::CreateTalkSession(const TalkWindow::talk_type type,
+TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
 	const UserID* user, string group_room, string group_username,
 	string thread, bool sound_on_new)
 {
 	TalkWindow *window = NULL;
 	
 	// is there a window already?
-	if (type != TalkWindow::GROUP && IsExistingWindowToUser(type, user->Handle()).size()) {
+	if (type != gloox::Message::Groupchat && IsExistingWindowToUser(type, user->Handle()).size()) {
 		window = _talk_map[IsExistingWindowToUser(type, user->Handle())];
 
 		// activate it
 		if (!sound_on_new) {
 			window->Activate();
 		}
-	} else if (type != TalkWindow::GROUP) {
+	} else if (type != gloox::Message::Groupchat) {
 		// create a new window
 		if (sound_on_new) {
 			window = new TalkWindow(type, user, "", "", true);
@@ -68,14 +68,14 @@ TalkWindow *TalkManager::CreateTalkSession(const TalkWindow::talk_type type,
 		
 		// add it to the known list BUGBUG we need to remove this when window closes
 		_talk_map[thread] = window;
-	} else if (type == TalkWindow::GROUP && IsExistingWindowToGroup(type, group_room).size()) {
+	} else if (type == gloox::Message::Groupchat && IsExistingWindowToGroup(type, group_room).size()) {
 		window = _talk_map[IsExistingWindowToGroup(type, group_room)];
 
 		// activate it
 		if (!sound_on_new) {
 			window->Activate();
 		}
-	} else if (type == TalkWindow::GROUP) {
+	} else if (type == gloox::Message::Groupchat) {
 		// create a new window
 		if (sound_on_new) {
 			window = new TalkWindow(type, user, group_room, group_username, true);
@@ -104,7 +104,7 @@ void
 TalkManager::handleMessage(const gloox::Message &msg,
 	__attribute__((unused)) gloox::MessageSession *session)
 {
-	TalkWindow::talk_type type;
+	gloox::Message::MessageType type;
 	string                thread_id;
 	string                sender;
 	TalkWindow           *window = NULL;
@@ -120,17 +120,11 @@ TalkManager::handleMessage(const gloox::Message &msg,
 	}
 
 	// configure type
-	if (msg.subtype() == gloox::Message::Normal) {
-		if (BlabberSettings::Instance()->Tag("convert-messages-to-chat")) {
-			type = TalkWindow::CHAT;
-		} else {
-			type = TalkWindow::MESSAGE;
-		}
-	} else if (msg.subtype() == gloox::Message::Chat) {
-		type = TalkWindow::CHAT;
-	} else if (msg.subtype() == gloox::Message::Groupchat) {
-		type = TalkWindow::GROUP;
-	} else if (msg.subtype() == gloox::Message::Error) {
+	type = msg.subtype();
+	if (type == gloox::Message::Normal) {
+		if (BlabberSettings::Instance()->Tag("convert-messages-to-chat"))
+			type = gloox::Message::Chat;
+	} else if (type == gloox::Message::Error) {
 		char buffer[2048];
 		
 		sprintf(buffer, "An error occurred when you tried sending a message to %s.  The reason is as follows:\n\n%s", msg.from().full().c_str(), msg.body().c_str());
@@ -148,18 +142,18 @@ TalkManager::handleMessage(const gloox::Message &msg,
 	// configure thread ID
 	thread_id = msg.thread();
 
-	if (type == TalkWindow::CHAT && _talk_map.count(thread_id) == 0) {
+	if (type == gloox::Message::Chat && _talk_map.count(thread_id) == 0) {
 		// is there a window with the same sender already open? (only for chat)
 		if (!IsExistingWindowToUser(type, sender).empty()) {
 			thread_id = IsExistingWindowToUser(type, sender);
 		}
-	} else if (type == TalkWindow::GROUP) {
+	} else if (type == gloox::Message::Groupchat) {
 		fprintf(stderr, "received group message at %s\n", __PRETTY_FUNCTION__);
 	}
 
 	// create new thread ID
 	if (thread_id.empty() || _talk_map.count(thread_id) == 0) {
-		if (type == TalkWindow::GROUP) {
+		if (type == gloox::Message::Groupchat) {
 			return;
 		}
 
@@ -193,7 +187,7 @@ TalkManager::handleMessage(const gloox::Message &msg,
 	if (window) {
 		window->Lock();
 
-		if (type == TalkWindow::GROUP) {
+		if (type == gloox::Message::Groupchat) {
 			if (group_username.empty()) {
 				window->AddToTalk("System:", msg.body(), TalkWindow::OTHER);
 			} else {
@@ -206,7 +200,10 @@ TalkManager::handleMessage(const gloox::Message &msg,
 	}
 }
 
-string TalkManager::IsExistingWindowToUser(TalkWindow::talk_type type, string username) {
+string
+TalkManager::IsExistingWindowToUser(gloox::Message::MessageType type,
+	string username)
+{
 	// check handles (with resource)
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
 		if ((*i).second->Type() == type && (*i).second->GetUserID()->Handle() == UserID(username).Handle()) {
@@ -225,7 +222,7 @@ string TalkManager::IsExistingWindowToUser(TalkWindow::talk_type type, string us
 	return "";
 }
 
-string TalkManager::IsExistingWindowToGroup(TalkWindow::talk_type type, string group_room) {
+string TalkManager::IsExistingWindowToGroup(gloox::Message::MessageType type, string group_room) {
 	// check names
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
 		if ((*i).second->Type() == type && (*i).second->GetGroupRoom() == group_room) {
@@ -355,8 +352,8 @@ TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 	group_identity = group_room + '@' + group_server;
 		
 	// is there a window with the same sender already open? (only for chat)
-	if (!IsExistingWindowToGroup(TalkWindow::GROUP, group_identity).empty()) {
-		thread_id = IsExistingWindowToGroup(TalkWindow::GROUP, group_identity);
+	if (!IsExistingWindowToGroup(gloox::Message::Groupchat, group_identity).empty()) {
+		thread_id = IsExistingWindowToGroup(gloox::Message::Groupchat, group_identity);
 	} else {
 		fprintf(stderr, "Failed to find chat window\n");
 		return;

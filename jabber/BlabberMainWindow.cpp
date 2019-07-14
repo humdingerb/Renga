@@ -99,7 +99,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			if (msg->FindString("channel",&fChannelName) == B_OK)
 			{
 				//TODO ValidateRoom (see SendTalkWindow.cpp)
-				TalkManager::Instance()->CreateTalkSession(TalkWindow::GROUP, NULL, fChannelName.String(), BlabberSettings::Instance()->Data("channel-name"));
+				TalkManager::Instance()->CreateTalkSession(gloox::Message::Groupchat, NULL, fChannelName.String(), BlabberSettings::Instance()->Data("channel-name"));
 			}
 			
 			break;
@@ -344,7 +344,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				const UserID *user = item->GetUserID();
 
 				// open chat window
-				TalkManager::Instance()->CreateTalkSession(TalkWindow::CHAT, new UserID(*user), "", "");
+				TalkManager::Instance()->CreateTalkSession(gloox::Message::Chat, new UserID(*user), "", "");
 			}
 			
 			break;
@@ -382,12 +382,12 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_OPEN_NEW_CHAT: {
-			(new SendTalkWindow(TalkWindow::CHAT))->Show();
+			(new SendTalkWindow(gloox::Message::Chat))->Show();
 			break;
 		}
 
 		case JAB_OPEN_NEW_GROUP_CHAT: {
-			(new SendTalkWindow(TalkWindow::GROUP))->Show();
+			(new SendTalkWindow(gloox::Message::Groupchat))->Show();
 			break;
 		}
 
@@ -398,13 +398,13 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			const UserID *user = item->GetUserID();
 
 			// open message window
-			TalkManager::Instance()->CreateTalkSession(TalkWindow::MESSAGE, new UserID(*user), "", "");
+			TalkManager::Instance()->CreateTalkSession(gloox::Message::Normal, new UserID(*user), "", "");
 			
 			break;
 		}
 
 		case JAB_OPEN_NEW_MESSAGE: {
-			(new SendTalkWindow(TalkWindow::MESSAGE))->Show();
+			(new SendTalkWindow(gloox::Message::Normal))->Show();
 			break;
 		}
 

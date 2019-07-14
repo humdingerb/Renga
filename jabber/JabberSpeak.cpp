@@ -518,19 +518,20 @@ void JabberSpeak::RemoveFromRoster(const UserID *removed_user) {
 }
 
 
-void JabberSpeak::SendMessage(const TalkWindow::talk_type type,
+void JabberSpeak::SendMessage(const gloox::Message::MessageType type,
 	const UserID *user, string body, string thread_id)
 {
-	gloox::Message message(type == TalkWindow::CHAT ?
-			gloox::Message::Chat : gloox::Message::Normal,
+	gloox::Message message(type,
 		gloox::JID(user->JabberCompleteHandle()), body, gloox::EmptyString,
 		thread_id);
 	fClient->send(message);
 }
 
 
-void JabberSpeak::SendMessage(__attribute__((unused)) const TalkWindow::talk_type type, __attribute__((unused)) string group_room, __attribute__((unused)) string message) {
-	puts(__PRETTY_FUNCTION__);
+void JabberSpeak::SendMessage(const gloox::Message::MessageType type,
+	string group_room, string body) {
+	gloox::Message message(type, gloox::JID(group_room), body);
+	fClient->send(message);
 }
 
 void JabberSpeak::SendPresence(gloox::Presence::PresenceType type, string status) {
@@ -934,7 +935,7 @@ JabberSpeak::handleBookmarks(const gloox::BookmarkList& bList,
 
 	for (auto i: cList) {
 		if (i.autojoin) {
-			TalkManager::Instance()->CreateTalkSession(TalkWindow::GROUP, NULL,
+			TalkManager::Instance()->CreateTalkSession(gloox::Message::Groupchat, NULL,
 				i.jid.c_str(), i.nick.c_str());
 		} else {
 			printf("%s\n", __PRETTY_FUNCTION__);

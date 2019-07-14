@@ -62,7 +62,7 @@
 	#include "UserID.h"
 #endif
 
-SendTalkWindow::SendTalkWindow(TalkWindow::talk_type type)
+SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 	: BWindow(BRect(0, 0, 0, 0), NULL, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE) {
 	_type = type;
 	
@@ -96,7 +96,7 @@ SendTalkWindow::SendTalkWindow(TalkWindow::talk_type type)
 	rect.InsetBy(5.0, 5.0);
 
 	_surrounding = new BBox(rect, NULL);
-	if (_type == TalkWindow::GROUP) {
+	if (_type == gloox::Message::Groupchat) {
 		_surrounding->SetLabel("Select Group Chat Properties");
 	} else {
 		_surrounding->SetLabel("Select a User");
@@ -118,7 +118,7 @@ SendTalkWindow::SendTalkWindow(TalkWindow::talk_type type)
 	_chat_services_selection->AddItem(new BMenuItem("MSN", new BMessage(AGENT_MENU_CHANGED_TO_MSN)));
 	_chat_services_selection->AddItem(new BMenuItem("Yahoo!", new BMessage(AGENT_MENU_CHANGED_TO_YAHOO)));
 
-	if (_type == TalkWindow::GROUP) {
+	if (_type == gloox::Message::Groupchat) {
 		rect.OffsetBy(0.0, 1.0);
 	}
 	
@@ -126,11 +126,11 @@ SendTalkWindow::SendTalkWindow(TalkWindow::talk_type type)
 
 	rect.OffsetBy(0.0, 24.0);
 
-	if (_type == TalkWindow::GROUP) {
+	if (_type == gloox::Message::Groupchat) {
 		rect.OffsetBy(0.0, -1.0);
 	}
 
-	if (_type == TalkWindow::GROUP) {
+	if (_type == gloox::Message::Groupchat) {
 		_handle = new BTextControl(rect, "handle", "Room Name: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
 	} else {
 		_handle = new BTextControl(rect, "handle", "Jabber ID: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
@@ -139,7 +139,7 @@ SendTalkWindow::SendTalkWindow(TalkWindow::talk_type type)
 	_name->SetDivider(_handle->Divider() - 35);
 	_handle->SetDivider(_handle->Divider() - 35);
 
-	if (_type == TalkWindow::GROUP) {
+	if (_type == gloox::Message::Groupchat) {
 		if (BlabberSettings::Instance()->Data("last-group-username")) {
 			_name->SetText(BlabberSettings::Instance()->Data("last-group-username"));
 		} else {
@@ -147,7 +147,7 @@ SendTalkWindow::SendTalkWindow(TalkWindow::talk_type type)
 		}
 	}
 
-	if (_type == TalkWindow::GROUP) {
+	if (_type == gloox::Message::Groupchat) {
 		if (BlabberSettings::Instance()->Data("last-group-joined")) {
 			_handle->SetText(BlabberSettings::Instance()->Data("last-group-joined"));
 		} else {
@@ -174,13 +174,13 @@ SendTalkWindow::SendTalkWindow(TalkWindow::talk_type type)
 
 	BButton *ok = new BButton(rect, "ok", "", new BMessage(JAB_OK));
 
-	if (_type == TalkWindow::MESSAGE) {
+	if (_type == gloox::Message::Normal) {
 		SetTitle("Send New Message");
 		ok->SetLabel("Send Message");
-	} else if (_type == TalkWindow::CHAT) {
+	} else if (_type == gloox::Message::Chat) {
 		SetTitle("Start New Chat");
 		ok->SetLabel("Start Chat");
-	} else if (_type == TalkWindow::GROUP) {
+	} else if (_type == gloox::Message::Groupchat) {
 		SetTitle("Start New Group Chat");
 		ok->SetLabel("Start Chat");
 	}
@@ -190,7 +190,7 @@ SendTalkWindow::SendTalkWindow(TalkWindow::talk_type type)
 		
 	_full_view->AddChild(picture);
 
-	if (_type == TalkWindow::GROUP) {
+	if (_type == gloox::Message::Groupchat) {
 		_surrounding->AddChild(_name);
 	} else {
 		_surrounding->AddChild(_chat_services);
@@ -244,7 +244,7 @@ void SendTalkWindow::MessageReceived(BMessage *msg) {
 
 		//// JAB_OK
 		case JAB_OK: {
-			if (_type == TalkWindow::GROUP) {
+			if (_type == gloox::Message::Groupchat) {
 				if (!ValidateGroupRoom()) {
 					break;
 				}

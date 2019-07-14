@@ -31,13 +31,16 @@ public:
 	static TalkManager  *Instance();
       	                ~TalkManager();
 
-	TalkWindow          *CreateTalkSession(const TalkWindow::talk_type type, const UserID* user,
+	TalkWindow          *CreateTalkSession(const gloox::Message::MessageType type,
+							const UserID* user,
 				std::string group_room, std::string group_username, 
 				std::string thread = GenericFunctions::GenerateUniqueID(), bool sound_on_new = false);
 	void                 handleMessage (const gloox::Message &msg, gloox::MessageSession *session) final;
 
-	std::string          IsExistingWindowToUser(TalkWindow::talk_type type, std::string username);
-	std::string          IsExistingWindowToGroup(TalkWindow::talk_type type, std::string group_room);
+	std::string          IsExistingWindowToUser(gloox::Message::MessageType type,
+							std::string username);
+	std::string          IsExistingWindowToGroup(gloox::Message::MessageType type,
+							std::string group_room);
 	void                 UpdateWindowTitles(const UserID *user);
 	void                 RemoveWindow(std::string thread_id);
 

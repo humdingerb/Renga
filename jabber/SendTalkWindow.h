@@ -33,7 +33,7 @@
 
 class SendTalkWindow : public BWindow {
 public:
-	                         SendTalkWindow(TalkWindow::talk_type type);
+	                         SendTalkWindow(gloox::Message::MessageType type);
 	                        ~SendTalkWindow();
 
 	void                     MessageReceived(BMessage *msg);
@@ -43,7 +43,7 @@ public:
 	
 private: 
 	BBox                   *_surrounding;
-	TalkWindow::talk_type   _type;
+	gloox::Message::MessageType _type;
 	BMenuField             *_chat_services;
 	BPopUpMenu             *_chat_services_selection;
 	BTextControl           *_handle;

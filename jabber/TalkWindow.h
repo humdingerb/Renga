@@ -6,6 +6,8 @@
 #ifndef TALK_WINDOW_H
 #define TALK_WINDOW_H
 
+#include <gloox/message.h>
+
 #include <cstdio>
 #include <deque>
 #include <string>
@@ -31,7 +33,6 @@
 
 class TalkWindow : public BWindow {
 public:
-	enum                 talk_type {MESSAGE, CHAT, GROUP};
 	enum                 user_type {MAIN_RECIPIENT, LOCAL, OTHER};
 
 public:
@@ -39,11 +40,12 @@ public:
 	static float         y_placement_offset;
 	
 public:  
-	                     TalkWindow(talk_type type, const UserID *user, std::string group_room,
-				std::string group_username, bool follow_focus_rules = false);
-	                    ~TalkWindow();
+						TalkWindow(gloox::Message::MessageType type,
+							const UserID *user, std::string group_room,
+							std::string group_username, bool follow_focus_rules = false);
+						~TalkWindow();
 
-	talk_type            Type();
+	gloox::Message::MessageType 	Type();
 
 	void                 FrameResized(float width, float height);
 	void                 MenusBeginning();
@@ -82,7 +84,7 @@ private:
 	std::string            _group_room;
 	std::string            _group_username;
 	UserID::online_status  _current_status;
-	talk_type              _type;
+	gloox::Message::MessageType _type;
 	std::string            _thread;
 	
 	// GUI
