@@ -107,10 +107,6 @@ private:
 	void					_ProcessVersionRequest(void);
 
 	// INCOMING COMMUNICATION
-	void                    _ProcessRegistration(XMLEntity *iq_register_entity);
-	void                    _ProcessUnregistration(XMLEntity *iq_register_entity);
-	void                    _SendTransportRegistrationInformation(Agent *agent, string key);
-	void                    _SendTransportUnregistrationInformation(Agent *agent, string key);
 	void                    _ProcessUserPresence(UserID *user, const gloox::Presence::PresenceType, const std::string&);
 	void                    _ParseAgentList(XMLEntity *iq_agent_entity);
 	void                    _AcceptPresence(string username);

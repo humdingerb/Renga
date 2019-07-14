@@ -164,21 +164,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 		return;
 	}
 
-	// convert non-ID'd IQs to query indexed calls
-	if (entity->IsCompleted() && !strcasecmp(entity->Name(), "iq") && !entity->Attribute("id")) {
-		// get access to query tag
-		XMLEntity *query = entity->Child("query");
-		
-		if (query && query->Attribute("xmlns")) {
-			string unique_id = GenericFunctions::GenerateUniqueID();
-			
-			if (!strcasecmp(query->Attribute("xmlns"), "jabber:iq:roster")) {
-				 iq_id = unique_id;
-				_iq_map[unique_id] = ROSTER;
-			}
-		}
-	}
-
 	// handle IQs (always closing tags)
 	if (entity->IsCompleted() && !strcasecmp(entity->Name(), "iq")) {
 		if (entity->Attribute("id")) {
@@ -246,9 +231,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 
 					ModalAlertFactory::Alert(buffer, "Oh, well.", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
-
-				// remove the item from the list of pending IQs
-				_iq_map.erase(iq_id);
 			}
 		}
 
@@ -264,11 +246,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 					_ParseAgentList(entity);
 				}
 
-				// for registering a transport
-				if (intent == REGISTER) {
-					_ProcessRegistration(entity);
-				}
-
 				// for completed registration
 				if (intent == SEND_REGISTER) {
 					if (entity->Attribute("from") && AgentList::Instance()->GetAgentByID(entity->Attribute("from"))) {
@@ -282,163 +259,9 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 
 					ModalAlertFactory::Alert(buffer, "Yeah!", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
-
-				// for unregistering from a transport
-				if (intent == UNREGISTER) {
-					_ProcessUnregistration(entity);
-				}
 			}
 		}
 	}
-}
-
-void JabberSpeak::_ProcessRegistration(XMLEntity *iq_register_entity) {
-	XMLEntity *entity = iq_register_entity;
-	Agent     *agent;
-
-	// get the agent
-	if (entity->Attribute("from")) {
-		agent = AgentList::Instance()->GetAgentByID(entity->Attribute("from"));
-	} else {
-		return;
-	}
-	
-	if (agent == NULL) {
-		return;
-	}	
-
-	// go one level deep to query
-	if (entity->Child("query")) {
-		entity = entity->Child("query");
-	} else {
-		return;
-	}
-	
-	// get the key
-	if (entity->Child("key")) {
-		// extract the key data
-		string key = entity->Child("key")->Data();
-
-		// complete registration of the transport
-		_SendTransportRegistrationInformation(agent, key);
-	} else {
-		return;
-	}
-}
-
-void JabberSpeak::_ProcessUnregistration(XMLEntity *iq_register_entity) {
-	XMLEntity *entity = iq_register_entity;
-	Agent     *agent;
-
-	// get the agent
-	if (entity->Attribute("from")) {
-		agent = AgentList::Instance()->GetAgentByID(entity->Attribute("from"));
-	} else {
-		return;
-	}
-	
-	if (agent == NULL) {
-		return;
-	}	
-
-	// go one level deep to query
-	if (entity->Child("query")) {
-		entity = entity->Child("query");
-	} else {
-		return;
-	}
-	
-	// get the key
-	if (entity->Child("key")) {
-		// extract the key data
-		string key = entity->Child("key")->Data();
-
-		// complete registration of the transport
-		_SendTransportUnregistrationInformation(agent, key);
-	} else {
-		return;
-	}
-}
-
-void JabberSpeak::_SendTransportRegistrationInformation(Agent *agent, string key) {
-	XMLEntity   *entity_iq, *entity_query;
-	char **atts_iq    = CreateAttributeMemory(6);
-	char **atts_query = CreateAttributeMemory(2);
-
-	// assemble attributes;
-	strcpy(atts_iq[0], "id");
-
-	strcpy(atts_iq[1], GenericFunctions::GenerateUniqueID().c_str());
-
-	strcpy(atts_iq[2], "type");
-	strcpy(atts_iq[3], "set");
-
-	strcpy(atts_iq[4], "to");
-	strcpy(atts_iq[5], agent->JID().c_str());
-
-	strcpy(atts_query[0], "xmlns");
-	strcpy(atts_query[1], "jabber:iq:register");
-
-	// construct XML tagset
-	entity_iq    = new XMLEntity("iq", (const char **)atts_iq);
-	entity_query = new XMLEntity("query", (const char **)atts_query);
-
-	entity_iq->AddChild(entity_query);
-	
-	entity_query->AddChild("username", NULL, agent->Username().c_str());
-	entity_query->AddChild("password", NULL, agent->Password().c_str());
-	entity_query->AddChild("nick", NULL, GenericFunctions::GenerateNick(agent->Username()).c_str());
-	entity_query->AddChild("key", NULL, key.c_str());
-
-	// log command
-	_iq_map[atts_iq[1]] = SEND_REGISTER;
-	
-	// send XML command
-	char *str = entity_iq->ToString();
-	free(str);
-
-	DestroyAttributeMemory(atts_iq, 6);
-	DestroyAttributeMemory(atts_query, 2);
-	delete entity_iq;
-}
-
-void JabberSpeak::_SendTransportUnregistrationInformation(Agent *agent, string key) {
-	XMLEntity   *entity_iq, *entity_query;
-	char **atts_iq    = CreateAttributeMemory(6);
-	char **atts_query = CreateAttributeMemory(2);
-
-	// assemble attributes;
-	strcpy(atts_iq[0], "id");
-	strcpy(atts_iq[1], GenericFunctions::GenerateUniqueID().c_str());
-
-	strcpy(atts_iq[2], "type");
-	strcpy(atts_iq[3], "set");
-
-	strcpy(atts_iq[4], "to");
-	strcpy(atts_iq[5], agent->JID().c_str());
-
-	strcpy(atts_query[0], "xmlns");
-	strcpy(atts_query[1], "jabber:iq:register");
-
-	// construct XML tagset
-	entity_iq    = new XMLEntity("iq", (const char **)atts_iq);
-	entity_query = new XMLEntity("query", (const char **)atts_query);
-
-	entity_iq->AddChild(entity_query);
-	
-	entity_query->AddChild("remove", NULL, NULL);
-	entity_query->AddChild("key", NULL, key.c_str());
-
-	// log command
-	_iq_map[atts_iq[1]] = SEND_UNREGISTER;
-	
-	// send XML command
-	char *str = entity_iq->ToString();
-	free(str);
-	
-	DestroyAttributeMemory(atts_iq, 6);
-	DestroyAttributeMemory(atts_query, 2);
-	delete entity_iq;
 }
 
 void JabberSpeak::_ProcessUserPresence(UserID *user,
