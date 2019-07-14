@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="../style.xsl" type="text/xsl"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Project xmlns="http://usefulinc.com/ns/doap#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xmpp="https://linkmauve.fr/ns/xmpp-doap#">
+    <name>Renga</name>
+
+    <created>2001-14-01</created>
+
+    <shortdesc xml:lang="en">XMPP client for Haiku</shortdesc>
+    <shortdesc xml:lang="fr">Client XMPP pour Haiku</shortdesc>
+
+    <description xml:lang="en">XMPP client for Haiku using the Gloox library</description>
+    <description xml:lang="fr">Client XMPP pour Haiku utilisant la bibliothèque Gloox</description>
+
+	<homepage rdf:resource="https://github.com/haikuarchives/jabber4haiku/"/>
+    <!-- TODO: https://github.com/ewilderj/doap/issues/51 -->
+    <!--<doc rdf:resource="https://doc.poez.io/"/>-->
+	<download-page rdf:resource="https://github.com/HaikuArchives/Jabber4Haiku/releases"/>
+	<bug-database rdf:resource="https://github.com/HaikuArchives/Jabber4Haiku/issues"/>
+		<!-- See https://github.com/ewilderj/doap/issues/53 -->
+	<!--
+    <developer-forum rdf:resource="xmpp:poezio@muc.poez.io?join"/>
+    <support-forum rdf:resource="xmpp:poezio@muc.poez.io?join"/>
+	-->
+
+	<license rdf:resource="https://github.com/HaikuArchives/Jabber4Haiku/raw/master/LICENSE"/>
+
+    <!-- See https://github.com/ewilderj/doap/issues/49 -->
+    <language>en</language>
+
+    <!-- TODO: https://github.com/ewilderj/doap/issues/40 -->
+    <!--<logo rdf:resource="https://poez.io/img/logo.png"/>-->
+    <!-- TODO: https://github.com/ewilderj/doap/issues/50 -->
+    <!--<screenshot rdf:resource="https://poez.io/img/screenshot.png"/>-->
+
+    <programming-language>C++</programming-language>
+
+    <os>Haiku</os>
+
+    <!-- TODO: Categories are URIs, find a better location for them. -->
+    <category rdf:resource="https://linkmauve.fr/ns/xmpp-doap#category-xmpp"/>
+    <category rdf:resource="https://linkmauve.fr/ns/xmpp-doap#category-jabber"/>
+    <category rdf:resource="https://linkmauve.fr/ns/xmpp-doap#category-client"/>
+
+    <maintainer>
+        <foaf:Person>
+            <foaf:name>PulkoMandy</foaf:name>
+            <foaf:homepage rdf:resource="https://pulkomandy.tk/"/>
+        </foaf:Person>
+    </maintainer>
+
+    <repository>
+        <GitRepository>
+			<browse rdf:resource="https://github.com/HaikuArchives/Jabber4Haiku"/>
+			<location rdf:resource="https://github.com/HaikuArchives/Jabber4Haiku.git"/>
+        </GitRepository>
+    </repository> 
+
+    <implements rdf:resource="https://xmpp.org/rfcs/rfc6120.html"/>
+    <implements rdf:resource="https://xmpp.org/rfcs/rfc6121.html"/>
+	<!-- Do we handle 6122 or rather 7622? -->
+    <implements rdf:resource="https://xmpp.org/rfcs/rfc6122.html"/>
+	<!-- TODO <implements rdf:resource="https://xmpp.org/rfcs/rfc7590.html"/> -->
+	<!-- TODO: https://github.com/HaikuArchives/Jabber4Haiku/issues/29 -->
+    <!--<implements rdf:resource="https://xmpp.org/rfcs/rfc5122.html"/>-->
+
+    <xmpp:software>
+        <xmpp:Client>
+            <xmpp:supports>
+                <xmpp:SupportedXep>
+                    <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0045.html"/>
+                    <xmpp:status>partial</xmpp:status>
+                    <xmpp:version>1.22.0</xmpp:version>
+                </xmpp:SupportedXep>
+            </xmpp:supports>
+            <xmpp:supports>
+                <xmpp:SupportedXep>
+                    <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0048.html"/>
+                    <xmpp:status>partial</xmpp:status>
+                    <xmpp:version>1.1</xmpp:version>
+                    <xmpp:since>1.22.0</xmpp:since>
+                </xmpp:SupportedXep>
+            </xmpp:supports>
+            <xmpp:supports>
+                <xmpp:SupportedXep>
+                    <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0060.html"/>
+                    <xmpp:status>partial</xmpp:status>
+                    <xmpp:version>1.13.5</xmpp:version>
+                    <xmpp:since>1.22.0</xmpp:since>
+                    <xmpp:note>only user nickname</xmpp:note>
+                </xmpp:SupportedXep>
+            </xmpp:supports>
+            <xmpp:supports>
+                <xmpp:SupportedXep>
+                    <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0092.html"/>
+                    <xmpp:status>complete</xmpp:status>
+                    <xmpp:version>1.1</xmpp:version>
+                    <xmpp:since>1.22.0</xmpp:since>
+                </xmpp:SupportedXep>
+            </xmpp:supports>
+        </xmpp:Client>
+    </xmpp:software>
+
+    <release>
+        <Version>
+            <revision>1.21</revision>
+            <created>2001-04-10</created>
+			<file-release rdf:resource="http://pulkomandy.tk/~beosarchive/unsorted/www.emupt.com/beos/j/BROKEN/JabberForBeOS_full.zip"/>
+        </Version>
+    </release>
+    <!-- TODO: https://github.com/ewilderj/doap/issues/52 -->
+    <release>
+        <Version>
+            <revision>1.2h</revision>
+            <created>2008-03-15</created>
+            <file-release rdf:resource="https://lab.louiz.org/poezio/poezio/-/archive/v0.12/poezio-v0.12.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.2.1</revision>
+            <created>2009-12-13</created>
+        </Version>
+    </release>
+</Project>
+</rdf:RDF>
