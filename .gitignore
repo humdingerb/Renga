@@ -1,0 +1,3 @@
+build/
+.*.sw?
+compile_commands.json
