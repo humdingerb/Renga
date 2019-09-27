@@ -4,6 +4,8 @@
 
 #include "BlabberMainWindow.h"
 
+#include "../ui/RegisterAccountWindow.h"
+
 #include <InterfaceKit.h>
 #include <be_apps/NetPositive/NetPositive.h>
 #include "AppLocation.h"
@@ -40,6 +42,11 @@
 #include <algorithm>
 #include <cstdio>
 #include <stdlib.h>
+
+
+enum {
+	kCreateAccount = 'crea'
+};
 
 
 BlabberMainWindow *BlabberMainWindow::_instance = NULL;
@@ -88,6 +95,11 @@ BlabberMainWindow::~BlabberMainWindow() {
 
 void BlabberMainWindow::MessageReceived(BMessage *msg) {
 	switch (msg->what) {
+		case kCreateAccount:
+		{
+			(new RegisterAccountWindow(this))->Show();
+			break;
+		}
 		// channels
 		case JAB_A_CHANNEL: {
 			if (!BlabberSettings::Instance()->Data("channel-name")) {
@@ -118,7 +130,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			cl->SetVisibleItem((int32)0);
 
 			// connect with current username or register new account
-			JabberSpeak::Instance()->SendConnect(_login_username->Text(), _login_password->Text(), _login_realname->Text(), _login_new_account->Value());
+			JabberSpeak::Instance()->SendConnect(_login_username->Text(), _login_password->Text(), _login_realname->Text());
 
 			break;
 		}
@@ -141,7 +153,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_CONNECT: {
 			_status_view->SetMessage("connecting");
-			JabberSpeak::Instance()->SendConnect("", "", "", false, true);
+			JabberSpeak::Instance()->SendConnect("", "", "", true);
 
 			break;
 		}
@@ -634,7 +646,7 @@ bool BlabberMainWindow::QuitRequested() {
 }
 
 BlabberMainWindow::BlabberMainWindow(BRect frame)
-	: BWindow(frame, "Renga", B_DOCUMENT_WINDOW, 0) {
+	: BWindow(frame, "Renga", B_DOCUMENT_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS) {
 
 	// editing filter for taksing
 	AddCommonFilter(new RotateChatFilter(NULL));
@@ -802,7 +814,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_login_full_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// graphics
-	_login_bulb = new PictureView("jabber-title");
+	_login_bulb = new PictureView("bulb-normal");
 
 	// username/password controls
 	_login_realname = new BTextControl(NULL, "Nickname: ", NULL, NULL);
@@ -812,7 +824,9 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_login_password = new BTextControl(NULL, "Password: ", NULL, NULL);
 	_login_password->TextView()->HideTyping(true);
 	
-	_login_new_account = new BCheckBox(NULL, "Create this account!", NULL);
+	BMessage* createAccount = new BMessage(kCreateAccount);
+	_login_new_account = new BButton("create", "Create a new account",
+		createAccount);
 
 	_login_auto_login = new BCheckBox(NULL, "Auto-login", NULL);
 
@@ -821,34 +835,31 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_login_login->MakeDefault(false);
 	_login_login->SetTarget(this);
 
-	// new user notes
-	rgb_color note = ui_color(B_PANEL_TEXT_COLOR);
-	BFont black_9(be_plain_font);
-	black_9.SetSize(std::min(black_9.Size() * 0.75f, 9.0f));
+	BStringView* appName = new BStringView("app name", "Renga");
+	BFont bigfont(be_plain_font);
+	bigfont.SetSize(bigfont.Size() * 3);
+	appName->SetFont(&bigfont);
 
-	BTextView *enter_note = new BetterTextView(NULL, &black_9, &note, B_WILL_DRAW);
-	enter_note->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	enter_note->MakeEditable(false);
-	enter_note->MakeSelectable(false);
-	enter_note->SetAlignment(B_ALIGN_CENTER);
-	enter_note->SetWordWrap(true);
-	enter_note->SetText("Note: Jabber ID's are of the form username@server.\n"
-		"Pick a fun username! If you don't know any servers, jabber.org is recommended.");
-	
 	BLayoutBuilder::Group<>(_login_full_view, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
-		.Add(_login_bulb)
+		.AddGrid()
+			.Add(_login_bulb, 0, 0, 1, 4)
+			.Add(appName, 1, 1)
+			.Add(new BStringView("", "XMPP client for Haiku"), 1, 2)
+		.End()
+		.Add(_login_new_account)
+		.AddGlue()
 		.AddGrid()
 			.AddTextControl(_login_realname, 0, 0)
 			.AddTextControl(_login_username, 0, 1)
 			.AddTextControl(_login_password, 0, 2)
 		.End()
 		.AddGroup(B_HORIZONTAL)
-			.Add(_login_new_account)
 			.Add(_login_auto_login)
+			.AddGlue()
+			.Add(_login_login)
 		.End()
-		.Add(_login_login)
-		.Add(enter_note)
+		.AddGlue()
 	.End();
 	
 	// attach all-encompassing main view to window
@@ -898,12 +909,8 @@ bool BlabberMainWindow::ValidateLogin() {
 	UserID username(gloox::JID(_login_username->Text()));
 
 	if (username.WhyNotValidJabberHandle().size()) {
-		char buffer[1024];
-		
-		if (_login_new_account->Value())
-			sprintf(buffer, "The Jabber ID you specified is not legal for the following reason:\n\n%s\n\nYou must specify a legal Jabber ID before you may create a new account.", username.WhyNotValidJabberHandle().c_str());
-		else
-			sprintf(buffer, "The Jabber ID you specified must not be yours because it's invalid for the following reason:\n\n%s\n\nIf you can't remember it, it's OK to create a new one by checking the \"Create a new Jabber Account!\" box.", username.WhyNotValidJabberHandle().c_str());
+		BString buffer;
+		buffer.SetToFormat("The Jabber ID you specified must not be yours because it's invalid for the following reason:\n\n%s\n\nIf you can't remember it, it's OK to create a new one by checking the \"Create a new Jabber Account!\" box.", username.WhyNotValidJabberHandle().c_str());
 
 		ModalAlertFactory::Alert(buffer, "OK", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_username->MakeFocus(true);
@@ -923,11 +930,7 @@ bool BlabberMainWindow::ValidateLogin() {
 	// 	existance of password
 	if (!strcmp(_login_password->Text(), "")) {
 		char buffer[1024];
-
-		if (_login_new_account->Value())
-			sprintf(buffer, "To create a new account, you must specify a password to protect it, %s.", username.Handle().c_str());
-		else
-			sprintf(buffer, "You must specify a password so I can make sure it's you, %s.", username.Handle().c_str());
+		sprintf(buffer, "You must specify a password so I can make sure it's you, %s.", username.Handle().c_str());
 
 		ModalAlertFactory::Alert(buffer, "Sorry!", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_password->MakeFocus(true);

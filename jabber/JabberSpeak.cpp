@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////
 
 #include <gloox/jid.h>
+#include <gloox/dataformitem.h>
 #include <gloox/disco.h>
 #include <gloox/registration.h>
 #include <gloox/rostermanager.h>
@@ -38,6 +39,8 @@ JabberSpeak *JabberSpeak::_instance = NULL;
 // CREATORS
 //////////////////////////////////////////////////
 
+// FIXME use the GlooxHandler instead for all XMPP things
+
 JabberSpeak *JabberSpeak::Instance() {
 	if (_instance == NULL) {
 		_instance = new JabberSpeak();
@@ -51,8 +54,6 @@ JabberSpeak::JabberSpeak()
 	, fClient(NULL)
 	, fBookmarks(NULL)
 {
-	_registering_new_account = false;
-	
 	// grab a handle to the settings now for convenience later
 	_blabber_settings = BlabberSettings::Instance();
 }
@@ -89,7 +90,6 @@ void JabberSpeak::JabberSpeakReset() {
 	_curr_login              = "";
 	_password                = "";
 	_am_logged_in            = false;
-	_registering_new_account = false;
 	_reconnecting            = false;
 	_got_some_agent_info     = false;
 	_got_some_roster_info    = false;
@@ -139,14 +139,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 	string iq_id;      // used for IQ tags
 
 	static int seen_streams = 0;
-
-	// handle connection
-	if (!entity->IsCompleted() && !strcasecmp(entity->Name(), "stream:stream")) {
-		if (_registering_new_account) {
-			// create account
-			_SendUserRegistration(UserID(_curr_login).JabberUsername(), _password, UserID(_curr_login).JabberResource());
-		}
-	}
 
 	// handle disconnection
 	if (entity->IsCompleted() && !strcasecmp(entity->Name(), "stream:stream")) {
@@ -402,8 +394,7 @@ void JabberSpeak::_RejectPresence(string username) {
 // OUTGOING COMMUNICATION
 //////////////////////////////////////////////////
 
-void JabberSpeak::SendConnect(string username, string password, string realname, bool is_new_account, bool suppress_auto_connect) {
-	_registering_new_account = is_new_account;
+void JabberSpeak::SendConnect(string username, string password, string realname, bool suppress_auto_connect) {
 
 	// if there's another application instance running, suppress auto-login
 	BList *teams = new BList;
@@ -469,12 +460,14 @@ JabberSpeak::GetRealPort()
 void JabberSpeak::_ConnectionThread() {
 	gloox::JID jid(_curr_login);
 	fClient = new gloox::Client(jid, _password);
+
+	fClient->rosterManager()->registerRosterListener(this);
 	fClient->logInstance().registerLogHandler(gloox::LogLevelDebug,
 		gloox::LogAreaXmlOutgoing, new LogHandler);
 	fClient->registerConnectionListener(this);
-	fClient->rosterManager()->registerRosterListener(this);
 	fClient->registerMessageHandler(TalkManager::Instance());
 	_ProcessVersionRequest();
+
 	fClient->connect();
 }
 
@@ -570,17 +563,6 @@ void JabberSpeak::SendGroupUnvitation(string _group_room, string _group_username
 	// Send presence Stanza
 	gloox::Presence presence(gloox::Presence::Unavailable, gloox::JID(group_presence));
 	fClient->send(presence);
-}
-
-void JabberSpeak::_SendUserRegistration(string username, string password, string resource __attribute__((unused))) {
-	gloox::Registration registration(fClient);
-	gloox::RegistrationFields fields;
-	fields.username = username;
-	fields.password = password;
-	// TODO this can return an error
-	registration.createAccount(
-		gloox::Registration::FieldUsername | gloox::Registration::FieldPassword,
-		fields);
 }
 
 void JabberSpeak::RegisterWithAgent(string agent) {
@@ -690,20 +672,27 @@ void JabberSpeak::_ProcessVersionRequest(void) {
 void
 JabberSpeak::onConnect()
 {
+	fprintf(stderr, "Logged in!\n");
 	MessageRepeater::Instance()->PostMessage(JAB_LOGGED_IN);
-	_reconnecting = false;
 	//SendLastPresence();	
-	
+
 	// Request for bookmarks
 	fBookmarks = new gloox::BookmarkStorage(fClient);
 	fBookmarks->registerBookmarkHandler(this);
 	fBookmarks->requestBookmarks();
+	_reconnecting = false;
 }
 
+
 void
-JabberSpeak::onDisconnect(__attribute__((unused)) gloox::ConnectionError e)
+JabberSpeak::onDisconnect(gloox::ConnectionError e)
 {
-	puts("onDisconnect");
+	fprintf(stderr, "%s(%d)\n", __PRETTY_FUNCTION__, e);
+
+	if (e == gloox::ConnAuthenticationFailed) {
+		// FIXME back to login screen
+		fprintf(stderr, " > auth error %d\n", fClient->authError());
+	}
 	
 	// reset XMLReader
 	XMLReader::Reset();

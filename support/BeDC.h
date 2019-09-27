@@ -75,24 +75,24 @@ class BeDC
 		//---------------
 		
 		//Send a format string - parameters
-		void SendFormat(const char *text, ...){ 
-			char buffer[1024]; 
-			va_list args; 
-   
-			va_start(args, text); 
-			vsprintf(buffer, text, args); 
-			va_end(args); 
-			SendMessage(buffer, DC_MESSAGE);       
+		void SendFormat(const char *text, ...) {
+			BString buffer;
+			va_list args;
+
+			va_start(args, text);
+			buffer.SetToFormatVarArgs(text, args);
+			va_end(args);
+			SendMessage(buffer, DC_MESSAGE);
 		} 
 		
-		void SendFormatT(const char *text, int8 type, ...){ 
-			char buffer[1024]; 
+		void SendFormatT(const char *text, int8 type, ...) {
+			BString buffer;
 			va_list args; 
  
-			va_start(args, type); 
-			vsprintf(buffer, text, args); 
-			va_end(args); 
-			SendMessage(buffer, type); 
+			va_start(args, type);
+			buffer.SetToFormatVarArgs(text, args);
+			va_end(args);
+			SendMessage(buffer, type);
 		} 
 		//---------------
 		

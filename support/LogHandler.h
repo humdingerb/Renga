@@ -13,14 +13,29 @@ class LogHandler: public gloox::LogHandler
 {
 	public:
 	LogHandler() 
-		: fDebugContext("Renga")
+		: fDebugContext("Renga"),
+		fWarningContext("Renga", DC_YELLOW),
+		fErrorContext("Renga", DC_RED)
 	{
 	}
 
 	private:
 	void handleLog(gloox::LogLevel level, gloox::LogArea area, const std::string &message) override {
-		fDebugContext.SendFormat("%d %d %s", level, area, message.c_str());
+		switch(level) {
+			case gloox::LogLevelDebug:
+			default:
+				fDebugContext.SendFormat("%d %s", area, message.c_str());
+				break;
+			case gloox::LogLevelWarning:
+				fWarningContext.SendFormat("%d %s", area, message.c_str());
+				break;
+			case gloox::LogLevelError:
+				fErrorContext.SendFormat("%d %s", area, message.c_str());
+				break;
+		}
 	}
 
 	BeDC fDebugContext;
+	BeDC fWarningContext;
+	BeDC fErrorContext;
 };

@@ -7,8 +7,6 @@ add_definitions('-g')
 add_definitions('-Wall' '-Wextra' '-Werror' '-Wno-multichar')
 #add_definitions('-std=c++11')
 
-include_directories(shared/split-pane)
-
 add_executable(Renga
 	 jabber/Agent.cpp
 	 jabber/CommandMessage.cpp
@@ -54,6 +52,12 @@ add_executable(Renga
 	 jabber/AppLocation.cpp
 	 jabber/XMLEntity.cpp
 	 jabber/XMLReader.cpp
+
+	network/bob.cpp
+	network/media.cpp
+	network/GlooxHandler.cpp
+
+	ui/RegisterAccountWindow.cpp
 )
 
 target_link_libraries(Renga
@@ -63,7 +67,6 @@ target_link_libraries(Renga
 add_custom_command(TARGET Renga POST_BUILD 
 	COMMAND rc -o Resource.rsrc ${CMAKE_SOURCE_DIR}/jabber/Resource.rdef
 	COMMAND xres -o ${CMAKE_BINARY_DIR}/Renga Resource.rsrc
-		-a PiNG:1:jabber-title ${CMAKE_SOURCE_DIR}/resources/graphics/jabber-title.png
 		-a PiNG:2:bulb-normal  ${CMAKE_SOURCE_DIR}/resources/graphics/bulb-normal.png
 		-a PiNG:3:bulb-big     ${CMAKE_SOURCE_DIR}/resources/graphics/bulb-big.png
 		-a PiNG:4:away-online  ${CMAKE_SOURCE_DIR}/resources/icons/away-online.png
@@ -79,3 +82,22 @@ add_custom_command(TARGET Renga POST_BUILD
 )
 
 install(TARGETS Renga RUNTIME DESTINATION apps/)
+
+# Testing support
+
+#add_executable(Test
+#	tests/Test.cpp
+#)
+
+#target_link_libraries(Test be)
+
+# YouCompleteMe support
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json")
+	EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
+		${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+	)
+endif()

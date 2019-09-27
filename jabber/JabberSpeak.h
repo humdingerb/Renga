@@ -11,6 +11,7 @@
 #include <gloox/client.h>
 #include <gloox/connectionlistener.h>
 #include <gloox/presence.h>
+#include <gloox/registration.h>
 #include <gloox/rosterlistener.h>
 #include <gloox/softwareversion.h>
 
@@ -47,7 +48,7 @@ public:
 	char                   **CreateAttributeMemory(int num_items);
 	void                     DestroyAttributeMemory(char **atts, int num_items);
 	static string            GenerateUniqueID();
-	void                     SendConnect(string username = "", string password = "", string realname = "", bool is_new_account = false, bool suppress_auto_connect = false);
+	void                     SendConnect(string username = "", string password = "", string realname = "", bool suppress_auto_connect = false);
 	void                     SendDisconnect();
 	void                     SendSubscriptionRequest(string username); 
 	void                     SendUnsubscriptionRequest(string username);
@@ -96,6 +97,7 @@ public:
 
 	void 					handleBookmarks(const gloox::BookmarkList& bList,
 										    const gloox::ConferenceList& cList) final;
+
 	gloox::Client* 			GlooxClient() { return fClient; }
 
 protected:
@@ -124,7 +126,6 @@ private:
 	string                  _password;
 	
 	bool                    _am_logged_in;
-	bool                    _registering_new_account;
 	bool                    _reconnecting;
 
 	bool                    _got_some_agent_info;
@@ -141,6 +142,7 @@ private:
 
 	gloox::Client*			fClient;
 	gloox::BookmarkStorage* fBookmarks;
+	gloox::Registration*	fRegistration;
 };
 
 #endif

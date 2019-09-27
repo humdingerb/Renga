@@ -76,7 +76,7 @@ private:
 	BTextControl             *_login_username;
 	BTextControl             *_login_password;
 
-	BCheckBox                *_login_new_account;
+	BButton                  *_login_new_account;
 	BCheckBox                *_login_auto_login;
 	
 	BButton                  *_login_login;
