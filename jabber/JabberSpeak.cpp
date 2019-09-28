@@ -498,6 +498,23 @@ void JabberSpeak::SendUnsubscriptionRequest(string username) {
 	fClient->send(subscription);
 }
 
+void JabberSpeak::SetFriendlyName(const gloox::JID& who, BString friendlyName)
+{
+	gloox::RosterItem* item = fClient->rosterManager()->getRosterItem(who);
+	if (item)
+		item->setName(friendlyName.String());
+	else {
+		const gloox::ConferenceListItem* bookmark
+			= BookmarkManager::Instance().GetBookmark(who.full().c_str());
+		if (bookmark) {
+			BookmarkManager::Instance().SetBookmark(who.full().c_str(),
+				bookmark->nick.c_str(), friendlyName, bookmark->autojoin);
+		} else {
+			debugger("User not found.");
+		}
+	}
+}
+
 void JabberSpeak::AddToRoster(const UserID *new_user) {
 	gloox::StringList groups;
 	fClient->rosterManager()->add(gloox::JID(new_user->Handle()),
@@ -563,7 +580,12 @@ void JabberSpeak::SendGroupUnvitation(string _group_room, string _group_username
 	fClient->send(presence);
 
 	// Disable autologin in bookmarks and store username
-	BookmarkManager::Instance().SetBookmark(_group_room.c_str(), _group_username.c_str(), false);
+	const gloox::ConferenceListItem* item
+		= BookmarkManager::Instance().GetBookmark(_group_room.c_str());
+	if (item) {
+		BookmarkManager::Instance().SetBookmark(_group_room.c_str(),
+			_group_username.c_str(), item->name.c_str(), false);
+	}
 }
 
 void JabberSpeak::RegisterWithAgent(string agent) {

@@ -30,7 +30,6 @@ public:
 	
 private:
 	const gloox::JID _userid;
-	BString fName;
 		
 	static BBitmap *_online_icon;
 	static BBitmap *_unknown_icon;

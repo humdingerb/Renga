@@ -4,35 +4,21 @@
 //     (Overwrite it)
 //////////////////////////////////////////////////
 
-#ifndef CHANGE_NAME_WINDOW_H
-#define CHANGE_NAME_WINDOW_H
+#pragma once
 
-#include <InterfaceKit.h>
+#include <TextControl.h>
+#include <Window.h>
 
-#ifndef _TEXT_CONTROL_H
-	#include <interface/TextControl.h>
-#endif
-
-#ifndef _WINDOW_H
-	#include <interface/Window.h>
-#endif
-
-#ifndef USER_ID_H
-	#include "UserID.h"
-#endif
+#include "UserID.h"
 
 class ChangeNameWindow : public BWindow {
 public:
-	                       ChangeNameWindow(UserID *changing_user);
+	                       ChangeNameWindow(const gloox::JID& changing_user, BString oldName);
 	                      ~ChangeNameWindow();
 
 	void                   MessageReceived(BMessage *msg);
 	
 private:
-	BBox                 *_surrounding;
-	UserID               *_changing_user;
+	const gloox::JID&     _changing_user;
 	BTextControl         *_handle;
-	BView                *_full_view;
 };
-
-#endif

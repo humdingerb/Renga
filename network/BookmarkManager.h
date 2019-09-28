@@ -31,7 +31,7 @@ class BookmarkManager: public BHandler, public gloox::BookmarkHandler
 
 		void Connect();
 		void Disconnect();
-		void SetBookmark(BString jid, BString nick, bool autojoin);
+		void SetBookmark(BString jid, BString nick, BString name, bool autojoin);
 		const gloox::ConferenceListItem* GetBookmark(BString jid);
 		void RemoveBookmark(BString jid);
 

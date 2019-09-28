@@ -254,8 +254,9 @@ void RosterView::LinkBookmark(const gloox::JID& added_bookmark, BString name) {
 	if (index < 0)
 		AddUnder(new BookmarkItem(added_bookmark, name), _bookmarks);
 	else {
-		// BookmarkItem* item = dynamic_cast<BookmarkItem*>(FullListItemAt(index));
-		// TODO set the new nickname
+		BookmarkItem* item = dynamic_cast<BookmarkItem*>(FullListItemAt(index));
+		item->Update(this, be_plain_font);
+		Invalidate(ItemFrame(index));
 	}
 }
 
@@ -389,15 +390,15 @@ void RosterView::UpdatePopUpMenu() {
 			_unsubscribe_presence->SetEnabled(false);
 		}
 	} else if (bookmark) {
-		// if not
+		// It's a bookmark/group chat, only some features are available
 		_chat_item->SetEnabled(true);
 		_message_item->SetEnabled(false);
 
-		sprintf(buffer, "Edit bookmark");
+		sprintf(buffer, "Edit %s", bookmark->Text());
 		_change_user_item->SetLabel(buffer);
-		_change_user_item->SetEnabled(false);
+		_change_user_item->SetEnabled(true);
 
-		sprintf(buffer, "Remove bookmark");
+		sprintf(buffer, "Remove %s", bookmark->Text());
 		_remove_user_item->SetLabel(buffer);
 		_remove_user_item->SetEnabled(true);
 

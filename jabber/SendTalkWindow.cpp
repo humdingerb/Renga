@@ -256,7 +256,7 @@ void SendTalkWindow::MessageReceived(BMessage *msg) {
 				TalkManager::Instance()->CreateTalkSession(_type, NULL, _handle->Text(), _name->Text());
 
 				// Add to bookmarks - TODO let user decide if they want autojoin?
-				BookmarkManager::Instance().SetBookmark(_handle->Text(), _name->Text(), true);
+				BookmarkManager::Instance().SetBookmark(_handle->Text(), _name->Text(), "", true);
 
 				PostMessage(B_QUIT_REQUESTED);
 			} else {

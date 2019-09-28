@@ -44,7 +44,7 @@ public:
 	std::string          IsExistingWindowToUser(gloox::Message::MessageType type,
 							std::string username);
 	std::string          IsExistingWindowToGroup(std::string group_room);
-	void                 UpdateWindowTitles(const UserID *user);
+	void                 UpdateWindowTitles(const gloox::JID& user, BString newTitle);
 	void                 RemoveWindow(std::string thread_id);
 
 	void                 RotateToNextWindow(TalkWindow *current, rotation direction);

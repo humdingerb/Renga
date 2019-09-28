@@ -53,6 +53,7 @@ public:
 	void                     SendSubscriptionRequest(string username); 
 	void                     SendUnsubscriptionRequest(string username);
 	void                     AddToRoster(const UserID *new_user);
+	void                     SetFriendlyName(const gloox::JID& who, BString name);
 	void                     RemoveFromRoster(const UserID *removed_user);
 	void                     SendMessage(const gloox::Message::MessageType type,
 								const UserID *user, string message,

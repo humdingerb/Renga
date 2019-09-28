@@ -27,6 +27,7 @@ public:
 	      user_type      UserType() const;
 	const std::string    Handle() const;
 	const std::string    FriendlyName() const;
+	const gloox::JID&    JID() const { return _handle; }
 
 	      online_status  OnlineStatus() const;
 	const std::string    ExactOnlineStatus() const;

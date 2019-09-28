@@ -10,6 +10,10 @@
 #include "../jabber/AgentList.h"
 #include "../jabber/TalkManager.h"
 
+#include "../network/BookmarkManager.h"
+
+#include <gloox/bookmarkhandler.h>
+
 #include <String.h>
 #include <TranslationUtils.h>
 
@@ -17,9 +21,8 @@ BBitmap *BookmarkItem::_online_icon = NULL;
 BBitmap *BookmarkItem::_unknown_icon = NULL;
 
 BookmarkItem::BookmarkItem(const gloox::JID& userid, BString name)
-	: BStringItem("")
+	: BStringItem(name)
 	, _userid(userid)
-	, fName(name)
 {
 	// intitialize static members
 	if (_online_icon == NULL) {
@@ -68,7 +71,7 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 
 	float height;
 
-	BString name = fName;
+	BString name = Text();
 	if (name.IsEmpty())
 		name = _userid.full().c_str();
 
@@ -94,6 +97,11 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 
 void BookmarkItem::Update(BView *owner, const BFont *font) {
 	BListItem::Update(owner, font);
+
+	const gloox::ConferenceListItem* item
+		= BookmarkManager::Instance().GetBookmark(_userid.full().c_str());
+	if (!item->name.empty())
+		SetText(item->name.c_str());
 
 	// set height to accomodate graphics and text
 	SetHeight(16.0);

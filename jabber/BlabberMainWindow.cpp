@@ -360,7 +360,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 				// Enable autojoin if needed
 				BookmarkManager::Instance().SetBookmark(group.full().c_str(),
-					info->nick.c_str(), true);
+					info->nick.c_str(), bookmark->Text(), true);
 			}
 			
 			break;
@@ -431,15 +431,19 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_OPEN_EDIT_BUDDY_WINDOW: {
-			// pick out user to be removed from RosterView
+			// pick out user to be edited from RosterView
 			RosterItem *item = _roster->CurrentItemSelection();
 			
 			if (item != NULL) {
-				// pick out user
-				UserID *user = const_cast<UserID *>(item->GetUserID());
-
 				// open edit buddy window
-				(new ChangeNameWindow(user))->Show();
+				(new ChangeNameWindow(item->GetUserID()->JID(), item->GetUserID()->FriendlyName().c_str()))->Show();
+			}
+
+			BookmarkItem *bookmark = _roster->CurrentBookmarkSelection();
+
+			if (bookmark != NULL) {
+				// open edit buddy window
+				(new ChangeNameWindow(bookmark->GetUserID(), bookmark->Text()))->Show();
 			}
 
 			break;

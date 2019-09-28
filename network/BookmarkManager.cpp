@@ -50,7 +50,7 @@ void BookmarkManager::Disconnect()
 
 
 void
-BookmarkManager::SetBookmark(BString jid, BString nick, bool autojoin)
+BookmarkManager::SetBookmark(BString jid, BString nick, BString name, bool autojoin)
 {
 	// Do nothing id we are disconnected
 	if (!fBookmarks && !fBookmarks2)
@@ -73,10 +73,10 @@ BookmarkManager::SetBookmark(BString jid, BString nick, bool autojoin)
 	item.nick = nick;
 	item.jid = jid;
 	item.autojoin = autojoin;
+	item.name = name;
 
 	if (!update) {
 		item.password = gloox::EmptyString;
-		item.name = jid;
 	}
 
 	fConferences.push_back(item);

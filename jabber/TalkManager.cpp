@@ -235,11 +235,12 @@ string TalkManager::IsExistingWindowToGroup(string group_room) {
 	return "";
 }
 
-void TalkManager::UpdateWindowTitles(const UserID *user) {
+void TalkManager::UpdateWindowTitles(const gloox::JID& jid, BString newTitle) {
 	// check handles (without resource)
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		if ((*i).second->GetUserID()->JabberHandle() == user->JabberHandle()) {
-			(*i).second->SetTitle(user->FriendlyName().c_str());
+		const UserID* id = (*i).second->GetUserID();
+		if (id && id->JabberHandle() == jid.full()) {
+			(*i).second->SetTitle(newTitle);
 		}
 	}
 }
