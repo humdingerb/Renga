@@ -85,11 +85,12 @@
     </implements>
     <implements>
         <xmpp:SupportedXep>
+            <!-- Bookmarks (legacy) -->
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0048.html"/>
             <xmpp:status>partial</xmpp:status>
             <xmpp:version>1.1</xmpp:version>
             <xmpp:since>1.22.0</xmpp:since>
-			<xmpp:note>retrieval only, autojoin only</xmpp:note>
+			<xmpp:note>no URL bookmarks, no pubsub. use XEP-0402 instead.</xmpp:note>
         </xmpp:SupportedXep>
     </implements>
     <implements>
@@ -142,6 +143,16 @@
             <xmpp:version>1.0</xmpp:version>
             <xmpp:version>1.22.0</xmpp:version>
 			<xmpp:note>only for in-band registration</xmpp:note>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <!-- Bookmarks 2 -->
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0402.html"/>
+            <xmpp:status>partial</xmpp:status>
+            <xmpp:version>0.2.1</xmpp:version>
+            <xmpp:since>1.22.0</xmpp:since>
+			<xmpp:note>no bookmark renaming</xmpp:note>
         </xmpp:SupportedXep>
     </implements>
 

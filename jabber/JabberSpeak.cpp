@@ -52,7 +52,6 @@ JabberSpeak *JabberSpeak::Instance() {
 JabberSpeak::JabberSpeak()
 	: XMLReader()
 	, fClient(NULL)
-	, fBookmarks(NULL)
 {
 	// grab a handle to the settings now for convenience later
 	_blabber_settings = BlabberSettings::Instance();
@@ -60,8 +59,6 @@ JabberSpeak::JabberSpeak()
 
 JabberSpeak::~JabberSpeak() {
 	_instance = NULL;
-
-	delete fBookmarks;
 }
 
 void JabberSpeak::Reset() {
@@ -72,6 +69,7 @@ void JabberSpeak::Reset() {
 	}
 	
 	if (!_reconnecting) {
+		BookmarkManager::Instance().Disconnect();
 		TalkManager::Instance()->Reset();
 	}
 	
@@ -563,6 +561,9 @@ void JabberSpeak::SendGroupUnvitation(string _group_room, string _group_username
 	// Send presence Stanza
 	gloox::Presence presence(gloox::Presence::Unavailable, gloox::JID(group_presence));
 	fClient->send(presence);
+
+	// Disable autologin in bookmarks and store username
+	BookmarkManager::Instance().SetBookmark(_group_room.c_str(), _group_username.c_str(), false);
 }
 
 void JabberSpeak::RegisterWithAgent(string agent) {
@@ -675,11 +676,9 @@ JabberSpeak::onConnect()
 	fprintf(stderr, "Logged in!\n");
 	MessageRepeater::Instance()->PostMessage(JAB_LOGGED_IN);
 	//SendLastPresence();	
+	
+	BookmarkManager::Instance().Connect();
 
-	// Request for bookmarks
-	fBookmarks = new gloox::BookmarkStorage(fClient);
-	fBookmarks->registerBookmarkHandler(this);
-	fBookmarks->requestBookmarks();
 	_reconnecting = false;
 }
 
@@ -689,6 +688,7 @@ JabberSpeak::onDisconnect(gloox::ConnectionError e)
 {
 	fprintf(stderr, "%s(%d)\n", __PRETTY_FUNCTION__, e);
 
+	BookmarkManager::Instance().Disconnect();
 	if (e == gloox::ConnAuthenticationFailed) {
 		// FIXME back to login screen
 		fprintf(stderr, " > auth error %d\n", fClient->authError());
@@ -911,26 +911,3 @@ JabberSpeak::handleRosterError(const gloox::IQ&)
 	printf("%s\n", __PRETTY_FUNCTION__);
 }
 
-
-void
-JabberSpeak::handleBookmarks(const gloox::BookmarkList& bList,
-                             const gloox::ConferenceList& cList)
-{
-	for (auto i: bList) {
-		printf("%s\n", __PRETTY_FUNCTION__);
-
-		printf("%s -> %s\n", i.name.c_str(), i.url.c_str());
-	}
-
-	for (auto i: cList) {
-		if (i.autojoin) {
-			TalkManager::Instance()->CreateTalkSession(gloox::Message::Groupchat, NULL,
-				i.jid.c_str(), i.nick.c_str());
-		} else {
-			printf("%s\n", __PRETTY_FUNCTION__);
-
-			printf("%s -> jid %s nick %s pwd %s autojoin %d\n", i.name.c_str(),
-				i.jid.c_str(), i.nick.c_str(), i.password.c_str(), i.autojoin);
-		}
-	}
-}

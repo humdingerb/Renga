@@ -18,8 +18,12 @@
 #include "TalkWindow.h"
 #include "XMLEntity.h"
 
+enum {
+	kWindowList = 'winl'
+};
+
 // FIXME could we replace this with MessageSessionHandler?
-class TalkManager : public gloox::MessageHandler, gloox::MUCRoomHandler {
+class TalkManager : public BHandler, public gloox::MessageHandler, gloox::MUCRoomHandler {
 public:
 	typedef  std::map<std::string, TalkWindow *>                   TalkMap;
 	typedef  std::map<std::string, TalkWindow *>::iterator         TalkIter;
@@ -39,8 +43,7 @@ public:
 
 	std::string          IsExistingWindowToUser(gloox::Message::MessageType type,
 							std::string username);
-	std::string          IsExistingWindowToGroup(gloox::Message::MessageType type,
-							std::string group_room);
+	std::string          IsExistingWindowToGroup(std::string group_room);
 	void                 UpdateWindowTitles(const UserID *user);
 	void                 RemoveWindow(std::string thread_id);
 

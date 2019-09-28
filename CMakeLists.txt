@@ -53,10 +53,17 @@ add_executable(Renga
 	 jabber/XMLEntity.cpp
 	 jabber/XMLReader.cpp
 
+	# Gloox extras (to be upstreamed, I guess)
 	network/bob.cpp
+	network/bookmark2storage.cpp
 	network/media.cpp
+
+	# "Modern" XMPP classes using gloox cleanly and directly
+	network/BookmarkManager.cpp
 	network/GlooxHandler.cpp
 
+	# "Modern" UI classes using gloox types and StartWatching/SendNotices
+	ui/BookmarkItem.cpp
 	ui/RegisterAccountWindow.cpp
 )
 

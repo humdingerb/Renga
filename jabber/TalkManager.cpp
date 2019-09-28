@@ -68,8 +68,9 @@ TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType typ
 		
 		// add it to the known list BUGBUG we need to remove this when window closes
 		_talk_map[thread] = window;
-	} else if (type == gloox::Message::Groupchat && IsExistingWindowToGroup(type, group_room).size()) {
-		window = _talk_map[IsExistingWindowToGroup(type, group_room)];
+		SendNotices(kWindowList);
+	} else if (type == gloox::Message::Groupchat && IsExistingWindowToGroup(group_room).size()) {
+		window = _talk_map[IsExistingWindowToGroup(group_room)];
 
 		// activate it
 		if (!sound_on_new) {
@@ -91,9 +92,9 @@ TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType typ
 		// FIXME we need to free this when leaving the room!
 		gloox::JID jid(group_room);
 		jid.setResource(group_username);
-		fprintf(stderr, "TRY TO JOIN MUC %s\n", group_room.c_str());
 		(new gloox::InstantMUCRoom(JabberSpeak::Instance()->GlooxClient(),
 			jid, this))->join();
+		SendNotices(kWindowList);
 	}
 	
 	// return a reference as well
@@ -222,10 +223,10 @@ TalkManager::IsExistingWindowToUser(gloox::Message::MessageType type,
 	return "";
 }
 
-string TalkManager::IsExistingWindowToGroup(gloox::Message::MessageType type, string group_room) {
+string TalkManager::IsExistingWindowToGroup(string group_room) {
 	// check names
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		if ((*i).second->Type() == type && (*i).second->GetGroupRoom() == group_room) {
+		if ((*i).second->Type() == gloox::Message::Groupchat && (*i).second->GetGroupRoom() == group_room) {
 			return (*i).first;
 		}
 	}
@@ -246,6 +247,7 @@ void TalkManager::UpdateWindowTitles(const UserID *user) {
 void TalkManager::RemoveWindow(string thread_id) {
 	if (_talk_map.count(thread_id) > 0) {
 		_talk_map.erase(thread_id);
+		SendNotices(kWindowList);
 	}
 }
 
@@ -352,8 +354,8 @@ TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 	group_identity = group_room + '@' + group_server;
 		
 	// is there a window with the same sender already open? (only for chat)
-	if (!IsExistingWindowToGroup(gloox::Message::Groupchat, group_identity).empty()) {
-		thread_id = IsExistingWindowToGroup(gloox::Message::Groupchat, group_identity);
+	if (!IsExistingWindowToGroup(group_identity).empty()) {
+		thread_id = IsExistingWindowToGroup(group_identity);
 	} else {
 		fprintf(stderr, "Failed to find chat window\n");
 		return;

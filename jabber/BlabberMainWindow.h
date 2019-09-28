@@ -85,7 +85,6 @@ private:
 	BMenu                    *_file_menu;
 	BMenu                    *_edit_menu;
 	BMenu                    *_status_menu;
-	BMenu                    *_channel_menu;
 	BMenu                    *_talk_menu;
 
 	BMenu                    *_common_status_menu;

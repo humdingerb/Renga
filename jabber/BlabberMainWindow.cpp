@@ -6,6 +6,8 @@
 
 #include "../ui/RegisterAccountWindow.h"
 
+#include <gloox/jid.h>
+
 #include <InterfaceKit.h>
 #include <be_apps/NetPositive/NetPositive.h>
 #include "AppLocation.h"
@@ -98,22 +100,6 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		case kCreateAccount:
 		{
 			(new RegisterAccountWindow(this))->Show();
-			break;
-		}
-		// channels
-		case JAB_A_CHANNEL: {
-			if (!BlabberSettings::Instance()->Data("channel-name")) {
-				ModalAlertFactory::Alert("Before you may use channels, you must select a channel name under the Messages/Chat section of Preferences.", "OK");
-				break;
-			}
-			
-			BString fChannelName;
-			if (msg->FindString("channel",&fChannelName) == B_OK)
-			{
-				//TODO ValidateRoom (see SendTalkWindow.cpp)
-				TalkManager::Instance()->CreateTalkSession(gloox::Message::Groupchat, NULL, fChannelName.String(), BlabberSettings::Instance()->Data("channel-name"));
-			}
-			
 			break;
 		}
 
@@ -356,7 +342,25 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				const UserID *user = item->GetUserID();
 
 				// open chat window
-				TalkManager::Instance()->CreateTalkSession(gloox::Message::Chat, new UserID(*user), "", "");
+				TalkManager::Instance()->CreateTalkSession(gloox::Message::Chat,
+					new UserID(*user), "", "");
+			}
+
+			// if there's a current selection, begin chat with that group
+			BookmarkItem *bookmark = _roster->CurrentBookmarkSelection();
+			
+			if (bookmark != NULL) {
+				const gloox::JID& group = bookmark->GetUserID();
+				const gloox::ConferenceListItem* info
+					= BookmarkManager::Instance().GetBookmark(group.full().c_str());
+
+				// open chat window
+				TalkManager::Instance()->CreateTalkSession(gloox::Message::Groupchat,
+					NULL, group.full(), info->nick);
+
+				// Enable autojoin if needed
+				BookmarkManager::Instance().SetBookmark(group.full().c_str(),
+					info->nick.c_str(), true);
 			}
 			
 			break;
@@ -467,6 +471,10 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				// remove the user
 				JabberSpeak::Instance()->RemoveFromRoster(user);
 			}
+
+			BookmarkItem *bookmark = _roster->CurrentBookmarkSelection();
+			if (bookmark)
+				BookmarkManager::Instance().RemoveBookmark(bookmark->GetUserID().full().c_str());
 
 			break;
 		}
@@ -641,6 +649,11 @@ bool BlabberMainWindow::QuitRequested() {
 	BlabberSettings::Instance()->SetFloatData("main-window-height", Bounds().Height());
 	BlabberSettings::Instance()->WriteToFile();
 
+	// FIXME we are doing this from the wrong thread, but I see no better place.
+	// It needs to be done immediately here, so that closing the other windows
+	// doen't remove them from autojoin.
+	BookmarkManager::Instance().Disconnect();
+
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
@@ -777,20 +790,10 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_talk_menu->AddItem(_send_groupchat_item);
 	_talk_menu->SetTargetForItems(this);
 
-	// CHANNEL MENU
-	_channel_menu = new BMenu("Channels");
-
-	BMessage* haiku_channel = new BMessage(JAB_A_CHANNEL);
-	haiku_channel->AddString("channel", "haiku-os@conference.jabber.org");
-	
-	BMenuItem* _a_channel = new BMenuItem("haiku-os", haiku_channel);
-	_channel_menu->AddItem(_a_channel);
-
 	_menubar->AddItem(_file_menu);
 	_menubar->AddItem(_edit_menu);
 	_menubar->AddItem(_status_menu);
 	_menubar->AddItem(_talk_menu);
-	_menubar->AddItem(_channel_menu);
 	//_menubar->AddItem(_help_menu);	
 
 	// tabbed view

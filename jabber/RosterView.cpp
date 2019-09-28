@@ -2,37 +2,19 @@
 // Blabber [RosterView.cpp]
 //////////////////////////////////////////////////
 
-#ifndef ROSTER_VIEW_H
-	#include "RosterView.h"
-#endif
+#include "RosterView.h"
 
-#ifndef _CSTDIO
-	#include <cstdio>
-#endif
+#include <cstdio>
 
-#ifndef _MENU_ITEM_H
-	#include <MenuItem.h>
-#endif
+#include <MenuItem.h>
 
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef BUDDY_INFO_WINDOW_H
-	#include "BuddyInfoWindow.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
-
-#ifndef SOUND_SYSTEM_H
-	#include "SoundSystem.h"
-#endif
+#include "BlabberSettings.h"
+#include "BuddyInfoWindow.h"
+#include "JabberSpeak.h"
+#include "Messages.h"
+#include "ModalAlertFactory.h"
+#include "SoundSystem.h"
+#include "TalkManager.h"
 
 #include <strings.h>
 
@@ -49,6 +31,7 @@ RosterView::~RosterView() {
 	BlabberSettings::Instance()->SetTag("unknown-collapsed", !_unknown->IsExpanded());
 	BlabberSettings::Instance()->SetTag("offline-collapsed", !_offline->IsExpanded());
 	BlabberSettings::Instance()->SetTag("transports-collapsed", !_transports->IsExpanded());
+	BlabberSettings::Instance()->SetTag("bookmarks-collapsed", !_bookmarks->IsExpanded());
 	BlabberSettings::Instance()->WriteToFile();
 }
 
@@ -57,7 +40,7 @@ int RosterView::ListComparison(const void *a, const void *b) {
 	const char *str_b = (*(RosterItem **)b)->Text();
 
 	return strcasecmp(str_a, str_b);
-}   
+}
 
 void RosterView::AttachedToWindow() {
 	// superclass call	
@@ -105,6 +88,7 @@ void RosterView::AttachedToWindow() {
 	AddItem(_unknown = new RosterSuperitem("No Presence"));
 	AddItem(_offline = new RosterSuperitem("Offline"));
 	AddItem(_transports = new RosterSuperitem("Live Transports"));
+	AddItem(_bookmarks = new RosterSuperitem("Group chats"));
 	
 	// make maps (BUGBUG better way to do two-way map?)
 	_item_to_status_map[_offline] = UserID::OFFLINE;
@@ -118,6 +102,7 @@ void RosterView::AttachedToWindow() {
 	_unknown->SetExpanded(!BlabberSettings::Instance()->Tag("unknown-collapsed"));
 	_unaccepted->SetExpanded(!BlabberSettings::Instance()->Tag("unaccepted-collapsed"));
 	_transports->SetExpanded(!BlabberSettings::Instance()->Tag("transports-collapsed"));
+	_bookmarks->SetExpanded(!BlabberSettings::Instance()->Tag("bookmarks-collapsed"));
 
 	_status_to_item_map[UserID::OFFLINE] = _offline;
 	_status_to_item_map[UserID::ONLINE]  = _online;
@@ -128,6 +113,9 @@ void RosterView::AttachedToWindow() {
 	// BUGBUG events
 	_presence->SetTargetForItems(Window());
 	_popup->SetTargetForItems(Window());
+
+	BookmarkManager::Instance().StartWatching(this, kBookmarks);
+	TalkManager::Instance()->StartWatching(this, kWindowList);
 }
 
 RosterItem *RosterView::CurrentItemSelection() {
@@ -135,6 +123,17 @@ RosterItem *RosterView::CurrentItemSelection() {
 	
 	if (index >= 0) {
 		return dynamic_cast<RosterItem *>(ItemAt(index));
+	} else {
+		return NULL;
+	}
+}
+
+BookmarkItem* RosterView::CurrentBookmarkSelection()
+{
+	int32 index = CurrentSelection();
+	
+	if (index >= 0) {
+		return dynamic_cast<BookmarkItem *>(ItemAt(index));
 	} else {
 		return NULL;
 	}
@@ -193,12 +192,71 @@ void RosterView::SelectionChanged() {
 	BOutlineListView::SelectionChanged();
 }
 
+
+void RosterView::MessageReceived(BMessage* message)
+{
+	switch(message->what) {
+		case B_OBSERVER_NOTICE_CHANGE:
+		{
+			int32 what = message->FindInt32("be:observe_change_what");
+			switch (what) {
+				case kBookmarks:
+				{
+					int index = 0;
+					BString name;
+				   	while (message->FindString("jid", index, &name) == B_OK) {
+						gloox::JID jid(name.String());
+						if (message->FindBool("delete", index)) {
+							UnlinkBookmark(jid);
+						} else {
+							BString name = message->FindString("name");
+							LinkBookmark(jid, name);
+						}
+						index++;
+					}
+					break;
+				}
+				case kWindowList:
+				{
+					// Update group chats status (anything below the "group chat" header)
+					BRect b = Bounds();
+					b.top = ItemFrame(IndexOf(_bookmarks)).bottom;
+					Invalidate(b);
+					break;
+				}
+				default:
+				{
+					message->PrintToStream();
+					break;
+				}
+			}
+			break;
+		}
+		default:
+		{
+			BOutlineListView::MessageReceived(message);
+			break;
+		}
+	}
+}
+
+
 void RosterView::LinkUser(const UserID *added_user) {
 	AddUnder(new RosterItem(added_user), _offline);
 }
 
 void RosterView::LinkTransport(const UserID *added_transport) {
 	AddUnder(new TransportItem(added_transport), _transports);
+}
+
+void RosterView::LinkBookmark(const gloox::JID& added_bookmark, BString name) {
+	int32 index = FindBookmark(added_bookmark);
+	if (index < 0)
+		AddUnder(new BookmarkItem(added_bookmark, name), _bookmarks);
+	else {
+		// BookmarkItem* item = dynamic_cast<BookmarkItem*>(FullListItemAt(index));
+		// TODO set the new nickname
+	}
 }
 
 void RosterView::UnlinkUser(const UserID *removed_user) {
@@ -213,6 +271,15 @@ void RosterView::UnlinkUser(const UserID *removed_user) {
 void RosterView::UnlinkTransport(const UserID *removed_transport) {
 	// does transport exist
 	int32 index = FindTransport(removed_transport);
+	
+	if (index >= 0) {
+		RemoveItem(index);	
+	}
+}
+
+void RosterView::UnlinkBookmark(const gloox::JID& removed_bookmark) {
+	// does transport exist
+	int32 index = FindBookmark(removed_bookmark);
 	
 	if (index >= 0) {
 		RemoveItem(index);	
@@ -267,10 +334,32 @@ int32 RosterView::FindTransport(const UserID *compare_transport) {
 	return -1;
 }
 
+
+int32 RosterView::FindBookmark(const gloox::JID& compare_jid)
+{
+	for (int i=0; i<FullListCountItems(); ++i) {
+		// get item
+		BookmarkItem *item = dynamic_cast<BookmarkItem *>(FullListItemAt(i));
+
+		if (item == NULL) {
+			continue;
+		}
+				
+		// compare against RosterView
+		if (item->GetUserID() == compare_jid) {
+			return i;
+		}
+	}
+
+	// no match
+	return -1;
+}
+
 void RosterView::UpdatePopUpMenu() {
 	char buffer[1024];
 
 	RosterItem *item = CurrentItemSelection();
+	BookmarkItem *bookmark = CurrentBookmarkSelection();
 
 	if (item && !item->StalePointer()) {
 		const UserID *user = item->GetUserID();
@@ -299,6 +388,23 @@ void RosterView::UpdatePopUpMenu() {
 			_subscribe_presence->SetEnabled(true);
 			_unsubscribe_presence->SetEnabled(false);
 		}
+	} else if (bookmark) {
+		// if not
+		_chat_item->SetEnabled(true);
+		_message_item->SetEnabled(false);
+
+		sprintf(buffer, "Edit bookmark");
+		_change_user_item->SetLabel(buffer);
+		_change_user_item->SetEnabled(false);
+
+		sprintf(buffer, "Remove bookmark");
+		_remove_user_item->SetLabel(buffer);
+		_remove_user_item->SetEnabled(true);
+
+		_user_info_item->SetEnabled(false);
+		_user_chatlog_item->SetEnabled(false);
+
+		_presence->SetEnabled(false);
 	} else {		
 		// if not
 		_chat_item->SetEnabled(false);

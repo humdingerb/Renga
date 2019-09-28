@@ -6,45 +6,19 @@
 #ifndef ROSTER_VIEW_H
 #define ROSTER_VIEW_H
 
-#ifndef __MAP__
-	#include <map>
-#endif
+#include <map>
 
-#ifndef _LIST_ITEM_H
-	#include <interface/ListItem.h>
-#endif
+#include <interface/ListItem.h>
+#include <interface/OutlineListView.h>
+#include <interface/PopUpMenu.h>
 
-#ifndef _OUTLINE_LIST_VIEW_H
-	#include <interface/OutlineListView.h>
-#endif
-
-#ifndef _POP_UP_MENU_H
-	#include <interface/PopUpMenu.h>
-#endif
-
-#ifndef JROSTER_H
-	#include "JRoster.h"
-#endif
-
-#ifndef ROSTER_ITEM_H
-	#include "RosterItem.h"
-#endif
-
-#ifndef ROSTER_SUPERITEM_H
-	#include "RosterSuperitem.h"
-#endif
-
-#ifndef TRANSPORT_ITEM_H
-	#include "TransportItem.h"
-#endif
-
-#ifndef USER_ID_H
-	#include "UserID.h"
-#endif
-
-#ifndef XML_ENTITY_H
-	#include "XMLEntity.h"
-#endif
+#include "../ui/BookmarkItem.h"
+#include "JRoster.h"
+#include "RosterItem.h"
+#include "RosterSuperitem.h"
+#include "TransportItem.h"
+#include "UserID.h"
+#include "XMLEntity.h"
 
 class RosterView : public BOutlineListView {
 public:
@@ -60,17 +34,22 @@ public:
 
 	void                AttachedToWindow();
 	RosterItem         *CurrentItemSelection();
+	BookmarkItem       *CurrentBookmarkSelection();
 	void                MouseDown(BPoint point);
 	void                RemoveSelected();
 	void                SelectionChanged();
+	void                MessageReceived(BMessage*) final;
 
 	void                LinkUser(const UserID *added_user);
 	void                LinkTransport(const UserID *added_transport);
+	void                LinkBookmark(const gloox::JID& added_bookmark, BString nick);
 	void                UnlinkUser(const UserID *removed_user);
 	void                UnlinkTransport(const UserID *removed_transport);
+	void                UnlinkBookmark(const gloox::JID& removed_bookmark);
 
 	int32               FindUser(const UserID *compare_user);
 	int32               FindTransport(const UserID *compare_transport);
+	int32               FindBookmark(const gloox::JID& compare_jid);
 
 	void                UpdatePopUpMenu();
 	void                UpdateRoster();
@@ -97,6 +76,7 @@ private:
 	RosterSuperitem   *_unknown;
 	RosterSuperitem   *_unaccepted;
 	RosterSuperitem   *_transports;
+	RosterSuperitem   *_bookmarks;
 };
 
 #endif
