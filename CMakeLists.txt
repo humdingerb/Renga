@@ -5,7 +5,6 @@ project(Renga)
 
 add_definitions('-g')
 add_definitions('-Wall' '-Wextra' '-Werror' '-Wno-multichar')
-#add_definitions('-std=c++11')
 
 add_executable(Renga
 	 jabber/Agent.cpp
@@ -67,6 +66,18 @@ add_executable(Renga
 	ui/PictureView.cpp
 	ui/RegisterAccountWindow.cpp
 )
+
+set_property(TARGET Renga PROPERTY CXX_STANDARD 14)
+
+find_library(gloox gloox)
+if(NOT gloox)
+	message(FATAL_ERROR "gloox not found, try pkgman install devel:libgloox_x86")
+endif()
+
+find_library(expat expat)
+if(NOT gloox)
+	message(FATAL_ERROR "expat not found, try pkgman install devel:libexpat_x86")
+endif()
 
 target_link_libraries(Renga
 	be expat game gloox tracker translation
