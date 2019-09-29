@@ -3,11 +3,11 @@
 //////////////////////////////////////////////////
 
 #ifndef APP_LOCATION_H
-	#include "AppLocation.h"
+	#include "../jabber/AppLocation.h"
 #endif
 
 #ifndef BLABBER_APP_H
-	#include "BlabberApp.h"
+	#include "../jabber/BlabberApp.h"
 #endif
 
 int main(__attribute__((unused)) int argc, char **argv) {

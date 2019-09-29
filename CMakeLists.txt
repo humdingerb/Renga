@@ -8,10 +8,10 @@ add_definitions('-Wall' '-Wextra' '-Werror' '-Wno-multichar')
 add_compile_options(-fdiagnostics-color=always)
 
 add_executable(Renga
+	# TODO review all these files for usefulness and relevance
 	 jabber/Agent.cpp
 	 jabber/CommandMessage.cpp
 	 jabber/UserID.cpp
-	 jabber/AboutWindow.cpp
 	 jabber/BetterTextView.cpp
 	 jabber/BuddyInfoWindow.cpp
 	 jabber/ChatTextView.cpp
@@ -22,7 +22,6 @@ add_executable(Renga
 	 jabber/PeopleListItem.cpp
 	 jabber/PreferencesWindow.cpp
 	 jabber/RosterItem.cpp
-	 jabber/RosterSuperitem.cpp
 	 jabber/RosterView.cpp
 	 jabber/RotateChatFilter.cpp
 	 jabber/SendTalkWindow.cpp
@@ -33,7 +32,6 @@ add_executable(Renga
 	 jabber/TransportItem.cpp
 	 jabber/TransportPreferencesView.cpp
 	 jabber/BlabberApp.cpp
-	 jabber/main.cpp
 	 jabber/AgentList.cpp
 	 jabber/BlabberMainWindow.cpp
 	 jabber/BlabberSettings.cpp
@@ -60,12 +58,17 @@ add_executable(Renga
 	network/BookmarkManager.cpp
 	network/GlooxHandler.cpp
 
+	# Misc. support stuff
+	support/main.cpp
+
 	# "Modern" UI classes using gloox types and StartWatching/SendNotices
+	ui/AboutWindow.cpp
 	ui/BookmarkItem.cpp
 	ui/ChangeNameWindow.cpp
 	ui/ModalAlertFactory.cpp
 	ui/PictureView.cpp
 	ui/RegisterAccountWindow.cpp
+	ui/RosterSuperitem.cpp
 )
 
 set_property(TARGET Renga PROPERTY CXX_STANDARD 14)

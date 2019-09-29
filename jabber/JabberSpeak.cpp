@@ -163,18 +163,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 				// process based on the intent
 				iq_intent intent = _iq_map[iq_id];
 
-				// for errors on registration				
-				if (intent == NEW_USER) {
-					sprintf(buffer, "You have been refused registration for the following reason:\n\n%s", entity->Child("error")->Data());
-					ModalAlertFactory::Alert(buffer, "I'll try again", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
-
-					JabberSpeakReset();
-
-					BlabberMainWindow::Instance()->Lock();
-					BlabberMainWindow::Instance()->ShowLogin();
-					BlabberMainWindow::Instance()->Unlock();
-				}
-
 				// for errors on login				
 				if (intent == LOGIN) {
 					sprintf(buffer, "Your login attempt failed due to the following reason:\n\n%s", entity->Child("error")->Data());

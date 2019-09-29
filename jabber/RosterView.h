@@ -15,10 +15,9 @@
 #include "../ui/BookmarkItem.h"
 #include "JRoster.h"
 #include "RosterItem.h"
-#include "RosterSuperitem.h"
+#include "../ui/RosterSuperitem.h"
 #include "TransportItem.h"
 #include "UserID.h"
-#include "XMLEntity.h"
 
 class RosterView : public BOutlineListView {
 public:

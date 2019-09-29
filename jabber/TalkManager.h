@@ -16,7 +16,6 @@
 
 #include "GenericFunctions.h"
 #include "TalkWindow.h"
-#include "XMLEntity.h"
 
 enum {
 	kWindowList = 'winl'

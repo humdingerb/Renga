@@ -8,7 +8,7 @@
 
 #include "BlabberApp.h"
 
-#include "AboutWindow.h"
+#include "../ui/AboutWindow.h"
 #include "BlabberMainWindow.h"
 #include "BlabberSettings.h"
 #include "JabberSpeak.h"

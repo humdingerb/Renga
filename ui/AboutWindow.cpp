@@ -2,9 +2,8 @@
 // Blabber [AboutWindow.cpp]
 //////////////////////////////////////////////////
 
-#include "BlabberApp.h"
 #include "AboutWindow.h"
-#include "GenericFunctions.h"
+
 
 AboutWindow *AboutWindow::_instance = NULL;
 

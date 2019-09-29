@@ -31,6 +31,8 @@
 	#include "TalkWindow.h"
 #endif
 
+#include <string>
+
 class SendTalkWindow : public BWindow {
 public:
 	                         SendTalkWindow(gloox::Message::MessageType type);
@@ -39,7 +41,7 @@ public:
 	void                     MessageReceived(BMessage *msg);
 
 	bool                     ValidateGroupRoom();
-	string                   ValidateUser();
+	std::string              ValidateUser();
 	
 private: 
 	BBox                   *_surrounding;
