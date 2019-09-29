@@ -12,7 +12,7 @@
 #include "JabberSpeak.h"
 #include "MessageRepeater.h"
 #include "Messages.h"
-#include "ModalAlertFactory.h"
+#include "../ui/ModalAlertFactory.h"
 #include "SoundSystem.h"
 #include "TalkManager.h"
 

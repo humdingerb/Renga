@@ -2,17 +2,11 @@
 // Blabber [BlabberSettings.cpp]
 //////////////////////////////////////////////////
 
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
+#include "BlabberSettings.h"
 
-#ifndef _DIRECTORY_H
-	#include <storage/Directory.h>
-#endif
+#include <storage/Directory.h>
 
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
+#include "../ui/ModalAlertFactory.h"
 
 BlabberSettings *BlabberSettings::_instance = NULL;
 

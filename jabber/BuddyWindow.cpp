@@ -2,54 +2,21 @@
 // Blabber [BuddyWindow.cpp]
 //////////////////////////////////////////////////
 
-#ifndef BUDDY_WINDOW_H
-	#include "BuddyWindow.h"
-#endif
+#include "BuddyWindow.h"
 
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
+#include <Application.h>
 
-#ifndef _APPLICATION_H
-	#include <Application.h>
-#endif
+#include "Agent.h"
+#include "AgentList.h"
+#include "AppLocation.h"
+#include "BlabberSettings.h"
+#include "GenericFunctions.h"
+#include "Messages.h"
+#include "../ui/ModalAlertFactory.h"
+#include "JRoster.h"
+#include "../ui/PictureView.h"
 
-#ifndef AGENT_H
-	#include "Agent.h"
-#endif
-
-#ifndef AGENT_LIST_H
-	#include "AgentList.h"
-#endif
-
-#ifndef APP_LOCATION_H
-	#include "AppLocation.h"
-#endif
-
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef GENERIC_FUNCTIONS_H
-	#include "GenericFunctions.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
-
-#ifndef JROSTER_H
-	#include "JRoster.h"
-#endif
-
-#ifndef PICTURE_VIEW_H
-	#include "PictureView.h"
-#endif
-
+#include <cstdio>
 #include <string.h>
 
 BuddyWindow *BuddyWindow::_instance = NULL;

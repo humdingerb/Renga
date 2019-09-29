@@ -2,29 +2,14 @@
 // Blabber [BuddyInfoWindow.cpp]
 //////////////////////////////////////////////////
 
-#ifndef BUDDY_INFO_WINDOW_H
-	#include "BuddyInfoWindow.h"
-#endif
+#include "BuddyInfoWindow.h"
 
-#ifndef _BUTTON_H
-	#include <interface/Button.h>
-#endif
+#include <interface/Button.h>
 
-#ifndef APP_LOCATION_H
-	#include "AppLocation.h"
-#endif
-
-#ifndef GENERIC_FUNCTIONS_H
-	#include "GenericFunctions.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef PICTURE_VIEW_H
-	#include "PictureView.h"
-#endif
+#include "AppLocation.h"
+#include "GenericFunctions.h"
+#include "Messages.h"
+#include "../ui/PictureView.h"
 
 BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	: BWindow(BRect(0, 0, 0, 0), "User Information Summary", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE) {

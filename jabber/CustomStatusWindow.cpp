@@ -14,7 +14,7 @@
 #include "GenericFunctions.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
-#include "PictureView.h"
+#include "../ui/PictureView.h"
 
 CustomStatusWindow *CustomStatusWindow::_instance = NULL;
 

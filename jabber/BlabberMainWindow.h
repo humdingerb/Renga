@@ -6,47 +6,18 @@
 #ifndef BLABBER_MAIN_WINDOW_H
 #define BLABBER_MAIN_WINDOW_H
 
-#include <InterfaceKit.h>
+#include <Button.h>
+#include <CheckBox.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
+#include <TabView.h>
+#include <TextControl.h>
+#include <Window.h>
 
-#ifndef _BUTTON_H
-	#include <interface/Button.h>
-#endif
-
-#ifndef _CHECK_BOX_H
-	#include <interface/CheckBox.h>
-#endif
-
-#ifndef _MENU_ITEM_H
-	#include <interface/MenuItem.h>
-#endif
-
-#ifndef _POP_UP_MENU_H
-	#include <interface/PopUpMenu.h>
-#endif
-
-#ifndef _TAB_VIEW_H
-	#include <interface/TabView.h>
-#endif
-
-#ifndef _TEXT_CONTROL_H
-	#include <interface/TextControl.h>
-#endif
-
-#ifndef _WINDOW_H
-	#include <interface/Window.h>
-#endif
-
-#ifndef PICTURE_VIEW_H
-	#include "PictureView.h"
-#endif
-
-#ifndef ROSTER_VIEW_H
-	#include "RosterView.h"
-#endif
-
-#ifndef STATUS_VIEW_H
-	#include "StatusView.h"
-#endif
+#include "../ui/PictureView.h"
+#include "RosterView.h"
+#include "StatusView.h"
 
 class BlabberMainWindow : public BWindow {
 public:

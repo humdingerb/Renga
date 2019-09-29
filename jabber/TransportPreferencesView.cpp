@@ -2,33 +2,15 @@
 // Blabber [MessagesPreferencesView.cpp]
 //////////////////////////////////////////////////
 
-#ifndef TRANSPORT_PREFERENCES_VIEW_H
-	#include "TransportPreferencesView.h"
-#endif
+#include "TransportPreferencesView.h"
 
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
+#include <cstdio>
 
-#ifndef AGENT_LIST_H
-	#include "AgentList.h"
-#endif
-
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
+#include "AgentList.h"
+#include "BlabberSettings.h"
+#include "JabberSpeak.h"
+#include "Messages.h"
+#include "../ui/ModalAlertFactory.h"
 
 TransportPreferencesView::TransportPreferencesView(BRect frame)
 	: BView (frame, NULL, B_FOLLOW_ALL, B_WILL_DRAW) {

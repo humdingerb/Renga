@@ -12,7 +12,7 @@
 #include "BuddyInfoWindow.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
-#include "ModalAlertFactory.h"
+#include "../ui/ModalAlertFactory.h"
 #include "SoundSystem.h"
 #include "TalkManager.h"
 

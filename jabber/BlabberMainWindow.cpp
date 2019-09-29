@@ -20,7 +20,7 @@
 #include "JabberSpeak.h"
 #include "Messages.h"
 #include "MessageRepeater.h"
-#include "ModalAlertFactory.h"
+#include "../ui/ModalAlertFactory.h"
 #include "PreferencesWindow.h"
 #include "RosterItem.h"
 #include "RotateChatFilter.h"

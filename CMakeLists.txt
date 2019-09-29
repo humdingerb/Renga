@@ -20,7 +20,6 @@ add_executable(Renga
 	 jabber/LoginPreferencesView.cpp
 	 jabber/EditingFilter.cpp
 	 jabber/MessagesPreferencesView.cpp
-	 jabber/ModalAlertFactory.cpp
 	 jabber/PeopleListItem.cpp
 	 jabber/PreferencesWindow.cpp
 	 jabber/RosterItem.cpp
@@ -46,7 +45,6 @@ add_executable(Renga
 	 jabber/GenericFunctions.cpp
 	 jabber/FileItem.cpp
 	 jabber/StatusView.cpp
-	 jabber/PictureView.cpp
 	 jabber/MessageRepeater.cpp
 	 jabber/FileXMLReader.cpp
 	 jabber/AppLocation.cpp
@@ -64,6 +62,8 @@ add_executable(Renga
 
 	# "Modern" UI classes using gloox types and StartWatching/SendNotices
 	ui/BookmarkItem.cpp
+	ui/ModalAlertFactory.cpp
+	ui/PictureView.cpp
 	ui/RegisterAccountWindow.cpp
 )
 

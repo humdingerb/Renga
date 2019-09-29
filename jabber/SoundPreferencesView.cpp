@@ -2,45 +2,19 @@
 // Blabber [MessagesPreferencesView.cpp]
 //////////////////////////////////////////////////
 
-#ifndef SOUND_PREFERENCES_VIEW_H
-	#include "SoundPreferencesView.h"
-#endif
+#include "SoundPreferencesView.h"
 
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
+#include <cstdio>
 
-#ifndef _PATH_H
-	#include <storage/Path.h>
-#endif
+#include <storage/Path.h>
 
-#ifndef APP_LOCATION_H
-	#include "AppLocation.h"
-#endif
-
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef FILE_ITEM_H
-	#include "FileItem.h"
-#endif
-
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
-
-#ifndef SOUND_SYSTEM_H
-	#include "SoundSystem.h"
-#endif
+#include "AppLocation.h"
+#include "BlabberSettings.h"
+#include "FileItem.h"
+#include "JabberSpeak.h"
+#include "Messages.h"
+#include "../ui/ModalAlertFactory.h"
+#include "SoundSystem.h"
 
 SoundPreferencesView::SoundPreferencesView(BRect frame)
 	: BView (frame, NULL, B_FOLLOW_ALL, B_WILL_DRAW) {

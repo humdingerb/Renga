@@ -8,18 +8,18 @@
 #include <gloox/registration.h>
 #include <gloox/rostermanager.h>
 
-#include "../support/LogHandler.h"
-
-#include "JabberSpeak.h"
 #include <cstdio>
 #include <Roster.h>
 #include <unistd.h>
 #include <sys/utsname.h>
+
 #include "BlabberApp.h"
 #include "AgentList.h"
 #include "GenericFunctions.h"
+#include "JabberSpeak.h"
 #include "JRoster.h"
-#include "ModalAlertFactory.h"
+#include "../support/LogHandler.h"
+#include "../ui/ModalAlertFactory.h"
 #include "MessageRepeater.h"
 #include "Messages.h"
 #include "TalkManager.h"

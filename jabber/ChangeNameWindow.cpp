@@ -16,10 +16,8 @@
 #include "GenericFunctions.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
-#include "ModalAlertFactory.h"
-#include "PictureView.h"
+#include "../ui/ModalAlertFactory.h"
 #include "TalkManager.h"
-#include "UserID.h"
 
 ChangeNameWindow::ChangeNameWindow(const gloox::JID& changing_user, BString oldName)
 	: BWindow(BRect(0, 0, 100, 100), "Changing User Name", B_TITLED_WINDOW,

@@ -2,65 +2,24 @@
 // Blabber [SendTalkWindow.cpp]
 //////////////////////////////////////////////////
 
-#ifndef SEND_TALK_WINDOW_H
-	#include "SendTalkWindow.h"
-#endif
+#include "SendTalkWindow.h"
 
-#ifndef __CSTDIO__
-	#include <cstdio>
-#endif
+#include <cstdio>
 
-#ifndef _BUTTON_H
-	#include <Button.h>
-#endif
+#include <Button.h>
+#include <StringView.h>
 
-#ifndef _STRING_VIEW_H
-	#include <StringView.h>
-#endif
-
-#ifndef AGENT_H
-	#include "Agent.h"
-#endif
-
-#ifndef AGENT_LIST_H
-	#include "AgentList.h"
-#endif
-
-#ifndef APP_LOCATION_H
-	#include "AppLocation.h"
-#endif
-
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
-
-#ifndef GENERIC_FUNCTIONS_H
-	#include "GenericFunctions.h"
-#endif
-
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef MODAL_ALERT_FACTORY_H
-	#include "ModalAlertFactory.h"
-#endif
-
-#ifndef PICTURE_VIEW_H
-	#include "PictureView.h"
-#endif
-
-#ifndef TALK_MANAGER_H
-	#include "TalkManager.h"
-#endif
-
-#ifndef USER_ID_H
-	#include "UserID.h"
-#endif
+#include "Agent.h"
+#include "AgentList.h"
+#include "AppLocation.h"
+#include "BlabberSettings.h"
+#include "GenericFunctions.h"
+#include "JabberSpeak.h"
+#include "Messages.h"
+#include "../ui/ModalAlertFactory.h"
+#include "../ui/PictureView.h"
+#include "TalkManager.h"
+#include "UserID.h"
 
 SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 	: BWindow(BRect(0, 0, 0, 0), NULL, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE) {
