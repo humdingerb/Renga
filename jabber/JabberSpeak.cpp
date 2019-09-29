@@ -708,14 +708,22 @@ JabberSpeak::onConnect()
 void
 JabberSpeak::onDisconnect(gloox::ConnectionError e)
 {
-	fprintf(stderr, "%s(%d)\n", __PRETTY_FUNCTION__, e);
 
 	BookmarkManager::Instance().Disconnect();
 	if (e == gloox::ConnAuthenticationFailed) {
-		// FIXME back to login screen
-		fprintf(stderr, " > auth error %d\n", fClient->authError());
+		gloox::AuthenticationError ae = fClient->authError();
+
+		if (ae == gloox::SaslNotAuthorized) {
+			// Incorrect login or password, highlight them in main window
+			// The code below gets us back to login screen
+			SendNotices(kAuthenticationFailed);
+		} else {
+			fprintf(stderr, "%s(%d) -> %d\n", __PRETTY_FUNCTION__, e, ae);
+		}
+	} else {
+		fprintf(stderr, "%s(%d)\n", __PRETTY_FUNCTION__, e);
 	}
-	
+
 	// reset XMLReader
 	XMLReader::Reset();
 

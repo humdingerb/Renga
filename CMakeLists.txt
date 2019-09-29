@@ -5,6 +5,7 @@ project(Renga)
 
 add_definitions('-g')
 add_definitions('-Wall' '-Wextra' '-Werror' '-Wno-multichar')
+add_compile_options(-fdiagnostics-color=always)
 
 add_executable(Renga
 	 jabber/Agent.cpp
@@ -13,7 +14,6 @@ add_executable(Renga
 	 jabber/AboutWindow.cpp
 	 jabber/BetterTextView.cpp
 	 jabber/BuddyInfoWindow.cpp
-	 jabber/ChangeNameWindow.cpp
 	 jabber/ChatTextView.cpp
 	 jabber/CustomStatusWindow.cpp
 	 jabber/LoginPreferencesView.cpp
@@ -62,6 +62,7 @@ add_executable(Renga
 
 	# "Modern" UI classes using gloox types and StartWatching/SendNotices
 	ui/BookmarkItem.cpp
+	ui/ChangeNameWindow.cpp
 	ui/ModalAlertFactory.cpp
 	ui/PictureView.cpp
 	ui/RegisterAccountWindow.cpp

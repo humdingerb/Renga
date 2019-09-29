@@ -6,10 +6,10 @@
 
 #pragma once
 
+#include <gloox/jid.h>
+
 #include <TextControl.h>
 #include <Window.h>
-
-#include "UserID.h"
 
 class ChangeNameWindow : public BWindow {
 public:

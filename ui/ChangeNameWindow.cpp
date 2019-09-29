@@ -11,13 +11,13 @@
 #include <LayoutBuilder.h>
 #include <StringView.h>
 
-#include "AppLocation.h"
-#include "BlabberSettings.h"
-#include "GenericFunctions.h"
-#include "JabberSpeak.h"
-#include "Messages.h"
+#include "../jabber/AppLocation.h"
+#include "../jabber/BlabberSettings.h"
+#include "../jabber/GenericFunctions.h"
+#include "../jabber/JabberSpeak.h"
+#include "../jabber/Messages.h"
 #include "../ui/ModalAlertFactory.h"
-#include "TalkManager.h"
+#include "../jabber/TalkManager.h"
 
 ChangeNameWindow::ChangeNameWindow(const gloox::JID& changing_user, BString oldName)
 	: BWindow(BRect(0, 0, 100, 100), "Changing User Name", B_TITLED_WINDOW,

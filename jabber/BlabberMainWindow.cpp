@@ -14,7 +14,7 @@
 #include "BlabberSettings.h"
 #include "BuddyWindow.h"
 #include "BuddyInfoWindow.h"
-#include "ChangeNameWindow.h"
+#include "../ui/ChangeNameWindow.h"
 #include "CustomStatusWindow.h"
 #include "GenericFunctions.h"
 #include "JabberSpeak.h"
@@ -598,15 +598,34 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 
-		case JAB_ROTATE_CHAT_FORWARD: {
+		case JAB_ROTATE_CHAT_FORWARD:
+		{
 			TalkManager::Instance()->RotateToNextWindow(NULL, TalkManager::ROTATE_FORWARD);
 			break;
 		}
 
-		case JAB_ROTATE_CHAT_BACKWARD: {
+		case JAB_ROTATE_CHAT_BACKWARD:
+		{
 			TalkManager::Instance()->RotateToNextWindow(NULL, TalkManager::ROTATE_BACKWARD);
 			break;
 		}
+
+		case B_OBSERVER_NOTICE_CHANGE:
+		{
+			int32 orig_what = msg->FindInt32("be:observe_change_what");
+			switch (orig_what) {
+				case kAuthenticationFailed:
+				{
+					ShowLogin();
+					_login_username->MarkAsInvalid(true);
+					_login_password->MarkAsInvalid(true);
+					break;
+				}
+			}
+
+			break;
+		}
+		
 		break;
 	}
 }
@@ -906,6 +925,8 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	} else {
 		_login_username->MakeFocus(true);
 	}
+
+	JabberSpeak::Instance()->StartWatchingAll(this);
 }
 
 bool BlabberMainWindow::ValidateLogin() {
@@ -961,6 +982,9 @@ void BlabberMainWindow::ShowLogin() {
 	_login_realname->SetText("");
 	_login_username->SetText("");
 	_login_password->SetText("");
+
+	_login_username->MarkAsInvalid(false);
+	_login_password->MarkAsInvalid(false);
 
 	// default
 	if(BlabberSettings::Instance()->Data("last-realname")) {

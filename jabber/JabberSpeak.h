@@ -26,7 +26,11 @@
 #include "UserID.h"
 #include "XMLReader.h"
 
-class JabberSpeak : public XMLReader,
+enum {
+	kAuthenticationFailed = 'Aerr'
+};
+
+class JabberSpeak : public BHandler, public XMLReader,
 	public gloox::ConnectionListener, public gloox::RosterListener
 {
 public:
