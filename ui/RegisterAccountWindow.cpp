@@ -6,6 +6,11 @@
 
 #include "RegisterAccountWindow.h"
 
+#include "../jabber/BlabberMainWindow.h"
+#include "../jabber/BlabberSettings.h"
+#include "../network/BobStore.h"
+#include "PictureView.h"
+
 #include <Button.h>
 #include <Country.h>
 #include <private/shared/Geolocation.h>
@@ -36,14 +41,29 @@ struct ServerInfo {
 };
 
 static const ServerInfo kServerInfos[] = {
-	{ "patchcord.be", "BE" }, // has a captcha but not as a media form?
+	// TODO confirm all of them are working as expected, once we have SRV records
+	{ "blah.im", "AT" },
+	{ "chinwag.im", "AU" },
+	{ "patchcord.be", "BE" }, // has a captcha, OK
 	{ "jabber.otr.im", "CA" },
-	{ "jabber-germany.de", "DE" }, // connection rejected?
-	{ "suchat.org", "ES" }, // has OOB and no dataform
-	{ "jabber.fr", "FR" },
+	{ "swissjabber.ch", "CH" },
+	{ "jabber.cz", "CZ" },
+	{ "jabber.de", "DE" },
+	{ "jabberes.org", "ES" },
+	{ "jabber.fr", "FR" }, // OK
+	{ "jabbim.hu", "HU" },
+	{ "jabin.org", "ID" },
 	{ "chatme.im", "IT" },
-	{ "jabber.calyxinstitute.org", "NL" },
-	{ "creep.im", "RU" },
+	{ "xmpp.jp", "JP" },
+	{ "jabber.etighichat.com", "NG" },
+	{ "movim.eu", "NL" },
+	{ "jabber.no", "NO" },
+	{ "jabber.co.nz", "NZ" },
+	{ "chrome.pl", "PL" },
+	{ "coderollers.com", "RO" },
+	{ "creep.im", "RU" }, // has a captcha, OK
+	{ "sss.chaoslab.ru", "UA" },
+	{ "comm.unicate.me", "UK" },
 	{ "home.zom.im", "US" },
 };
 
@@ -244,6 +264,12 @@ RegisterAccountWindow::MessageReceived(BMessage* message)
 		{
 			fLayout->SetVisibleItem(2);
 
+			// Cleanup the registration form from previous attempts, if any
+			for (int32 count = fRegistrationForm->CountChildren(); --count >= 0;)
+			{
+				fRegistrationForm->RemoveChild(fRegistrationForm->ChildAt(count));
+			}
+
 			// connect to server and ask which fields are required
 			gloox::Client* client = new gloox::Client(fServerBox->Text());
 			fConnection = new GlooxHandler(client);
@@ -255,8 +281,39 @@ RegisterAccountWindow::MessageReceived(BMessage* message)
 
 		case kCreateAccount:
 		{
-			// TODO register account on server, then notify main window of the
-			// newly created account
+			BView* formContainer = getRegistrationView();
+
+			if (formContainer) {
+				gloox::DataForm* dataForm = new gloox::DataForm(gloox::TypeSubmit);
+				for (int32 count = formContainer->CountChildren(); --count >= 0;) {
+					BView* entry = formContainer->ChildAt(count);
+
+					if (entry->Name() == BString("gloox::title")) {
+						BStringView* title = dynamic_cast<BStringView*>(entry);
+						dataForm->setTitle(title->Text());
+					} else {
+						BTextControl* c = dynamic_cast<BTextControl*>(entry);
+						if (c) {
+							dataForm->addField(gloox::DataFormField::TypeNone,
+								c->Name(), c->Text());
+
+							// Extract these fields for populating the main
+							// window when registration completes.
+							if (c->Name() == BString("username"))
+								fUsername = c->Text();
+							if (c->Name() == BString("password"))
+								fPassword = c->Text();
+						}
+					}
+
+					// TODO serialize all fields (name and value only)
+				}
+				fConnection->createAccount(dataForm);
+			} else {
+				// TODO try to locate a FixedField form view instead and use that
+				fprintf(stderr, "Don't know how to create an account without a dataform, yet\n");
+			}
+			// see you in handleRegistrationResult!
 			break;
 		}
 
@@ -300,12 +357,28 @@ RegisterAccountWindow::MessageReceived(BMessage* message)
 					handleDataForm(from, view);
 					break;
 				}
+				case kMedia:
+				{
+					BString uri = message->FindString("uri");
+					BString type = message->FindString("type");
+					handleMedia(type, BUrl(uri));
+					break;
+				}
+				case kOOB:
+				{
+					message->PrintToStream();
+					//handleOOB(...);
+					break;
+				}
+
+
 				case kRegistrationResult:
 				{
-					BString jid = message->FindString("gloox::JID");
+					BString jidString = message->FindString("gloox::JID");
+					gloox::JID jid(jidString.String());
 					gloox::RegistrationResult result = (gloox::RegistrationResult)
 						message->FindInt32("gloox::RegistrationResult");
-					fprintf(stderr, "Reg res %d from %s\n", result, jid.String());
+					handleRegistrationResult(jid, result);
 					break;
 				}
 				default:
@@ -345,18 +418,103 @@ void RegisterAccountWindow::handleRegistrationFields(const gloox::JID& from __at
 		gloox::Registration::FieldUsername | gloox::Registration::FieldPassword,
 		fields);
 }
+#endif
 
 
 void RegisterAccountWindow::handleRegistrationResult(const gloox::JID&, gloox::RegistrationResult r)
 {
-	if (r == gloox::RegistrationSuccess) {
-		// TODO we're done, close the window and fill in the login/password fields of the main window
-		return;
+	switch (r)
+	{
+		case gloox::RegistrationSuccess:
+		{
+			// Put login in password into configuration
+			BString jid;
+			jid.SetToFormat("%s@%s", fUsername.String(), fServerBox->Text());
+			BlabberSettings::Instance()->SetData("last-login", fUsername);
+			BlabberSettings::Instance()->SetData("last-password", fPassword);
+
+			// Refresh main window (disconnects a running session, but that should be ok)
+			BlabberMainWindow::Instance()->PostMessage(kResetWindow);
+
+			// And finally, we can close ourselves, the registration is complete
+			PostMessage(B_QUIT_REQUESTED);
+			return;
+		}
+
+		case gloox::RegistrationNotAcceptable:
+		{
+			BView* formContainer = getRegistrationView();
+			if (formContainer) {
+				// Probably a required field was not filled, highlight all empty ones
+				bool required = false;
+				for (int32 count = formContainer->CountChildren(); --count >= 0;) {
+					BView* entry = formContainer->ChildAt(count);
+
+					if (entry->Name() == BString("gloox::requiredMarker")) {
+						required = true;
+						continue;
+					} else {
+						BTextControl* control = dynamic_cast<BTextControl*>(entry);
+						if (control) {
+							bool valid = (!required) || !BString(control->Text()).IsEmpty();
+							control->MarkAsInvalid(!valid);
+							if (!valid)
+								control->SetToolTip("This field is required.");
+							else
+								control->SetToolTip((const char*)NULL);
+						}
+						required = false;
+					}
+				}
+			}
+			break;
+		}
+
+		case gloox::RegistrationConflict:
+		{
+			BView* formContainer = getRegistrationView();
+			if (formContainer) {
+				BView* v = formContainer->FindView("username");
+				BTextControl* c = dynamic_cast<BTextControl*>(v);
+				if (c) {
+					c->MarkAsInvalid(true);
+					c->SetToolTip("This username is already registered. Pick another one.");
+				} else {
+					fprintf(stderr, "username not found\n");
+				}
+			} else {
+				fprintf(stderr, "registrationview not found\n");
+			}
+			break;
+		}
+
+		case gloox::RegistrationNotAllowed:
+		{
+			fWelcome->SetText("The server currently does not allow registration.\n"
+				"Try another one.");
+			fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
+			fLayout->SetVisibleItem(1);
+			break;
+		}
+
+		case gloox::RegistrationUnknownError:
+		{
+			// Unknown error, better try another server that works more sanely.
+			fWelcome->SetText("The server did not accept our registration request.\n"
+				"Try another one.");
+			fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
+			fLayout->SetVisibleItem(1);
+			break;
+		}
+
+		default:
+		{
+			// TODO something went wrong, go back to the previous screen + highlight problems
+			fprintf(stderr, "%s(%d)\n", __PRETTY_FUNCTION__, r);
+			break;
+		}
 	}
-	// TODO something went wrong, go back to the previous screen + highlight problems
-	fprintf(stderr, "%s(%d)\n", __PRETTY_FUNCTION__, r);
 }
-#endif
 
 
 void RegisterAccountWindow::handleDataForm(const gloox::JID&, BView* form)
@@ -366,8 +524,31 @@ void RegisterAccountWindow::handleDataForm(const gloox::JID&, BView* form)
 }
 
 
+void RegisterAccountWindow::handleMedia(BString type __attribute__((unused)), BUrl uri)
+{
+	BPositionIO* data = NULL;
+	std::string storage;
+
+	if (uri.Protocol() == "cid") {
+		// Get the data from bob registry
+		storage = BobStore::Instance()->Get(uri.Path().String());
+		data = new BMemoryIO(storage.c_str(), storage.length());
+	} else {
+		fprintf(stderr, "Unhandled protocol for %s\n", uri.UrlString().String());
+		// TODO get the data using UrlRoster if it can handle it
+	}
+
+	if (data) {
+		PictureView* pic = new PictureView(data);
+		fRegistrationForm->AddChild(pic);
+	}
+
+	delete data;
+}
+
+
 #if 0
-void RegisterAccountWindow::handleOOB(const gloox::JID&, const gloox::OOB&)
+void RegisterAccountWindow::handleOOB(const gloox::JID&, const gloox::OOB& oob)
 {
 	// TODO this will usually provide an URL for out-of-band registration.
 	// If this is all we get, it means the registration process cannot be
@@ -386,9 +567,25 @@ void RegisterAccountWindow::onDisconnect(gloox::ConnectionError error,
 	switch (error)
 	{
 		case gloox::ConnStreamError:
-			fWelcome->SetText("Could not understand the reply from the server.\n"
-				"Stream error %d", streamError);
+		{
+			switch (streamError) {
+				case gloox::ConnStreamClosed:
+				{
+					fWelcome->SetText("The server closed the connection unexpectedly.\n");
+					fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
+					break;
+				}
+				default:
+				{
+					BString message;
+					message.SetToFormat("Could not understand the reply from the server.\n"
+							"Stream error %d", streamError);
+					fWelcome->SetText(message);
+					break;
+				}
+			}
 			break;
+		}
 		case gloox::ConnStreamClosed:
 			fWelcome->SetText("The server closed the connection unexpectedly. "
 				"Maybe your internet access is too slow to use XMPP reliably.");
@@ -412,4 +609,19 @@ void RegisterAccountWindow::onDisconnect(gloox::ConnectionError error,
 			break;
 	}
 	fLayout->SetVisibleItem(1);
+}
+
+
+BView* RegisterAccountWindow::getRegistrationView()
+{
+	BView* formContainer = NULL;
+	for (int32 count = fRegistrationForm->CountChildren(); --count >= 0;)
+	{
+		formContainer = fRegistrationForm->ChildAt(count);
+		if (formContainer->Name() == BString("gloox::DataForm"))
+			break;
+		formContainer = nullptr;
+	}
+
+	return formContainer;
 }

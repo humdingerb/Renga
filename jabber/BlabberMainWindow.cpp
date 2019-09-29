@@ -573,25 +573,30 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 
-		case BLAB_CUSTOM_STATUS: {
+		case BLAB_CUSTOM_STATUS:
+		{
 			CustomStatusWindow::Instance()->Show();
 			CustomStatusWindow::Instance()->Activate();
 			break;
 		}
 		
 #if 0
-		case PortTalker::COULD_NOT_RESOLVE_HOSTNAME: {
+		case PortTalker::COULD_NOT_RESOLVE_HOSTNAME: 
+		{
 			char buffer[1024];
 			
 			sprintf(buffer, "The hostname '%s' couldn't be reached.  Please re-check the name and try again. There could be a networking problem as well.", msg->FindString("hostname"));
 			ModalAlertFactory::Alert(buffer, "Doh!");
+		}
+#endif
 
+		case kResetWindow:
+		{
 			JabberSpeak::Instance()->Reset();
 			ShowLogin();
 			
 			break;
 		}
-#endif
 
 		case JAB_ROTATE_CHAT_FORWARD: {
 			TalkManager::Instance()->RotateToNextWindow(NULL, TalkManager::ROTATE_FORWARD);

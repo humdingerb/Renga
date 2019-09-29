@@ -18,6 +18,8 @@
 
 #include <gloox/stanzaextension.h>
 
+#include "bobhandler.h"
+
 #include <string>
 
 namespace gloox
@@ -68,6 +70,8 @@ namespace gloox
        */
       virtual ~BOB() {}
 
+      void RegisterBobHandler(BobHandler* handler) { fBobHandler = handler; }
+
       /**
        * Returns the binary data.
        * @return The binary data.
@@ -98,7 +102,11 @@ namespace gloox
       // reimplemented from StanzaExtension
       virtual StanzaExtension* newInstance( const Tag* tag ) const
       {
-        return new BOB( tag );
+    	BOB* instance = new BOB( tag );
+		if (fBobHandler) {
+			fBobHandler->handleBob(instance);
+		}
+		return instance;
       }
 
       // reimplemented from StanzaExtension
@@ -117,6 +125,7 @@ namespace gloox
       std::string m_data;
       int m_maxage;
 
+	  BobHandler* fBobHandler;
   };
 
 }

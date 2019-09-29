@@ -20,10 +20,6 @@ Media::Media(const gloox::Tag* tag)
 	gloox::Tag* uri = tag->findChild("uri");
 	fType = uri->findAttribute("type");
 	fURI = uri->cdata();
-	//gloox::Tag* path = uri->children().front();
-	fprintf(stderr, "got Media! %s\n", uri->xml().c_str());
-	// Add method to get the data (if the URI is a CID, find the BOB, else,
-	// try using BUrlProtocolRoster)
 }
 
 
@@ -36,8 +32,10 @@ const std::string& Media::filterString() const
 
 gloox::Tag* Media::tag() const
 {
-	gloox::Tag* t = new gloox::Tag("media");
+	gloox::Tag* t = new gloox::Tag("media", "type", fType);
 	t->setXmlns(XMLNS_MEDIA);
-	// TODO fill in
+	gloox::Tag* uri = new gloox::Tag("uri");
+	uri->setCData(fURI);
+	t->addChild(uri);
 	return t;
 }

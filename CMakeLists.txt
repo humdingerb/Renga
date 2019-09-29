@@ -57,6 +57,7 @@ add_executable(Renga
 	network/media.cpp
 
 	# "Modern" XMPP classes using gloox cleanly and directly
+	network/BobStore.cpp
 	network/BookmarkManager.cpp
 	network/GlooxHandler.cpp
 

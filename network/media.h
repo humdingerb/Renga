@@ -10,29 +10,35 @@
 
 #include <gloox/stanzaextension.h>
 
+#include "mediahandler.h"
 
 class Media: public gloox::StanzaExtension
 {
 	public:
 		Media(const gloox::Tag* tag = 0);
-		virtual const std::string& filterString() const final;
-		virtual gloox::StanzaExtension* newInstance(const gloox::Tag* tag) const final
+		const std::string& filterString() const final;
+		gloox::StanzaExtension* newInstance(const gloox::Tag* tag) const final
 		{
-			return new Media(tag);
+			Media* instance = new Media(tag);
+			if (fMediaHandler)
+				fMediaHandler->handleMedia(instance);
+			return instance;
 		}
 
-		virtual gloox::Tag* tag() const final;
-		virtual gloox::StanzaExtension* clone() const final
+		gloox::Tag* tag() const final;
+		gloox::StanzaExtension* clone() const final
 		{
-			// TODO
-			return new Media();
+			return new Media(*this);
 		}
+
+		void RegisterMediaHandler(MediaHandler* handler) { fMediaHandler = handler; }
 
 		const std::string& uri() const { return fURI; }
 		const std::string& type() const { return fType; }
-		const std::string& data() const;
 
 	private:
 		std::string fType;
 		std::string fURI;
+
+		MediaHandler* fMediaHandler;
 };

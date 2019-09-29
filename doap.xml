@@ -62,11 +62,12 @@
     <!--<implements rdf:resource="https://xmpp.org/rfcs/rfc5122.html"/>-->
     <implements>
         <xmpp:SupportedXep>
+            <!-- Data forms -->
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0004.html"/>
             <xmpp:status>partial</xmpp:status>
             <xmpp:version>2.9</xmpp:version>
             <xmpp:version>1.22.0</xmpp:version>
-			<xmpp:note>only for in-band registration</xmpp:note>
+			<xmpp:note>Not all field types will properly render</xmpp:note>
         </xmpp:SupportedXep>
     </implements>
     <implements>
@@ -121,15 +122,16 @@
     </implements>
     <implements>
         <xmpp:SupportedXep>
+            <!-- CAPTCHA Forms -->
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0158.html"/>
-            <xmpp:status>partial</xmpp:status>
+            <xmpp:status>complete</xmpp:status>
             <xmpp:version>1.0</xmpp:version>
             <xmpp:version>1.22.0</xmpp:version>
-			<xmpp:note>only for in-band registration</xmpp:note>
         </xmpp:SupportedXep>
     </implements>
     <implements>
         <xmpp:SupportedXep>
+            <!-- Data Forms Media Element -->
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0221.html"/>
             <xmpp:status>partial</xmpp:status>
             <xmpp:version>1.22.0</xmpp:version>
@@ -138,11 +140,12 @@
     </implements>
     <implements>
         <xmpp:SupportedXep>
+            <!-- Bits of Binary -->
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0231.html"/>
             <xmpp:status>partial</xmpp:status>
             <xmpp:version>1.0</xmpp:version>
             <xmpp:version>1.22.0</xmpp:version>
-			<xmpp:note>only for in-band registration</xmpp:note>
+			<xmpp:note>only receiving, for in-band registration</xmpp:note>
         </xmpp:SupportedXep>
     </implements>
     <implements>

@@ -15,6 +15,7 @@
 #include <ListView.h>
 #include <StringView.h>
 #include <TextControl.h>
+#include <Url.h>
 #include <Window.h>
 
 
@@ -30,6 +31,11 @@ class RegisterAccountWindow: public BWindow
 	private:
 		void onDisconnect(gloox::ConnectionError error, gloox::StreamError streamError);
 		void handleDataForm(const gloox::JID& from, BView* form);
+		void handleMedia(BString type, BUrl uri);
+
+		void handleRegistrationResult(const gloox::JID&, gloox::RegistrationResult r);
+
+		BView* getRegistrationView();
 
 	private:
 		BCardLayout* fLayout;
@@ -44,6 +50,9 @@ class RegisterAccountWindow: public BWindow
 
 		// Registration form items
 		BGridView* fRegistrationForm;
+
+		BString fUsername;
+		BString fPassword;
 #if 0
 		BTextView* fInstructions;
 		BTextControl* fUsername;

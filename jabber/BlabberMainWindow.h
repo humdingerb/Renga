@@ -19,6 +19,10 @@
 #include "RosterView.h"
 #include "StatusView.h"
 
+enum {
+	kResetWindow = 'Wrst'
+};
+
 class BlabberMainWindow : public BWindow {
 public:
 	static BlabberMainWindow  *Instance();

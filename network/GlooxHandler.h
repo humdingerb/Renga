@@ -20,6 +20,9 @@
 #include <gloox/registration.h>
 #include <gloox/registrationhandler.h>
 
+#include "bobhandler.h"
+#include "mediahandler.h"
+
 
 enum {
 	kRegistrationFields = 'Rfld',
@@ -30,17 +33,25 @@ enum {
 
 	kConnect = 'Ccon',
 	kDisconnect = 'Cdis',
-	kTLSConnect = 'Ctls'
+	kTLSConnect = 'Ctls',
+
+	kMedia = 'Mdia'
 };
 
 
 class GlooxHandler: public BHandler, public gloox::RegistrationHandler,
-	public gloox::ConnectionListener
+	public gloox::ConnectionListener, public MediaHandler
 {
 public:
 	GlooxHandler(gloox::Client* client);
 
+	// Start the client thread and do things
 	void Run();
+
+	// Callbacks - FIXME should use a BHandler and serialize all things, and
+	// see how to sycnhronize with GlooxThread? (as there is annoyingly no way
+	// to poll() it)
+	void createAccount(gloox::DataForm* form);
 
 private:
 	static int32 GlooxThread(void*);
@@ -56,6 +67,9 @@ private:
 	void onConnect() final;
 	void onDisconnect(gloox::ConnectionError) final;
 	bool onTLSConnect(const gloox::CertInfo& info) final;
+
+	// mediahandler
+	void handleMedia(const Media* media) final;
 
 private:
 	gloox::Client* fClient;
