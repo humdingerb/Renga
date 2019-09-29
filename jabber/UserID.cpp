@@ -99,7 +99,7 @@ bool UserID::HaveSubscriptionTo() const {
 }
 
 bool UserID::IsUser() const {
-	return (UserType() == JABBER || UserType() == AIM || UserType() == ICQ || UserType() == YAHOO || UserType() == MSN);
+	return (UserType() == JABBER || UserType() == AIM || UserType() == ICQ);
 }
 
 const std::string UserID::JabberHandle() const {

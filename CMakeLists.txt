@@ -98,8 +98,6 @@ add_custom_command(TARGET Renga POST_BUILD
 		-a PiNG:7:unknown      ${CMAKE_SOURCE_DIR}/resources/icons/unknown.png
 		-a PiNG:8:aol          ${CMAKE_SOURCE_DIR}/resources/icons/aol.png
 		-a PiNG:9:icq          ${CMAKE_SOURCE_DIR}/resources/icons/icq.png
-		-a PiNG:10:yahoo       ${CMAKE_SOURCE_DIR}/resources/icons/yahoo.png
-		-a PiNG:11:msn         ${CMAKE_SOURCE_DIR}/resources/icons/msn.png
 	COMMAND mimeset -f ${CMAKE_BINARY_DIR}/Renga
 	DEPENDS jabber/Resource.rdef
 )

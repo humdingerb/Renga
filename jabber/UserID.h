@@ -15,7 +15,7 @@
 class UserID {
 public:
 	enum online_status  {UNKNOWN, UNACCEPTED, OFFLINE, ONLINE, TRANSPORT_ONLINE};
-	enum user_type      {INVALID, JABBER, AIM, ICQ, YAHOO, MSN, TRANSPORT};
+	enum user_type      {INVALID, JABBER, AIM, ICQ, TRANSPORT};
 
 public:
           	             UserID(gloox::JID username);

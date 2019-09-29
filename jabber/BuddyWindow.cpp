@@ -78,8 +78,6 @@ BuddyWindow::BuddyWindow(BRect frame)
 	_chat_services_selection->AddItem(new BMenuItem("AOL", new BMessage(AGENT_MENU_CHANGED_TO_AIM)));
 	_chat_services_selection->AddItem(new BMenuItem("ICQ", new BMessage(AGENT_MENU_CHANGED_TO_ICQ)));
 	_chat_services_selection->AddItem(new BMenuItem("Jabber", new BMessage(AGENT_MENU_CHANGED_TO_JABBER)));
-	_chat_services_selection->AddItem(new BMenuItem("MSN", new BMessage(AGENT_MENU_CHANGED_TO_MSN)));
-	_chat_services_selection->AddItem(new BMenuItem("Yahoo!", new BMessage(AGENT_MENU_CHANGED_TO_YAHOO)));
 
 	rect.OffsetBy(0.0, 23.0);
 	_handle = new BTextControl(rect, "handle", "Jabber ID: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
@@ -157,12 +155,6 @@ void BuddyWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 
-		case AGENT_MENU_CHANGED_TO_YAHOO: {
-			_enter_note->SetText("Please enter the user's Yahoo! IM screenname or Yahoo.com login (e.g., YahooMan14).");
-			_handle->SetLabel("Yahoo ID:");
-			break;
-		}
-
 		case AGENT_MENU_CHANGED_TO_ICQ: {
 			_enter_note->SetText("Please enter the user's ICQ numeric ID (e.g., 99818234).");
 			_handle->SetLabel("ICQ #:");
@@ -172,12 +164,6 @@ void BuddyWindow::MessageReceived(BMessage *msg) {
 		case AGENT_MENU_CHANGED_TO_AIM: {
 			_enter_note->SetText("Please enter the user's AOL screenname or AIM screenname (e.g., BeOSLover213).");
 			_handle->SetLabel("AOL Screen Name:");
-			break;
-		}
-
-		case AGENT_MENU_CHANGED_TO_MSN: {
-			_enter_note->SetText("Please enter the user's Hotmail or Passport username excluding the domain (e.g., ZaBlanc and not ZaBlanc@hotmail.com).");
-			_handle->SetLabel("Passport Sign-In:");
 			break;
 		}
 	}
@@ -206,7 +192,7 @@ void BuddyWindow::AddNewUser() {
 		return;
 	}
 	
-	// internally replace the username with a proper one if necessary (AOL, Yahoo!, etc...)
+	// internally replace the username with a proper one if necessary (AOL, etc...)
 	Agent *agent;
 	string username = _handle->Text();
 
@@ -224,20 +210,6 @@ void BuddyWindow::AddNewUser() {
 		}
 	} else if (!strcasecmp(_chat_services->Menu()->FindMarked()->Label(), "ICQ")) {
 		agent = AgentList::Instance()->GetAgentByService("icq");
-
-		if (agent) {
-			username += "@";
-			username += agent->JID();
-		}
-	} else if (!strcasecmp(_chat_services->Menu()->FindMarked()->Label(), "Yahoo!")) {
-		agent = AgentList::Instance()->GetAgentByService("yahoo");
-
-		if (agent) {
-			username += "@";
-			username += agent->JID();
-		}
-	} else if (!strcasecmp(_chat_services->Menu()->FindMarked()->Label(), "MSN")) {
-		agent = AgentList::Instance()->GetAgentByService("msn");
 
 		if (agent) {
 			username += "@";

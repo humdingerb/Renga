@@ -372,28 +372,6 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const UserID *user,
 				sprintf(buffer, "you are communicating via the ICQ service");
 				_status_view->SetMessage(buffer); 
 			}
-		} else if (user->UserType() == UserID::YAHOO) {
-			user_representation += " (Yahoo!)";
-
-			// identify the user
-			if (!AgentList::Instance()->GetAgentByService("yahoo")->Username().empty()) {
-				sprintf(buffer, "your identity is %s", AgentList::Instance()->GetAgentByService("yahoo")->Username().c_str());
-				_status_view->SetMessage(buffer); 
-			} else {
-				sprintf(buffer, "you are communicating via the Yahoo! Messenger service");
-				_status_view->SetMessage(buffer); 
-			}
-		} else if (user->UserType() == UserID::MSN) {
-			user_representation += " (MSN)";
-
-			// identify the user
-			if (!AgentList::Instance()->GetAgentByService("msn")->Username().empty()) {
-				sprintf(buffer, "your identity is %s", AgentList::Instance()->GetAgentByService("msn")->Username().c_str());
-				_status_view->SetMessage(buffer); 
-			} else {
-				sprintf(buffer, "you are communicating via the MSN Messenger service");
-				_status_view->SetMessage(buffer); 
-			}
 		}
 	}
 

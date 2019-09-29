@@ -20,8 +20,6 @@ BBitmap *RosterItem::_online_icon       = NULL;
 BBitmap *RosterItem::_unknown_icon      = NULL;
 BBitmap *RosterItem::_aol_icon          = NULL;
 BBitmap *RosterItem::_icq_icon          = NULL;
-BBitmap *RosterItem::_msn_icon          = NULL;
-BBitmap *RosterItem::_yahoo_icon        = NULL;
 
 RosterItem::RosterItem(const UserID *userid)
 	: BStringItem(userid->FriendlyName().c_str()) {
@@ -36,8 +34,6 @@ RosterItem::RosterItem(const UserID *userid)
 		_unknown_icon = BTranslationUtils::GetBitmap('PiNG', "unknown");
 		_aol_icon = BTranslationUtils::GetBitmap('PiNG', "aol");
 		_icq_icon = BTranslationUtils::GetBitmap('PiNG', "icq");
-		_yahoo_icon = BTranslationUtils::GetBitmap('PiNG', "yahoo");
-		_msn_icon = BTranslationUtils::GetBitmap('PiNG', "msn");
 	}
 }
 
@@ -169,17 +165,9 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 		if (_aol_icon) {
 			owner->DrawBitmapAsync(_aol_icon, BPoint(owner->PenLocation().x + 2.0, frame.top + 2));
 		}
-	} else if (GetUserID()->UserType() == UserID::YAHOO) {
-		if (_yahoo_icon) {
-			owner->DrawBitmapAsync(_yahoo_icon, BPoint(owner->PenLocation().x + 3.0, frame.top + 3));
-		}
 	} else if (GetUserID()->UserType() == UserID::ICQ) {
 		if (_icq_icon) {
 			owner->DrawBitmapAsync(_icq_icon, BPoint(owner->PenLocation().x + 2.0, frame.top + 2));
-		}
-	} else if (GetUserID()->UserType() == UserID::MSN) {
-		if (_msn_icon) {
-			owner->DrawBitmapAsync(_msn_icon, BPoint(owner->PenLocation().x + 2.0, frame.top + 2));
 		}
 	}
 	

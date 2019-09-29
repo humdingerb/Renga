@@ -54,25 +54,13 @@ void TransportPreferencesView::AttachedToWindow() {
 	rect.right  = rect.left + 375.0;
 	rect.bottom = rect.top + 18;
 
-	// transport selection (AOL, Yahoo!, MSN, ICQ)
+	// transport selection (AOL, ICQ)
 	_agent_entries = new BPopUpMenu("<select a service>");
 
 	if (agents->GetAgentByService("icq")) {
 		BMenuItem *icq = new BMenuItem("Mirabilis ICQ", new BMessage(AGENT_MENU_CHANGED_TO_ICQ));
 		icq->SetTarget(this);
 		_agent_entries->AddItem(icq);
-	}
-
-	if (agents->GetAgentByService("msn")) {
-		BMenuItem *msn = new BMenuItem("MSN", new BMessage(AGENT_MENU_CHANGED_TO_MSN));
-		msn->SetTarget(this);
-		_agent_entries->AddItem(msn);
-	}
-
-	if (agents->GetAgentByService("yahoo")) {
-		BMenuItem *yahoo = new BMenuItem("Yahoo!", new BMessage(AGENT_MENU_CHANGED_TO_YAHOO));
-		yahoo->SetTarget(this);
-		_agent_entries->AddItem(yahoo);
 	}
 
 	if (agents->GetAgentByService("aim")) {
@@ -215,7 +203,6 @@ void TransportPreferencesView::MessageReceived(BMessage *msg) {
 			break;
 		}
 		
-		// fall through
 		case AGENT_MENU_CHANGED_TO_AIM: {
 			_curr_transport = "aim";
 
@@ -228,38 +215,11 @@ void TransportPreferencesView::MessageReceived(BMessage *msg) {
 			break;
 		}
 
-		// fall through
 		case AGENT_MENU_CHANGED_TO_ICQ: {
 			_curr_transport = "icq";
 
 			if (agents->GetAgentByService(_curr_transport)) {
 				_username->SetLabel("ICQ #:");
-				_username->SetText(agents->GetAgentByService(_curr_transport)->Username().c_str());
-				_password->SetText(agents->GetAgentByService(_curr_transport)->Password().c_str());
-			}
-
-			break;
-		}
-
-		// fall through
-		case AGENT_MENU_CHANGED_TO_YAHOO: {
-			_curr_transport = "yahoo";
-
-			if (agents->GetAgentByService(_curr_transport)) {
-				_username->SetLabel("Yahoo ID:");
-				_username->SetText(agents->GetAgentByService(_curr_transport)->Username().c_str());
-				_password->SetText(agents->GetAgentByService(_curr_transport)->Password().c_str());
-			}
-
-			break;
-		}
-
-		// fall through
-		case AGENT_MENU_CHANGED_TO_MSN: {
-			_curr_transport = "msn";
-
-			if (agents->GetAgentByService(_curr_transport)) {
-				_username->SetLabel("Passport Sign-In:");
 				_username->SetText(agents->GetAgentByService(_curr_transport)->Username().c_str());
 				_password->SetText(agents->GetAgentByService(_curr_transport)->Password().c_str());
 			}

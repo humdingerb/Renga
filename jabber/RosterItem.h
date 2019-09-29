@@ -45,8 +45,6 @@ private:
 	static BBitmap *_unknown_icon;
 	static BBitmap *_aol_icon;
 	static BBitmap *_icq_icon;
-	static BBitmap *_yahoo_icon;
-	static BBitmap *_msn_icon;
 };
 
 #endif

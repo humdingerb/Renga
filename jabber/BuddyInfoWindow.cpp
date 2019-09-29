@@ -109,10 +109,6 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	} else {
 		if (querying_user->UserType() == UserID::AIM) {
 			jabberid_label = new BStringView(label_rect, NULL, "AOL Screen Name:");
-		} else if (querying_user->UserType() == UserID::YAHOO) {
-			jabberid_label = new BStringView(label_rect, NULL, "Yahoo ID:");
-		} else if (querying_user->UserType() == UserID::MSN) {
-			jabberid_label = new BStringView(label_rect, NULL, "Passport Sign-In:");
 		} else if (querying_user->UserType() == UserID::ICQ) {
 			jabberid_label = new BStringView(label_rect, NULL, "ICQ #:");
 		} else {
