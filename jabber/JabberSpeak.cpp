@@ -412,9 +412,10 @@ void JabberSpeak::SendUnsubscriptionRequest(string username) {
 void JabberSpeak::SetFriendlyName(const gloox::JID& who, BString friendlyName)
 {
 	gloox::RosterItem* item = fClient->rosterManager()->getRosterItem(who);
-	if (item)
+	if (item) {
 		item->setName(friendlyName.String());
-	else {
+		fClient->rosterManager()->synchronize();
+	} else {
 		const gloox::ConferenceListItem* bookmark
 			= BookmarkManager::Instance().GetBookmark(who.full().c_str());
 		if (bookmark) {

@@ -2,21 +2,16 @@
 // Blabber [UserID.cpp]
 //////////////////////////////////////////////////
 
-#ifndef __CSTRING__
-	#include <cstring>
-#endif
+#include "UserID.h"
 
-#ifndef AGENT_H
-	#include "Agent.h"
-#endif
+#include <cstring>
 
-#ifndef AGENT_LIST_H
-	#include "AgentList.h"
-#endif
+#include "Agent.h"
+#include "AgentList.h"
+#include "JabberSpeak.h"
 
-#ifndef USER_ID_H
-	#include "UserID.h"
-#endif
+#include <gloox/rosteritem.h>
+#include <gloox/rostermanager.h>
 
 UserID::UserID(gloox::JID handle) {
 	// initialize values
@@ -30,7 +25,6 @@ UserID::UserID(gloox::JID handle) {
 
 UserID::UserID(const UserID &copied_userid) {
 	SetHandle(copied_userid.Handle());
-	SetFriendlyName(copied_userid.FriendlyName());
 
 	SetSubscriptionStatus(copied_userid.SubscriptionStatus());
 	SetOnlineStatus(copied_userid.OnlineStatus());
@@ -59,7 +53,11 @@ const std::string UserID::Handle() const {
 }
 
 const std::string UserID::FriendlyName() const {
-	return _friendly_name;
+	gloox::RosterItem* item = JabberSpeak::Instance()->GlooxClient()
+		->rosterManager()->getRosterItem(_handle);
+	if (item)
+		return item->name();
+	return "";
 }
 
 UserID::online_status UserID::OnlineStatus() const {
@@ -136,15 +134,15 @@ const std::string UserID::JabberCompleteHandle() const {
 }
 
 const std::string UserID::JabberUsername() const {
-	return _jabber_username;
+	return _handle.username();
 }
 
 const std::string UserID::JabberServer() const {
-	return _jabber_server;
+	return _handle.server();
 }
 
 const std::string UserID::JabberResource() const {
-	return _jabber_resource;
+	return _handle.resource();
 }
 
 const std::string UserID::TransportID() const {
@@ -170,17 +168,17 @@ std::string UserID::WhyNotValidJabberHandle() {
 		return "";
 	}
 
-	if (_jabber_username.size() == 0 || _jabber_server.size() == 0) {
+	if (_handle.username().size() == 0 || _handle.server().size() == 0) {
 		return "Jabber ID must be of the form username@server[/resource].";
 	}
 
 	// verify length
-	if (_jabber_username.size() > 255) {
+	if (_handle.username().size() > 255) {
 		return "Jabber ID username part must not be longer than 255 characters.";
 	}
 
 	// verify ASCII charactership of abbreviated username
-	if (_jabber_username.find_first_of(":@<>'\"&") != std::string::npos) {
+	if (_handle.username().find_first_of(":@<>'\"&") != std::string::npos) {
 		return "Jabber ID username part must not contain any of the following characters in the handle: @<>:'\"&";
 	}
 
@@ -192,19 +190,31 @@ std::string UserID::WhyNotValidJabberHandle() {
 	return "";
 }
 
-void UserID::SetHandle(gloox::JID handle) {
+void UserID::SetHandle(gloox::JID handle)
+{
 	// initialize values
 	_handle = handle;
 
 	// process based on username structure
-	_ProcessHandle();
+	if (_handle.username().size() && _handle.server().size()) {
+		_user_type = JABBER;
+	} else {
+		_user_type = INVALID;
+	}
 }
 
-void UserID::SetFriendlyName(std::string friendly_name) {
-	_friendly_name = friendly_name;
+void UserID::SetFriendlyName(std::string friendly_name)
+{
+	gloox::RosterManager* manager = JabberSpeak::Instance()->GlooxClient()->rosterManager();
+	gloox::RosterItem* item = manager->getRosterItem(_handle);
+	if (item) {
+		item->setName(friendly_name);
+		manager->synchronize();
+	}
 }
 
-void UserID::SetOnlineStatus(online_status status) {
+void UserID::SetOnlineStatus(online_status status)
+{
 	// special value
 	if (status == UNACCEPTED) {
 		status = UNKNOWN;
@@ -252,18 +262,5 @@ void UserID::SetSubscriptionStatus(gloox::SubscriptionType status) {
 		if (OnlineStatus() == UserID::UNKNOWN) {
 			SetOnlineStatus(UserID::OFFLINE);
 		}
-	}
-}
-
-void UserID::_ProcessHandle() {
-	// reset split values
-	_jabber_username  = _handle.username();
-	_jabber_server    = _handle.server();
-	_jabber_resource  = _handle.resource();
-
-	if (_jabber_username.size() && _jabber_server.size()) {
-		_user_type = JABBER;
-	} else {
-		_user_type = INVALID;
 	}
 }

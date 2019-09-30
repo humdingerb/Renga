@@ -176,9 +176,6 @@ JRoster::handleItemUpdated(const gloox::JID& jid)
 	UserID* roster_user = FindUser(JRoster::HANDLE, jid.full());
 	if (roster_user) {
 		roster_user->SetSubscriptionStatus(item->subscription());
-		printf("%s(%s)\n", __PRETTY_FUNCTION__, jid.full().c_str());
-		printf("   name %s\n", item->name().c_str());
-		printf("   onln %d\n", item->online());
 	} else {
 		printf("%s(%s) user not found\n", __PRETTY_FUNCTION__, jid.full().c_str());
 	}
@@ -199,7 +196,6 @@ JRoster::handleRoster(const gloox::Roster& roster)
 
 	for (auto item: roster) {
 		UserID user(item.first);
-		user.SetFriendlyName(item.second->name());
 		user.SetSubscriptionStatus(item.second->subscription());
 
 		// obtain a handle to the user (is there a new one?)

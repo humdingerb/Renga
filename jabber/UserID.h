@@ -52,7 +52,6 @@ public:
 	std::string          WhyNotValidJabberHandle();
 
 	// MANIPULATORS
-	void                 SetHandle(gloox::JID handle);
 	void                 SetFriendlyName(std::string friendly_name);
 
 	void                 SetOnlineStatus(online_status status);
@@ -61,13 +60,12 @@ public:
 	void                 SetSubscriptionStatus(gloox::SubscriptionType status);
 
 private:
-	void                 _ProcessHandle();
+	void                 SetHandle(gloox::JID handle);
 
 	// identification
-	gloox::JID           _handle;
-	std::string          _friendly_name;
-	std::string          _service;
+	gloox::JID           _handle; // RosterItem
 
+	// Things tracked by JRoster (handlePresence, etc)
 	online_status        _status;
 	std::string          _exact_status;
 	std::string          _more_exact_status;
@@ -75,10 +73,6 @@ private:
 
 	// split into pieces
 	user_type            _user_type;
-
-	std::string          _jabber_username;
-	std::string          _jabber_server;
-	std::string          _jabber_resource;
 
 	std::string          _transport_id;
 	std::string          _transport_username;
