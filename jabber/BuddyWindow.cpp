@@ -204,10 +204,10 @@ void BuddyWindow::AddNewUser() {
 	}
 
 	// make a user to validate against	
-	UserID validating_user(username);
+	std::string validate = UserID::WhyNotValidJabberHandle(username);
 	
-	if (!strcasecmp(_handle->Label(), "Jabber ID:") && validating_user.WhyNotValidJabberHandle().size()) {
-		sprintf(buffer, "%s is not a valid Jabber ID for the following reason:\n\n%s\n\nPlease correct it.", _handle->Text(), validating_user.WhyNotValidJabberHandle().c_str()); 
+	if (!strcasecmp(_handle->Label(), "Jabber ID:") && validate.size()) {
+		sprintf(buffer, "%s is not a valid Jabber ID for the following reason:\n\n%s\n\nPlease correct it.", _handle->Text(), validate.c_str()); 
 		ModalAlertFactory::Alert(buffer, "Hmm, better check that...");
 		_handle->MakeFocus(true);
 		
@@ -226,13 +226,11 @@ void BuddyWindow::AddNewUser() {
 	}
 	JRoster::Instance()->Unlock();
 
-	// create a new user
-	UserID *new_user = new UserID(UserID(username));
-	new_user->SetFriendlyName(_realname->Text());
+	gloox::JID jid(username);
 	
 	// add this user to the roster
 	JRoster::Instance()->Lock();
-	JRoster::Instance()->AddNewUser(new_user);
+	JRoster::Instance()->AddNewUser(jid, _realname->Text());
 	JRoster::Instance()->Unlock();
 
 	// alert all RosterViews

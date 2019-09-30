@@ -29,36 +29,35 @@ JRoster::~JRoster() {
 }
 
 
-void JRoster::AddNewUser(UserID *new_user) {
-	_roster->push_back(new_user);
+void JRoster::AddNewUser(const gloox::JID& new_user, std::string friendlyName) {
+	_roster->push_back(new UserID(new_user));
 
 	// communicate the new user to the server
 	gloox::Client* client = JabberSpeak::Instance()->GlooxClient();
 	gloox::StringList groups;
-	client->rosterManager()->add(gloox::JID(new_user->Handle()),
-		new_user->FriendlyName(), groups);
+	client->rosterManager()->add(new_user, friendlyName, groups);
+	client->rosterManager()->synchronize();
 
 	// refresh all roster views
 	RefreshRoster();
 }
 
-void JRoster::RemoveUser(const UserID *removed_user) {
+void JRoster::RemoveUser(const gloox::JID& removed_user) {
 	for (RosterIter i = _roster->begin(); i != _roster->end(); ++i) {
-		if (*i == removed_user) {
-			_roster->erase(i);
+		if ((*i)->JID() == removed_user) {
 
 			// for transports
-			if (removed_user->UserType() == UserID::TRANSPORT) {
-				Agent *agent = AgentList::Instance()->GetAgentByID(removed_user->TransportID());
+			if ((*i)->UserType() == UserID::TRANSPORT) {
+				Agent *agent = AgentList::Instance()->GetAgentByID((*i)->TransportID());
 
 				if (agent) {
 					agent->SetRegisteredFlag(false);
 				}
 			}
-			
 			// goodbye memory
-			delete removed_user;
-
+			delete (*i);
+			_roster->erase(i);
+			
 			break;	
 		}
 	}
@@ -76,14 +75,6 @@ void JRoster::RemoveAllUsers() {
 }
 	
 UserID *JRoster::FindUser(search_method search_type, string name) {
-	if (search_type == JRoster::FRIENDLY_NAME) {
-		for (RosterIter i = _roster->begin(); i != _roster->end(); ++i) {
-			if (!strcasecmp(name.c_str(), (*i)->FriendlyName().c_str())) {
-				return (*i);
-			}
-		}
-	}
-	
 	if (search_type == JRoster::HANDLE) {
 		for (RosterIter i = _roster->begin(); i != _roster->end(); ++i) {
 			if (!strcasecmp(name.c_str(), (*i)->JabberHandle().c_str())) {
@@ -111,8 +102,8 @@ UserID *JRoster::FindUser(search_method search_type, string name) {
 	return NULL;
 }
 
-UserID *JRoster::FindUser(const UserID *comparing_user) {
-	return FindUser(JRoster::HANDLE, comparing_user->JabberHandle());
+UserID *JRoster::FindUser(const gloox::JID& comparing_user) {
+	return FindUser(JRoster::HANDLE, comparing_user.bare());
 }
 
 UserID::online_status JRoster::UserStatus(string username) {

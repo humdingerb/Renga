@@ -39,7 +39,7 @@
 float TalkWindow::x_placement_offset = -100;
 float TalkWindow::y_placement_offset = -100;
 
-TalkWindow::TalkWindow(gloox::Message::MessageType type, const UserID *user,
+TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 		string group_room, string group_username, bool follow_focus_rules)
 	: BWindow(BRect(0, 0, 0, 0), "<talk window>", B_DOCUMENT_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS)
@@ -53,12 +53,15 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const UserID *user,
 	MessageRepeater::Instance()->AddTarget(this);
 
 	_type           = type;
-	_user           = user;
+	if (user)
+		_user = JRoster::Instance()->FindUser(*user);
+	else
+		_user = NULL;
 	_group_room     = group_room;
 	_group_username = group_username;
 
-	if (_type != gloox::Message::Groupchat) {
-		_current_status = user->OnlineStatus();
+	if (_type != gloox::Message::Groupchat && _user) {
+		_current_status = _user->OnlineStatus();
 	}
 
 	// generate a thread ID
@@ -77,8 +80,8 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const UserID *user,
 		}
 		// assure that directory exists...
 		create_directory(chatlog_path.c_str(), 0777);
-		if(_user != 0) {
-		  chatlog_path += "/" + _user->JabberHandle();
+		if(user != 0) {
+		  chatlog_path += "/" + user->username();
 		} else {
 		  chatlog_path += "/" + group_room;
 		}	
@@ -339,18 +342,18 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const UserID *user,
 		// identify the user
 		sprintf(buffer, "your identity is %s", _group_username.c_str());
 		_status_view->SetMessage(buffer); 
-	} else if (user->UserType() == UserID::JABBER) {
+	} else if (_user->UserType() == UserID::JABBER) {
 		// identify the user
 		sprintf(buffer, "your identity is %s", JabberSpeak::Instance()->CurrentLogin().c_str());
 		_status_view->SetMessage(buffer); 
 	} else {
-		user_representation = user->FriendlyName();
+		user_representation = _user->FriendlyName();
 		
 		if (user_representation.empty()) {
-			user_representation = user->JabberUsername();
+			user_representation = _user->JabberUsername();
 		}
 
-		if (user->UserType() == UserID::ICQ) {
+		if (_user->UserType() == UserID::ICQ) {
 			user_representation += " (ICQ)";
 
 			// identify the user
@@ -365,7 +368,7 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const UserID *user,
 	}
 
 	if (_type != gloox::Message::Groupchat && user_representation.empty()) {
-		user_representation = user->FriendlyName();
+		user_representation = _user->FriendlyName();
 	}
 
 	if (type == gloox::Message::Normal) {
@@ -417,8 +420,6 @@ TalkWindow::~TalkWindow() {
 		fclose(_log);
 	}
 
-	delete _user;
-	
 	// remove self from message family
 	MessageRepeater::Instance()->RemoveTarget(this);
 }
@@ -1098,7 +1099,7 @@ string TalkWindow::OurRepresentation() {
 			
 	// and if not :)
 	if (user.empty()) {
-		user = UserID(JabberSpeak::Instance()->CurrentLogin()).JabberUsername();
+		user = JabberSpeak::Instance()->CurrentLogin();
 	}
 
 	return user;

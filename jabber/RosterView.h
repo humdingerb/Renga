@@ -42,12 +42,12 @@ public:
 	void                LinkUser(const UserID *added_user);
 	void                LinkTransport(const UserID *added_transport);
 	void                LinkBookmark(const gloox::JID& added_bookmark, BString nick);
-	void                UnlinkUser(const UserID *removed_user);
-	void                UnlinkTransport(const UserID *removed_transport);
+	void                UnlinkUser(const gloox::JID& removed_user);
+	void                UnlinkTransport(const gloox::JID& removed_transport);
 	void                UnlinkBookmark(const gloox::JID& removed_bookmark);
 
-	int32               FindUser(const UserID *compare_user);
-	int32               FindTransport(const UserID *compare_transport);
+	int32               FindUser(const gloox::JID& compare_user);
+	int32               FindTransport(const gloox::JID& compare_transport);
 	int32               FindBookmark(const gloox::JID& compare_jid);
 
 	void                UpdatePopUpMenu();

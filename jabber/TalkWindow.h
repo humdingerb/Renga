@@ -41,7 +41,7 @@ public:
 	
 public:  
 						TalkWindow(gloox::Message::MessageType type,
-							const UserID *user, std::string group_room,
+							const gloox::JID *user, std::string group_room,
 							std::string group_username, bool follow_focus_rules = false);
 						~TalkWindow();
 

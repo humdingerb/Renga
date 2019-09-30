@@ -38,14 +38,14 @@ TalkManager::~TalkManager() {
 }
 
 TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
-	const UserID* user, string group_room, string group_username,
+	const gloox::JID* user, string group_room, string group_username,
 	string thread, bool sound_on_new)
 {
 	TalkWindow *window = NULL;
 	
 	// is there a window already?
-	if (type != gloox::Message::Groupchat && IsExistingWindowToUser(type, user->Handle()).size()) {
-		window = _talk_map[IsExistingWindowToUser(type, user->Handle())];
+	if (type != gloox::Message::Groupchat && IsExistingWindowToUser(type, user->bare()).size()) {
+		window = _talk_map[IsExistingWindowToUser(type, user->bare())];
 
 		// activate it
 		if (!sound_on_new) {
@@ -53,11 +53,7 @@ TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType typ
 		}
 	} else if (type != gloox::Message::Groupchat) {
 		// create a new window
-		if (sound_on_new) {
-			window = new TalkWindow(type, user, "", "", true);
-		} else {
-			window = new TalkWindow(type, user, "", "");
-		}
+		window = new TalkWindow(type, user, "", "", sound_on_new);
 		
 		window->SetThreadID(thread);
 
@@ -78,11 +74,7 @@ TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType typ
 		}
 	} else if (type == gloox::Message::Groupchat) {
 		// create a new window
-		if (sound_on_new) {
-			window = new TalkWindow(type, user, group_room, group_username, true);
-		} else {
-			window = new TalkWindow(type, user, group_room, group_username);
-		}
+		window = new TalkWindow(type, user, group_room, group_username, sound_on_new);
 		
 		window->SetThreadID(thread);
 
@@ -161,25 +153,21 @@ TalkManager::handleMessage(const gloox::Message &msg,
 		thread_id = GenericFunctions::GenerateUniqueID();
 
 		// configure user ID
-		UserID *user;
+		gloox::JID user;
 
 		JRoster::Instance()->Lock();
 
-		if (JRoster::Instance()->FindUser(JRoster::HANDLE, UserID(sender).JabberHandle())) {
-			UserID *tmp_user = JRoster::Instance()->FindUser(JRoster::HANDLE, UserID(sender).JabberHandle());
-			user = new UserID(*tmp_user);
+		if (JRoster::Instance()->FindUser(JRoster::HANDLE, gloox::JID(sender).bare())) {
+			UserID *tmp_user = JRoster::Instance()->FindUser(JRoster::HANDLE,gloox::JID(sender).bare());
+			user = tmp_user->JID();
 		} else {
-			user = new UserID(sender);
-
-			if (user->UserType() == UserID::INVALID) {
-				user->SetFriendlyName("Jabber Server Host");
-			}
+			user.setJID(sender);
 		}
 
 		JRoster::Instance()->Unlock();
 
 		// create the new session								
-		window = CreateTalkSession(type, user, group_room, group_username, thread_id, true);
+		window = CreateTalkSession(type, &user, group_room, group_username, thread_id, true);
 	} else {
 		window = _talk_map[thread_id];
 	}
@@ -207,14 +195,14 @@ TalkManager::IsExistingWindowToUser(gloox::Message::MessageType type,
 {
 	// check handles (with resource)
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		if ((*i).second->Type() == type && (*i).second->GetUserID()->Handle() == UserID(username).Handle()) {
+		if ((*i).second->Type() == type && (*i).second->GetUserID()->JID() == gloox::JID(username)) {
 			return (*i).first;
 		}
 	}
 
 	// check handles (without resource)
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		if ((*i).second->Type() == type && (*i).second->GetUserID()->JabberHandle() == UserID(username).JabberHandle()) {
+		if ((*i).second->Type() == type && (*i).second->GetUserID()->JID().bare() == gloox::JID(username).bare()) {
 			return (*i).first;
 		}
 	}

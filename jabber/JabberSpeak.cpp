@@ -316,7 +316,7 @@ void JabberSpeak::SendConnect(string username, string password, string realname,
 	}
 	
 	// if we don't have all the data, query for it
-	if (username.size() == 0 || password.size() == 0 || UserID(username).JabberServer().size() == 0) {
+	if (username.size() == 0 || password.size() == 0 || gloox::JID(username).server().size() == 0) {
 		// check auto-login 
 		if (suppress_auto_connect == false && _blabber_settings->Tag("auto-login")) {
 			// last login data should be used (make sure it's there though)
@@ -326,7 +326,7 @@ void JabberSpeak::SendConnect(string username, string password, string realname,
 		}
 
 		// if we still don't have all the data, query for it
-		if (username.size() == 0 || password.size() == 0 || UserID(username).JabberServer().size() == 0) {
+		if (username.size() == 0 || password.size() == 0 || gloox::JID(username).server().size() == 0) {
 			BlabberMainWindow::Instance()->Lock();
 			BlabberMainWindow::Instance()->ShowLogin();
 			BlabberMainWindow::Instance()->Unlock();
@@ -356,7 +356,7 @@ int32 JabberSpeak::_SpawnConnectionThread(void *obj) {
 string					
 JabberSpeak::GetRealServer()
 {
-	return UserID(_curr_login).JabberServer();
+	return gloox::JID(_curr_login).server();
 }
 
 int	

@@ -341,7 +341,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 				// open chat window
 				TalkManager::Instance()->CreateTalkSession(gloox::Message::Chat,
-					new UserID(*user), "", "");
+					&user->JID(), "", "");
 			}
 
 			// if there's a current selection, begin chat with that group
@@ -412,7 +412,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			const UserID *user = item->GetUserID();
 
 			// open message window
-			TalkManager::Instance()->CreateTalkSession(gloox::Message::Normal, new UserID(*user), "", "");
+			TalkManager::Instance()->CreateTalkSession(gloox::Message::Normal, &user->JID(), "", "");
 			
 			break;
 		}
@@ -937,11 +937,10 @@ bool BlabberMainWindow::ValidateLogin() {
 	}
 
 	// validity of username
-	UserID username(gloox::JID(_login_username->Text()));
-
-	if (username.WhyNotValidJabberHandle().size()) {
+	std::string validate = UserID::WhyNotValidJabberHandle(_login_username->Text());
+	if (validate.size()) {
 		BString buffer;
-		buffer.SetToFormat("The Jabber ID you specified must not be yours because it's invalid for the following reason:\n\n%s\n\nIf you can't remember it, it's OK to create a new one by checking the \"Create a new Jabber Account!\" box.", username.WhyNotValidJabberHandle().c_str());
+		buffer.SetToFormat("The Jabber ID you specified must not be yours because it's invalid for the following reason:\n\n%s\n\nIf you can't remember it, it's OK to create a new one by checking the \"Create a new Jabber Account!\" box.", validate.c_str());
 
 		ModalAlertFactory::Alert(buffer, "OK", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_username->MakeFocus(true);
@@ -949,19 +948,18 @@ bool BlabberMainWindow::ValidateLogin() {
 		return false;
 	}	
 
-	// append default resource if missing
-	if (username.JabberResource().empty()) {
-		string handle     = username.Handle();
-		string resource   = "/haiku";
-		string new_handle = handle + resource;
+	gloox::JID username(_login_username->Text());
 
-		_login_username->SetText(new_handle.c_str());
+	// append default resource if missing
+	if (username.resource().empty()) {
+		username.setResource("haiku");
+		_login_username->SetText(username.full().c_str());
 	}
 	
 	// 	existance of password
 	if (!strcmp(_login_password->Text(), "")) {
 		char buffer[1024];
-		sprintf(buffer, "You must specify a password so I can make sure it's you, %s.", username.Handle().c_str());
+		sprintf(buffer, "You must specify a password so I can make sure it's you, %s.", username.username().c_str());
 
 		ModalAlertFactory::Alert(buffer, "Sorry!", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_password->MakeFocus(true);

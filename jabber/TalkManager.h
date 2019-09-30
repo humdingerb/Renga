@@ -34,8 +34,9 @@ public:
 	static TalkManager  *Instance();
       	                ~TalkManager();
 
+						// TODO split out into CreateTalkSession / CreateGroupSession
 	TalkWindow          *CreateTalkSession(const gloox::Message::MessageType type,
-							const UserID* user,
+							const gloox::JID* user,
 				std::string group_room, std::string group_username, 
 				std::string thread = GenericFunctions::GenerateUniqueID(), bool sound_on_new = false);
 	void                 handleMessage (const gloox::Message &msg, gloox::MessageSession *session) final;

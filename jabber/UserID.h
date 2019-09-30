@@ -18,11 +18,7 @@ public:
 	enum user_type      {INVALID, JABBER, ICQ, TRANSPORT};
 
 public:
-          	             UserID(gloox::JID username);
-          	             UserID(const UserID &copied_userid);
 	virtual             ~UserID();
-
-	UserID              &operator=(const UserID &rhs);
 
 	      user_type      UserType() const;
 	const std::string    Handle() const;
@@ -49,7 +45,7 @@ public:
 	const std::string    TransportPassword() const;
 
 	void                 StripJabberResource();        // xxx@yyy/zzz -> xxx@yyy
-	std::string          WhyNotValidJabberHandle();
+	static std::string   WhyNotValidJabberHandle(std::string jidCandidate);
 
 	// MANIPULATORS
 	void                 SetFriendlyName(std::string friendly_name);
@@ -60,6 +56,11 @@ public:
 	void                 SetSubscriptionStatus(gloox::SubscriptionType status);
 
 private:
+          	             UserID(gloox::JID username);
+          	             UserID(const UserID &copied_userid);
+	UserID              &operator=(const UserID &rhs);
+	friend class         JRoster; // Ony JRoster is allowed to create/copy UserIDs
+
 	void                 SetHandle(gloox::JID handle);
 
 	// identification

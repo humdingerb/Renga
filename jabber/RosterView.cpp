@@ -260,7 +260,7 @@ void RosterView::LinkBookmark(const gloox::JID& added_bookmark, BString name) {
 	}
 }
 
-void RosterView::UnlinkUser(const UserID *removed_user) {
+void RosterView::UnlinkUser(const gloox::JID& removed_user) {
 	// does user exist
 	int32 index = FindUser(removed_user);
 	
@@ -269,7 +269,7 @@ void RosterView::UnlinkUser(const UserID *removed_user) {
 	}
 }
 
-void RosterView::UnlinkTransport(const UserID *removed_transport) {
+void RosterView::UnlinkTransport(const gloox::JID& removed_transport) {
 	// does transport exist
 	int32 index = FindTransport(removed_transport);
 	
@@ -287,12 +287,7 @@ void RosterView::UnlinkBookmark(const gloox::JID& removed_bookmark) {
 	}
 }
 
-int32 RosterView::FindUser(const UserID *compare_user) {
-	// handle NULL argument
-	if (compare_user == NULL) {
-		return -1;
-	}
-
+int32 RosterView::FindUser(const gloox::JID& compare_user) {
 	for (int i=0; i<FullListCountItems(); ++i) {
 		// get item
 		RosterItem *item = dynamic_cast<RosterItem *>(FullListItemAt(i));
@@ -302,7 +297,7 @@ int32 RosterView::FindUser(const UserID *compare_user) {
 		}
 				
 		// compare against RosterView
-		if (item->GetUserID() == compare_user) {
+		if (item->GetUserID()->JID() == compare_user) {
 			return i;
 		}
 	}
@@ -311,12 +306,7 @@ int32 RosterView::FindUser(const UserID *compare_user) {
 	return -1;
 }
 
-int32 RosterView::FindTransport(const UserID *compare_transport) {
-	// handle NULL argument
-	if (compare_transport == NULL) {
-		return -1;
-	}
-
+int32 RosterView::FindTransport(const gloox::JID& compare_transport) {
 	for (int i=0; i<FullListCountItems(); ++i) {
 		// get item
 		TransportItem *item = dynamic_cast<TransportItem *>(FullListItemAt(i));
@@ -326,7 +316,7 @@ int32 RosterView::FindTransport(const UserID *compare_transport) {
 		}
 				
 		// compare against RosterView
-		if (item->GetUserID() == compare_transport) {
+		if (item->GetUserID()->JID() == compare_transport) {
 			return i;
 		}
 	}
@@ -433,10 +423,10 @@ void RosterView::UpdateRoster() {
 	roster->Lock();
 
 	for (JRoster::ConstRosterIter i = roster->BeginIterator(); i != roster->EndIterator(); ++i) {
-		if ((*i)->IsUser() && FindUser(*i) < 0) {
+		if ((*i)->IsUser() && FindUser((*i)->JID()) < 0) {
 			// this entry does not exist in the RosterView
 			LinkUser(*i);
-		} else if ((*i)->UserType() == UserID::TRANSPORT && FindTransport(*i) < 0 && (*i)->OnlineStatus() == UserID::TRANSPORT_ONLINE) {
+		} else if ((*i)->UserType() == UserID::TRANSPORT && FindTransport((*i)->JID()) < 0 && (*i)->OnlineStatus() == UserID::TRANSPORT_ONLINE) {
 			LinkTransport(*i);
 		}
 	}
@@ -454,7 +444,7 @@ void RosterView::UpdateRoster() {
 
 		if (item) {
 			// process removals
-			if (!roster->FindUser(item->GetUserID())) {
+			if (!roster->FindUser(item->GetUserID()->JID())) {
 				item->SetStalePointer(true);
 				RemoveItem(i);
 
@@ -484,7 +474,7 @@ void RosterView::UpdateRoster() {
 			// clean it
 			InvalidateItem(i);
 		} else if (transport_item) {
-			if (!roster->FindUser(transport_item->GetUserID()) || transport_item->GetUserID()->OnlineStatus() != UserID::TRANSPORT_ONLINE) {
+			if (!roster->FindUser(transport_item->GetUserID()->JID()) || transport_item->GetUserID()->OnlineStatus() != UserID::TRANSPORT_ONLINE) {
 				transport_item->SetStalePointer(true);
 				RemoveItem(i);
 

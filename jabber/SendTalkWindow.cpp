@@ -204,7 +204,8 @@ void SendTalkWindow::MessageReceived(BMessage *msg) {
 					BlabberSettings::Instance()->SetData("last-talk-sent-to", user.c_str());
 
 					// create session
-					TalkManager::Instance()->CreateTalkSession(_type, new UserID(user), "", "");
+					gloox::JID jid(user);
+					TalkManager::Instance()->CreateTalkSession(_type, &jid, "", "");
 				}
 
 				PostMessage(B_QUIT_REQUESTED);
@@ -273,10 +274,10 @@ string SendTalkWindow::ValidateUser() {
 	}
 
 	// make a user to validate against	
-	UserID validating_user(username);
+	std::string validate = UserID::WhyNotValidJabberHandle(username);
 	
-	if (!strcasecmp(_handle->Label(), "Jabber ID:") && validating_user.WhyNotValidJabberHandle().size()) {
-		sprintf(buffer, "%s is not a valid Jabber ID for the following reason:\n\n%s\n\nPlease correct it.", _handle->Text(), validating_user.WhyNotValidJabberHandle().c_str()); 
+	if (!strcasecmp(_handle->Label(), "Jabber ID:") && validate.size()) {
+		sprintf(buffer, "%s is not a valid Jabber ID for the following reason:\n\n%s\n\nPlease correct it.", _handle->Text(), validate.c_str()); 
 		ModalAlertFactory::Alert(buffer, "Hmm, better check that...");
 		_handle->MakeFocus(true);
 		

@@ -158,36 +158,34 @@ const std::string UserID::TransportPassword() const {
 }
 
 void UserID::StripJabberResource() {
-	if (WhyNotValidJabberHandle().size()) {
+	if (WhyNotValidJabberHandle(_handle.full()).size()) {
 		_handle.setResource("");
 	}
 }
 
-std::string UserID::WhyNotValidJabberHandle() {
-	if (UserType() == JABBER) {
+std::string UserID::WhyNotValidJabberHandle(std::string jidCandidate)
+{
+	gloox::JID jid(jidCandidate);
+
+	if (jid) {
 		return "";
 	}
 
-	if (_handle.username().size() == 0 || _handle.server().size() == 0) {
+	if (jid.username().size() == 0 || jid.server().size() == 0) {
 		return "Jabber ID must be of the form username@server[/resource].";
 	}
 
 	// verify length
-	if (_handle.username().size() > 255) {
+	if (jid.username().size() > 255) {
 		return "Jabber ID username part must not be longer than 255 characters.";
 	}
 
 	// verify ASCII charactership of abbreviated username
-	if (_handle.username().find_first_of(":@<>'\"&") != std::string::npos) {
+	if (jid.username().find_first_of(":@<>'\"&") != std::string::npos) {
 		return "Jabber ID username part must not contain any of the following characters in the handle: @<>:'\"&";
 	}
 
-	if (!_handle) {
-		return "Jabber ID could not be parsed for an unkonwn reason";
-	}
-
-	// no errors found
-	return "";
+	return "Jabber ID could not be parsed for an unkonwn reason";
 }
 
 void UserID::SetHandle(gloox::JID handle)

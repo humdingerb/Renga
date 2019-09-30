@@ -15,23 +15,23 @@
 class JRoster: public gloox::RosterListener {
 public:
 	// search method
-	enum search_method         {FRIENDLY_NAME, HANDLE, COMPLETE_HANDLE, TRANSPORT_ID};
+	enum search_method         {HANDLE, COMPLETE_HANDLE, TRANSPORT_ID};
 
 	// shortened
-	typedef std::vector<UserID *>                 RosterList;
-	typedef std::vector<UserID *>::iterator       RosterIter;
-	typedef std::vector<UserID *>::const_iterator ConstRosterIter;
+	typedef std::vector<UserID *>      RosterList;
+	typedef RosterList::iterator       RosterIter;
+	typedef RosterList::const_iterator ConstRosterIter;
 
 public:
 	static JRoster              *Instance();
 	                            ~JRoster();
 
-	void                         AddNewUser(UserID *new_user);
-	void                         RemoveUser(const UserID *removed_user);
+	void                         AddNewUser(const gloox::JID& new_user, std::string friendlyName);
+	void                         RemoveUser(const gloox::JID& removed_user);
 	void                         RemoveAllUsers();
 
 	UserID                      *FindUser(search_method search_type, std::string key);
-	UserID                      *FindUser(const UserID *comparing_user);
+	UserID                      *FindUser(const gloox::JID& comparing_user);
 
 	UserID::online_status        UserStatus(std::string username);
 
