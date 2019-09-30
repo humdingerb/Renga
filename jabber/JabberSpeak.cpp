@@ -90,7 +90,6 @@ void JabberSpeak::JabberSpeakReset() {
 	_am_logged_in            = false;
 	_reconnecting            = false;
 	_got_some_agent_info     = false;
-	_got_some_roster_info    = false;
 
 	_iq_map.clear();
 }
@@ -239,79 +238,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 	}
 }
 
-void JabberSpeak::_ProcessUserPresence(UserID *user,
-	gloox::Presence::PresenceType type, const std::string& message) {
-#if 0
-	// get best asker name
-	const char *asker;
-					
-	if (user && user->FriendlyName().size() > 0) {
-		// they have a friendly name
-		asker = user->FriendlyName().c_str();
-	} else {
-		// they have a JID
-		asker = entity.from().full();
-	}full
-#endif
-
-	// reflect presence
-	if (user && type == gloox::Presence::Unavailable) {
-		user->SetOnlineStatus(UserID::OFFLINE);
-	} else if (user && type == gloox::Presence::Available) {
-		user->SetOnlineStatus(UserID::ONLINE);
-#if 0
-	// FIXME we should rather implement RosterManager instead of doing this ourselves
-	} else if (!strcasecmp(availability, "unsubscribe")) {
-		sprintf(buffer, "%s no longer wishes to know your online status.", asker);
-		ModalAlertFactory::NonModalAlert(buffer, "I feel so unloved.");
-	} else if (user && !strcasecmp(availability, "unsubscribed")) {
-		// do nothing?
-		user->SetOnlineStatus(UserID::UNKNOWN);
-	} else if (user && !strcasecmp(availability, "subscribed")) {
-		user->SetOnlineStatus(UserID::ONLINE);
-
-		if (entity->Child("status")) {
-			sprintf(buffer, "[%s]\n\n%s", asker, entity->Child("status")->Data());
-		} else {
-			sprintf(buffer, "Your subscription request was accepted by %s!", asker);
-		}
-		
-		ModalAlertFactory::Alert(buffer, "Hooray!");
-	} else if (!strcasecmp(availability, "subscribe")) {
-		sprintf(buffer, "%s would like to subscribe to your presence so they may know if you're online or not.  Would you like to allow it?", asker);
-
-		// query for presence authorization (for users)
-		int32 answer = 0;
-				
-		if (user->IsUser()) {
-			answer = ModalAlertFactory::Alert(buffer, "No, I prefer privacy.", "Yes, grant them my presence!");
-		} else if (user->UserType() == UserID::TRANSPORT) {
-			answer = 1;
-		}
-
-		// send back the response
-		if (answer == 1) {
-			// presence is granted
-			_AcceptPresence(entity->Attribute("from"));
-		} else if (answer == 0) {
-			// presence is denied
-			_RejectPresence(entity->Attribute("from"));
-		}
-#endif
-	}
-
-	if (user && (type == gloox::Presence::Unavailable
-			|| type == gloox::Presence::Available)) {
-#if 0
-		if (entity->Child("show") && entity->Child("show")->Data()) {
-			user->SetExactOnlineStatus(entity->Child("show")->Data());
-		}
-#endif
-
-		user->SetMoreExactOnlineStatus(message);
-	}
-}
-
 void JabberSpeak::_ParseAgentList(XMLEntity *iq_agent_entity) {
 	XMLEntity *entity = iq_agent_entity;
 	
@@ -360,10 +286,7 @@ void JabberSpeak::_ParseAgentList(XMLEntity *iq_agent_entity) {
 	}
 
 	_got_some_agent_info = true;
-
-	if (_got_some_agent_info && _got_some_roster_info) {
-		_am_logged_in = true;
-	}	
+	_am_logged_in = true;
 }
 
 void JabberSpeak::_AcceptPresence(string username) {
@@ -447,7 +370,7 @@ void JabberSpeak::_ConnectionThread() {
 	gloox::JID jid(_curr_login);
 	fClient = new gloox::Client(jid, _password);
 
-	fClient->rosterManager()->registerRosterListener(this);
+	fClient->rosterManager()->registerRosterListener(JRoster::Instance());
 	fClient->logInstance().registerLogHandler(gloox::LogLevelDebug,
 		gloox::LogAreaXmlOutgoing, new LogHandler);
 	fClient->registerConnectionListener(this);
@@ -722,7 +645,6 @@ JabberSpeak::onDisconnect(gloox::ConnectionError e)
 		MessageRepeater::Instance()->PostMessage(JAB_RECONNECTING);
 
 		_got_some_agent_info     = false;
-		_got_some_roster_info    = false;
 		_am_logged_in            = false;
 
 		// reset networking
@@ -737,195 +659,5 @@ JabberSpeak::onTLSConnect(__attribute__((unused)) const gloox::CertInfo& info)
 {
 	// TODO verify certificate
 	return true;
-}
-
-
-void
-JabberSpeak::handleItemAdded(const gloox::JID&)
-{
-	printf("%s\n", __PRETTY_FUNCTION__);
-}
-
-
-void
-JabberSpeak::handleItemSubscribed(const gloox::JID&)
-{
-	printf("%s\n", __PRETTY_FUNCTION__);
-}
-
-
-void
-JabberSpeak::handleItemRemoved(const gloox::JID&)
-{
-	printf("%s\n", __PRETTY_FUNCTION__);
-}
-
-
-void
-JabberSpeak::handleItemUpdated(const gloox::JID& jid)
-{
-	gloox::RosterItem* item = fClient->rosterManager()->getRosterItem(jid);
-	UserID* roster_user = JRoster::Instance()->FindUser(JRoster::HANDLE, jid.full());
-	if (roster_user) {
-		roster_user->SetSubscriptionStatus(item->subscription());
-		printf("%s(%s)\n", __PRETTY_FUNCTION__, jid.full().c_str());
-		printf("   name %s\n", item->name().c_str());
-		printf("   onln %d\n", item->online());
-	} else {
-		printf("%s(%s) user not found\n", __PRETTY_FUNCTION__, jid.full().c_str());
-	}
-}
-
-
-void
-JabberSpeak::handleItemUnsubscribed(const gloox::JID&)
-{
-	printf("%s\n", __PRETTY_FUNCTION__);
-}
-
-
-void
-JabberSpeak::handleRoster(const gloox::Roster& roster)
-{
-	JRoster::Instance()->Lock();
-
-	for (auto item: roster) {
-		UserID user(item.first);
-		user.SetFriendlyName(item.second->name());
-		user.SetSubscriptionStatus(item.second->subscription());
-
-		// obtain a handle to the user (is there a new one?)
-		UserID *roster_user;
-			
-		if (user.IsUser()) {
-			roster_user = JRoster::Instance()->FindUser(JRoster::HANDLE, user.JabberHandle());
-		} else if (user.UserType() == UserID::TRANSPORT) {
-			roster_user = JRoster::Instance()->FindUser(JRoster::TRANSPORT_ID, user.TransportID());
-		} else {
-			continue;
-		}
-
-		// if we have duplicates, settle disputes
-		if (roster_user) {
-#if 0
-			// process if it's a removal
-			if (entity->Child(i)->Attribute("subscription") && !strcasecmp(entity->Child(i)->Attribute("subscription"), "remove")) {
-				// remove from the list
-				JRoster::Instance()->RemoveUser(roster_user);
-
-				continue;
-			}
-#endif
-
-			// update the new roster item
-			*roster_user = user;
-		} else {
-			// create the user
-			roster_user = new UserID(item.first);
-
-			*roster_user = user;
-
-			// add to the list
-			JRoster::Instance()->AddRosterUser(roster_user);
-		}
-	}
-
-	JRoster::Instance()->Unlock();	
-
-	// update all RosterViews
-	JRoster::Instance()->RefreshRoster();
-	
-	_got_some_roster_info = true;
-	
-	if (_got_some_agent_info && _got_some_roster_info) {
-		_am_logged_in = true;
-	}
-}
-
-
-void
-JabberSpeak::handleRosterPresence(const gloox::RosterItem& item,
-	const string& resource __attribute__((unused)), gloox::Presence::PresenceType presenceType,
-	const string& message)
-{
-	JRoster *roster = JRoster::Instance();
-	int num_matches = 0;
-	const gloox::JID& jid = item.jidJID();
-
-	roster->Lock();
-
-	for (JRoster::ConstRosterIter i = roster->BeginIterator();
-		i != roster->EndIterator(); ++i)
-	{
-		UserID *user = NULL;
-		if ((*i)->IsUser() && !strcasecmp(UserID(jid.full()).JabberHandle().c_str(),
-			(*i)->JabberHandle().c_str()))
-		{
-			// found another match
-			++num_matches;
-			user = *i;
-			_ProcessUserPresence(user, presenceType, message);
-		} else if ((*i)->UserType() == UserID::TRANSPORT
-			&& !strcasecmp(UserID(jid.full()).TransportID().c_str(),
-				(*i)->TransportID().c_str()))
-		{
-			// found another match
-			++num_matches;
-			user = *i;
-			_ProcessUserPresence(user, presenceType, message);
-		}
-	}
-	if (num_matches == 0) {
-#if 0
-		UserID user(jid.full());
-		ProcessUserPresence(&user, presence);
-#endif
-		puts("user not found");
-	}
-
-	roster->Unlock();
-
-	// update all RosterViews
-	JRoster::Instance()->RefreshRoster();				
-}
-
-
-void
-JabberSpeak::handleSelfPresence(const gloox::RosterItem&, const string& resource, gloox::Presence::PresenceType, const string& msg)
-{
-	// TODO this gets called for giving us our current presence and message,
-	// and also for all other resources, so we can know that the same user
-	// is also online elsewhere
-	printf("%s(%s, %s)\n", __PRETTY_FUNCTION__, resource.c_str(), msg.c_str());
-}
-
-
-bool
-JabberSpeak::handleSubscriptionRequest(const gloox::JID&, const string&)
-{
-	printf("%s\n", __PRETTY_FUNCTION__);
-	return false;
-}
-
-
-bool
-JabberSpeak::handleUnsubscriptionRequest(const gloox::JID&, const string&)
-{
-	printf("%s\n", __PRETTY_FUNCTION__);
-	return false;
-}
-
-
-void
-JabberSpeak::handleNonrosterPresence(const gloox::Presence&)
-{
-	printf("%s\n", __PRETTY_FUNCTION__);
-}
-
-
-void
-JabberSpeak::handleRosterError(const gloox::IQ&)
-{
-	printf("%s\n", __PRETTY_FUNCTION__);
 }
 

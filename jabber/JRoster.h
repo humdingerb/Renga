@@ -3,22 +3,16 @@
 //     The official JRoster repository
 //////////////////////////////////////////////////
 
-#ifndef JROSTER_H
-#define JROSTER_H
+#pragma once
 
-#ifndef __STRING__
-	#include <string>
-#endif
+#include <string>
+#include <vector>
 
-#ifndef __VECTOR__
-	#include <vector>
-#endif
+#include "UserID.h"
 
-#ifndef USER_ID_H
-	#include "UserID.h"
-#endif
+#include <gloox/rosterlistener.h>
 
-class JRoster {
+class JRoster: public gloox::RosterListener {
 public:
 	// search method
 	enum search_method         {FRIENDLY_NAME, HANDLE, COMPLETE_HANDLE, TRANSPORT_ID};
@@ -52,8 +46,24 @@ public:
 	void                         Lock();
 	void                         Unlock();
 
+	void 					handleItemAdded(const gloox::JID&) final;
+	void 					handleItemSubscribed(const gloox::JID&) final;
+	void 					handleItemRemoved(const gloox::JID&) final;
+	void 					handleItemUpdated(const gloox::JID&) final;
+	void 					handleItemUnsubscribed(const gloox::JID&) final;
+	void 					handleRoster(const gloox::Roster&) final;
+	void 					handleRosterPresence(const gloox::RosterItem&, const std::string&, gloox::Presence::PresenceType, const std::string&) final;
+	void 					handleSelfPresence(const gloox::RosterItem&, const std::string&, gloox::Presence::PresenceType, const std::string&) final;
+	bool 					handleSubscriptionRequest(const gloox::JID&, const std::string&) final;
+	bool 					handleUnsubscriptionRequest(const gloox::JID&, const std::string&) final;
+	void 					handleNonrosterPresence(const gloox::Presence&) final;
+	void 					handleRosterError(const gloox::IQ&) final;
+
 protected:
 	                             JRoster();
+
+private:
+	void                    _ProcessUserPresence(UserID *user, const gloox::Presence::PresenceType, const std::string&);
 
 private:
 	static JRoster             *_instance;
@@ -62,4 +72,3 @@ private:
 	sem_id                      _roster_lock;
 };
 
-#endif

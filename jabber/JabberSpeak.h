@@ -11,7 +11,6 @@
 #include <gloox/connectionlistener.h>
 #include <gloox/presence.h>
 #include <gloox/registration.h>
-#include <gloox/rosterlistener.h>
 #include <gloox/softwareversion.h>
 
 #include "../network/BookmarkManager.h"
@@ -31,7 +30,7 @@ enum {
 };
 
 class JabberSpeak : public BHandler, public XMLReader,
-	public gloox::ConnectionListener, public gloox::RosterListener
+	public gloox::ConnectionListener
 {
 public:
 	enum iq_intent {LOGIN, ROSTER, AGENTS, REGISTER, SEND_REGISTER, UNREGISTER, SEND_UNREGISTER, NEW_USER, MESSAGE, CHAT};
@@ -87,19 +86,6 @@ public:
 	void					onDisconnect(gloox::ConnectionError e) final;
 	bool					onTLSConnect(const gloox::CertInfo& info) final;
 
-	void 					handleItemAdded(const gloox::JID&) final;
-	void 					handleItemSubscribed(const gloox::JID&) final;
-	void 					handleItemRemoved(const gloox::JID&) final;
-	void 					handleItemUpdated(const gloox::JID&) final;
-	void 					handleItemUnsubscribed(const gloox::JID&) final;
-	void 					handleRoster(const gloox::Roster&) final;
-	void 					handleRosterPresence(const gloox::RosterItem&, const string&, gloox::Presence::PresenceType, const string&) final;
-	void 					handleSelfPresence(const gloox::RosterItem&, const string&, gloox::Presence::PresenceType, const string&) final;
-	bool 					handleSubscriptionRequest(const gloox::JID&, const string&) final;
-	bool 					handleUnsubscriptionRequest(const gloox::JID&, const string&) final;
-	void 					handleNonrosterPresence(const gloox::Presence&) final;
-	void 					handleRosterError(const gloox::IQ&) final;
-
 	gloox::Client* 			GlooxClient() { return fClient; }
 
 protected:
@@ -114,7 +100,6 @@ private:
 	void					_ProcessVersionRequest(void);
 
 	// INCOMING COMMUNICATION
-	void                    _ProcessUserPresence(UserID *user, const gloox::Presence::PresenceType, const std::string&);
 	void                    _ParseAgentList(XMLEntity *iq_agent_entity);
 	void                    _AcceptPresence(string username);
 	void                    _RejectPresence(string username);
@@ -131,7 +116,6 @@ private:
 	bool                    _reconnecting;
 
 	bool                    _got_some_agent_info;
-	bool                    _got_some_roster_info;
 	
 	// communication state information
 	IQMap                   _iq_map;
