@@ -27,19 +27,16 @@ JRoster::~JRoster() {
 	// destroy semaphore
 	delete_sem(_roster_lock);
 }
-	    
-void JRoster::AddRosterUser(UserID *roster_user) {
-	_roster->push_back(roster_user);
-	
-	// refresh all roster views
-	RefreshRoster();
-}
+
 
 void JRoster::AddNewUser(UserID *new_user) {
 	_roster->push_back(new_user);
 
 	// communicate the new user to the server
-	JabberSpeak::Instance()->AddToRoster(new_user);
+	gloox::Client* client = JabberSpeak::Instance()->GlooxClient();
+	gloox::StringList groups;
+	client->rosterManager()->add(gloox::JID(new_user->Handle()),
+		new_user->FriendlyName(), groups);
 
 	// refresh all roster views
 	RefreshRoster();
@@ -114,29 +111,8 @@ UserID *JRoster::FindUser(search_method search_type, string name) {
 	return NULL;
 }
 
-bool JRoster::ExistingUserObject(const UserID *comparing_user) {
-	for (RosterIter i = _roster->begin(); i != _roster->end(); ++i) {
-		if ((*i) == comparing_user) {
-			return true;
-		}
-	}
-	
-	return false;
-}
-
 UserID *JRoster::FindUser(const UserID *comparing_user) {
 	return FindUser(JRoster::HANDLE, comparing_user->JabberHandle());
-}
-
-void JRoster::SetUserStatus(string username, UserID::online_status status) {
-	UserID *user = const_cast<UserID *>(FindUser(COMPLETE_HANDLE, username));
-	
-	if (user != NULL) {
-		user->SetOnlineStatus(status);
-	}
-
-	// refresh all roster views
-	RefreshRoster();
 }
 
 UserID::online_status JRoster::UserStatus(string username) {
@@ -258,7 +234,7 @@ JRoster::handleRoster(const gloox::Roster& roster)
 			*roster_user = user;
 
 			// add to the list
-			AddRosterUser(roster_user);
+			_roster->push_back(roster_user);
 		}
 	}
 

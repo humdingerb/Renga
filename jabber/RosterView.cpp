@@ -454,7 +454,7 @@ void RosterView::UpdateRoster() {
 
 		if (item) {
 			// process removals
-			if (!roster->ExistingUserObject(item->GetUserID()) || !roster->FindUser(item->GetUserID())) {
+			if (!roster->FindUser(item->GetUserID())) {
 				item->SetStalePointer(true);
 				RemoveItem(i);
 
@@ -484,7 +484,7 @@ void RosterView::UpdateRoster() {
 			// clean it
 			InvalidateItem(i);
 		} else if (transport_item) {
-			if (!roster->ExistingUserObject(transport_item->GetUserID()) || !roster->FindUser(transport_item->GetUserID()) || transport_item->GetUserID()->OnlineStatus() != UserID::TRANSPORT_ONLINE) {
+			if (!roster->FindUser(transport_item->GetUserID()) || transport_item->GetUserID()->OnlineStatus() != UserID::TRANSPORT_ONLINE) {
 				transport_item->SetStalePointer(true);
 				RemoveItem(i);
 

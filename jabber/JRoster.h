@@ -26,16 +26,13 @@ public:
 	static JRoster              *Instance();
 	                            ~JRoster();
 
-	void                         AddRosterUser(UserID *roster_user);
 	void                         AddNewUser(UserID *new_user);
 	void                         RemoveUser(const UserID *removed_user);
 	void                         RemoveAllUsers();
 
 	UserID                      *FindUser(search_method search_type, std::string key);
 	UserID                      *FindUser(const UserID *comparing_user);
-	bool                         ExistingUserObject(const UserID *comparing_user);
 
-	void                         SetUserStatus(std::string username, UserID::online_status status);
 	UserID::online_status        UserStatus(std::string username);
 
 	ConstRosterIter              BeginIterator();
@@ -60,15 +57,15 @@ public:
 	void 					handleRosterError(const gloox::IQ&) final;
 
 protected:
-	                             JRoster();
+	                    	JRoster();
 
 private:
 	void                    _ProcessUserPresence(UserID *user, const gloox::Presence::PresenceType, const std::string&);
 
 private:
-	static JRoster             *_instance;
-	RosterList                 *_roster;
+	static JRoster          *_instance;
+	RosterList              *_roster;
 
-	sem_id                      _roster_lock;
+	sem_id                  _roster_lock;
 };
 

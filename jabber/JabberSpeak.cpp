@@ -426,12 +426,6 @@ void JabberSpeak::SetFriendlyName(const gloox::JID& who, BString friendlyName)
 	}
 }
 
-void JabberSpeak::AddToRoster(const UserID *new_user) {
-	gloox::StringList groups;
-	fClient->rosterManager()->add(gloox::JID(new_user->Handle()),
-		new_user->FriendlyName(), groups);
-}
-
 void JabberSpeak::RemoveFromRoster(const UserID *removed_user) {
 	fClient->rosterManager()->remove(gloox::JID(removed_user->Handle()));
 }
