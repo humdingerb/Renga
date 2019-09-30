@@ -3,12 +3,14 @@
 //////////////////////////////////////////////////
 
 #include "CustomStatusWindow.h"
-#include <InterfaceKit.h>
+
 #include <cstdio>
-#include <interface/Box.h>
-#include <interface/Button.h>
-#include <interface/StringView.h>
-#include "AppLocation.h"
+
+#include <Box.h>
+#include <Button.h>
+#include <StringView.h>
+
+#include "../support/AppLocation.h"
 #include "BlabberMainWindow.h"
 #include "BlabberSettings.h"
 #include "GenericFunctions.h"

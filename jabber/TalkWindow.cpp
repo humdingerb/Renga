@@ -15,7 +15,7 @@
 #include <storage/Path.h>
 #include <SplitView.h>
 
-#include "AppLocation.h"
+#include "../support/AppLocation.h"
 #include "BlabberSettings.h"
 #include "CommandMessage.h"
 #include "GenericFunctions.h"
@@ -350,18 +350,7 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const UserID *user,
 			user_representation = user->JabberUsername();
 		}
 
-		if (user->UserType() == UserID::AIM) {
-			user_representation += " (AOL)";
-
-			// identify the user
-			if (!AgentList::Instance()->GetAgentByService("aim")->Username().empty()) {
-				sprintf(buffer, "your identity is %s", AgentList::Instance()->GetAgentByService("aim")->Username().c_str());
-				_status_view->SetMessage(buffer); 
-			} else {
-				sprintf(buffer, "you are communicating via the AOL service");
-				_status_view->SetMessage(buffer); 
-			}
-		} else if (user->UserType() == UserID::ICQ) {
+		if (user->UserType() == UserID::ICQ) {
 			user_representation += " (ICQ)";
 
 			// identify the user

@@ -15,7 +15,7 @@
 #endif
 
 #ifndef APP_LOCATION_H
-	#include "AppLocation.h"
+	#include "../support/AppLocation.h"
 #endif
 
 #ifndef BLABBER_SETTINGS_H

@@ -7,7 +7,7 @@
 #endif
 
 #ifndef APP_LOCATION_H
-	#include "AppLocation.h"
+	#include "../support/AppLocation.h"
 #endif
 
 #ifndef _TRANSLATION_UTILS_H
@@ -18,7 +18,6 @@ BBitmap *RosterItem::_kinda_online_icon = NULL;
 BBitmap *RosterItem::_offline_icon      = NULL;
 BBitmap *RosterItem::_online_icon       = NULL;
 BBitmap *RosterItem::_unknown_icon      = NULL;
-BBitmap *RosterItem::_aol_icon          = NULL;
 BBitmap *RosterItem::_icq_icon          = NULL;
 
 RosterItem::RosterItem(const UserID *userid)
@@ -32,7 +31,6 @@ RosterItem::RosterItem(const UserID *userid)
 		_online_icon = BTranslationUtils::GetBitmap('PiNG', "online");
 		_offline_icon = BTranslationUtils::GetBitmap('PiNG', "offline");
 		_unknown_icon = BTranslationUtils::GetBitmap('PiNG', "unknown");
-		_aol_icon = BTranslationUtils::GetBitmap('PiNG', "aol");
 		_icq_icon = BTranslationUtils::GetBitmap('PiNG', "icq");
 	}
 }
@@ -161,11 +159,7 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 	}
 
 	// draw external chat icon
-	if (GetUserID()->UserType() == UserID::AIM) {
-		if (_aol_icon) {
-			owner->DrawBitmapAsync(_aol_icon, BPoint(owner->PenLocation().x + 2.0, frame.top + 2));
-		}
-	} else if (GetUserID()->UserType() == UserID::ICQ) {
+	if (GetUserID()->UserType() == UserID::ICQ) {
 		if (_icq_icon) {
 			owner->DrawBitmapAsync(_icq_icon, BPoint(owner->PenLocation().x + 2.0, frame.top + 2));
 		}

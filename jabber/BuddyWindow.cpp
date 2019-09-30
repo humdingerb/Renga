@@ -8,7 +8,7 @@
 
 #include "Agent.h"
 #include "AgentList.h"
-#include "AppLocation.h"
+#include "../support/AppLocation.h"
 #include "BlabberSettings.h"
 #include "GenericFunctions.h"
 #include "Messages.h"
@@ -75,7 +75,6 @@ BuddyWindow::BuddyWindow(BRect frame)
 	_chat_services_selection = new BPopUpMenu("Jabber");
 	_chat_services = new BMenuField(rect, "chat_services", "Online Service: ", _chat_services_selection);	
 	_chat_services->SetDivider(_chat_services->Divider() - 33);
-	_chat_services_selection->AddItem(new BMenuItem("AOL", new BMessage(AGENT_MENU_CHANGED_TO_AIM)));
 	_chat_services_selection->AddItem(new BMenuItem("ICQ", new BMessage(AGENT_MENU_CHANGED_TO_ICQ)));
 	_chat_services_selection->AddItem(new BMenuItem("Jabber", new BMessage(AGENT_MENU_CHANGED_TO_JABBER)));
 
@@ -160,12 +159,6 @@ void BuddyWindow::MessageReceived(BMessage *msg) {
 			_handle->SetLabel("ICQ #:");
 			break;
 		}
-
-		case AGENT_MENU_CHANGED_TO_AIM: {
-			_enter_note->SetText("Please enter the user's AOL screenname or AIM screenname (e.g., BeOSLover213).");
-			_handle->SetLabel("AOL Screen Name:");
-			break;
-		}
 	}
 }
 
@@ -192,7 +185,7 @@ void BuddyWindow::AddNewUser() {
 		return;
 	}
 	
-	// internally replace the username with a proper one if necessary (AOL, etc...)
+	// internally replace the username with a proper one if necessary (transports)
 	Agent *agent;
 	string username = _handle->Text();
 
@@ -201,14 +194,7 @@ void BuddyWindow::AddNewUser() {
 		username = GenericFunctions::CrushOutWhitespace(username);
 	}
 	
-	if (!strcasecmp(_chat_services->Menu()->FindMarked()->Label(), "AOL")) {
-		agent = AgentList::Instance()->GetAgentByService("aim");
-
-		if (agent) {
-			username += "@";
-			username += agent->JID();
-		}
-	} else if (!strcasecmp(_chat_services->Menu()->FindMarked()->Label(), "ICQ")) {
+	if (!strcasecmp(_chat_services->Menu()->FindMarked()->Label(), "ICQ")) {
 		agent = AgentList::Instance()->GetAgentByService("icq");
 
 		if (agent) {

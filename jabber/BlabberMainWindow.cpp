@@ -4,13 +4,9 @@
 
 #include "BlabberMainWindow.h"
 
-#include "../ui/RegisterAccountWindow.h"
-
 #include <gloox/jid.h>
 
-#include <InterfaceKit.h>
-#include <be_apps/NetPositive/NetPositive.h>
-#include "AppLocation.h"
+#include "../support/AppLocation.h"
 #include "BlabberSettings.h"
 #include "BuddyWindow.h"
 #include "BuddyInfoWindow.h"
@@ -22,6 +18,7 @@
 #include "MessageRepeater.h"
 #include "../ui/ModalAlertFactory.h"
 #include "PreferencesWindow.h"
+#include "../ui/RegisterAccountWindow.h"
 #include "RosterItem.h"
 #include "RotateChatFilter.h"
 #include "SendTalkWindow.h"
@@ -36,6 +33,7 @@
 #include <LayoutBuilder.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <be_apps/NetPositive/NetPositive.h>
 #include <Path.h>
 #include <Roster.h>
 #include <ScrollView.h>

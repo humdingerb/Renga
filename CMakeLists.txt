@@ -44,7 +44,6 @@ add_executable(Renga
 	 jabber/StatusView.cpp
 	 jabber/MessageRepeater.cpp
 	 jabber/FileXMLReader.cpp
-	 jabber/AppLocation.cpp
 	 jabber/XMLEntity.cpp
 	 jabber/XMLReader.cpp
 
@@ -59,6 +58,7 @@ add_executable(Renga
 	network/GlooxHandler.cpp
 
 	# Misc. support stuff
+	support/AppLocation.cpp
 	support/main.cpp
 
 	# "Modern" UI classes using gloox types and StartWatching/SendNotices
@@ -96,7 +96,6 @@ add_custom_command(TARGET Renga POST_BUILD
 		-a PiNG:5:online       ${CMAKE_SOURCE_DIR}/resources/icons/online.png
 		-a PiNG:6:offline      ${CMAKE_SOURCE_DIR}/resources/icons/offline.png
 		-a PiNG:7:unknown      ${CMAKE_SOURCE_DIR}/resources/icons/unknown.png
-		-a PiNG:8:aol          ${CMAKE_SOURCE_DIR}/resources/icons/aol.png
 		-a PiNG:9:icq          ${CMAKE_SOURCE_DIR}/resources/icons/icq.png
 	COMMAND mimeset -f ${CMAKE_BINARY_DIR}/Renga
 	DEPENDS jabber/Resource.rdef

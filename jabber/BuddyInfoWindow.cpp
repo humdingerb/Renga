@@ -6,7 +6,7 @@
 
 #include <interface/Button.h>
 
-#include "AppLocation.h"
+#include "../support/AppLocation.h"
 #include "GenericFunctions.h"
 #include "Messages.h"
 #include "../ui/PictureView.h"
@@ -107,9 +107,7 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 		jabberid_label = new BStringView(label_rect, NULL, "Jabber ID:");
 		jabberid_name  = new BStringView(value_rect, NULL, querying_user->Handle().c_str());
 	} else {
-		if (querying_user->UserType() == UserID::AIM) {
-			jabberid_label = new BStringView(label_rect, NULL, "AOL Screen Name:");
-		} else if (querying_user->UserType() == UserID::ICQ) {
+		if (querying_user->UserType() == UserID::ICQ) {
 			jabberid_label = new BStringView(label_rect, NULL, "ICQ #:");
 		} else {
 			jabberid_label = new BStringView(label_rect, NULL, "Jabber ID:");

@@ -43,7 +43,6 @@ private:
 	static BBitmap *_online_icon;
 	static BBitmap *_offline_icon;
 	static BBitmap *_unknown_icon;
-	static BBitmap *_aol_icon;
 	static BBitmap *_icq_icon;
 };
 

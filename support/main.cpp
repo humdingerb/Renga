@@ -2,13 +2,9 @@
 // Blabber [main.cpp]
 //////////////////////////////////////////////////
 
-#ifndef APP_LOCATION_H
-	#include "../jabber/AppLocation.h"
-#endif
+#include "AppLocation.h"
 
-#ifndef BLABBER_APP_H
-	#include "../jabber/BlabberApp.h"
-#endif
+#include "../jabber/BlabberApp.h"
 
 int main(__attribute__((unused)) int argc, char **argv) {
 	// record app location

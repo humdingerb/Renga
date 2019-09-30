@@ -6,8 +6,6 @@
 
 #include "BookmarkItem.h"
 
-#include "../jabber/Agent.h"
-#include "../jabber/AgentList.h"
 #include "../jabber/TalkManager.h"
 
 #include "../network/BookmarkManager.h"

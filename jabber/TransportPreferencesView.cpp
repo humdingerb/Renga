@@ -54,19 +54,13 @@ void TransportPreferencesView::AttachedToWindow() {
 	rect.right  = rect.left + 375.0;
 	rect.bottom = rect.top + 18;
 
-	// transport selection (AOL, ICQ)
+	// transport selection (ICQ)
 	_agent_entries = new BPopUpMenu("<select a service>");
 
 	if (agents->GetAgentByService("icq")) {
 		BMenuItem *icq = new BMenuItem("Mirabilis ICQ", new BMessage(AGENT_MENU_CHANGED_TO_ICQ));
 		icq->SetTarget(this);
 		_agent_entries->AddItem(icq);
-	}
-
-	if (agents->GetAgentByService("aim")) {
-		BMenuItem *aim = new BMenuItem("AOL IM", new BMessage(AGENT_MENU_CHANGED_TO_AIM));
-		aim->SetTarget(this);
-		_agent_entries->AddItem(aim);
 	}
 
 	_agent_list = new BMenuField(rect, "agent_registrations", "Online Service: ", _agent_entries);	
@@ -140,9 +134,9 @@ void TransportPreferencesView::AttachedToWindow() {
 	enter_note->SetViewColor(216, 216, 216, 255);
 	enter_note->MakeEditable(false);
 	enter_note->MakeSelectable(false);
-	enter_note->SetText("Note: Transports serve as the means by which Jabber "
-		"communicates with external chat systems such as AOL and ICQ.  They "
-		"are add-on components to the Jabber server you are logged on to and "
+	enter_note->SetText("Note: Transports serve as the means by which XMPP "
+		"communicates with external chat systems such as ICQ.  They "
+		"are add-on components to the XMPP server you are logged on to and "
 		"thus can be ERRATIC and/or BUGGY.  If you are having trouble with a "
 		"transport, it is likely the server's fault and not Renga.");
 
@@ -203,18 +197,6 @@ void TransportPreferencesView::MessageReceived(BMessage *msg) {
 			break;
 		}
 		
-		case AGENT_MENU_CHANGED_TO_AIM: {
-			_curr_transport = "aim";
-
-			if (agents->GetAgentByService(_curr_transport)) {
-				_username->SetLabel("AOL/AIM Screen Name:");
-				_username->SetText(agents->GetAgentByService(_curr_transport)->Username().c_str());
-				_password->SetText(agents->GetAgentByService(_curr_transport)->Password().c_str());
-			}
-
-			break;
-		}
-
 		case AGENT_MENU_CHANGED_TO_ICQ: {
 			_curr_transport = "icq";
 

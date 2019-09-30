@@ -15,7 +15,7 @@
 #endif
 
 #ifndef APP_LOCATION_H
-	#include "AppLocation.h"
+	#include "../support/AppLocation.h"
 #endif
 
 #ifndef _TRANSLATION_UTILS_H

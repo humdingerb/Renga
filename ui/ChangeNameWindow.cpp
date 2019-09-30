@@ -11,9 +11,8 @@
 #include <LayoutBuilder.h>
 #include <StringView.h>
 
-#include "../jabber/AppLocation.h"
+#include "../support/AppLocation.h"
 #include "../jabber/BlabberSettings.h"
-#include "../jabber/GenericFunctions.h"
 #include "../jabber/JabberSpeak.h"
 #include "../jabber/Messages.h"
 #include "../ui/ModalAlertFactory.h"

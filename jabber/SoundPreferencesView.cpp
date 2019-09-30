@@ -8,7 +8,7 @@
 
 #include <storage/Path.h>
 
-#include "AppLocation.h"
+#include "../support/AppLocation.h"
 #include "BlabberSettings.h"
 #include "FileItem.h"
 #include "JabberSpeak.h"
