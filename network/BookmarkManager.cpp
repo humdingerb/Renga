@@ -26,11 +26,14 @@ void BookmarkManager::Connect()
 
 	gloox::Client* client = JabberSpeak::Instance()->GlooxClient();
 	// Request for bookmarks
-	// We can always use bookmarks2:
+	// We could always use bookmarks2:
 	// - If the server supports migration from the older version, that's great
 	// - If it doesn't, we can still store and retrieve bookmarks this way,
 	//   they just won't sync up with clients using the old format
-	if (false) {
+	// However, since few servers support them, for now it makes more sense to
+	// keep with bookmarks1. Later we can detect servers which expose "bookmark
+	// migration" and use bookmarks2 only for those.
+	if (true) {
 		fBookmarks = std::make_unique<gloox::BookmarkStorage>(client);
 		fBookmarks->registerBookmarkHandler(this);
 		fBookmarks->requestBookmarks();
