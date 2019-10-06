@@ -149,6 +149,17 @@ void
 JRoster::handleItemSubscribed(const gloox::JID&)
 {
 	printf("%s\n", __PRETTY_FUNCTION__);
+#if 0
+		user->SetOnlineStatus(UserID::ONLINE);
+
+		if (entity->Child("status")) {
+			sprintf(buffer, "[%s]\n\n%s", asker, entity->Child("status")->Data());
+		} else {
+			sprintf(buffer, "Your subscription request was accepted by %s!", asker);
+		}
+		
+		ModalAlertFactory::Alert(buffer, "Hooray!");
+#endif
 }
 
 
@@ -177,6 +188,9 @@ void
 JRoster::handleItemUnsubscribed(const gloox::JID&)
 {
 	printf("%s\n", __PRETTY_FUNCTION__);
+#if 0
+		user->SetOnlineStatus(UserID::UNKNOWN);
+#endif
 }
 
 
@@ -292,6 +306,27 @@ bool
 JRoster::handleSubscriptionRequest(const gloox::JID&, const string&)
 {
 	printf("%s\n", __PRETTY_FUNCTION__);
+#if 0
+		sprintf(buffer, "%s would like to subscribe to your presence so they may know if you're online or not.  Would you like to allow it?", asker);
+
+		// query for presence authorization (for users)
+		int32 answer = 0;
+				
+		if (user->IsUser()) {
+			answer = ModalAlertFactory::Alert(buffer, "No, I prefer privacy.", "Yes, grant them my presence!");
+		} else if (user->UserType() == UserID::TRANSPORT) {
+			answer = 1;
+		}
+
+		// send back the response
+		if (answer == 1) {
+			// presence is granted
+			_AcceptPresence(entity->Attribute("from"));
+		} else if (answer == 0) {
+			// presence is denied
+			_RejectPresence(entity->Attribute("from"));
+		}
+#endif
 	return false;
 }
 
@@ -300,6 +335,10 @@ bool
 JRoster::handleUnsubscriptionRequest(const gloox::JID&, const string&)
 {
 	printf("%s\n", __PRETTY_FUNCTION__);
+#if 0
+		sprintf(buffer, "%s no longer wishes to know your online status.", asker);
+		ModalAlertFactory::NonModalAlert(buffer, "I feel so unloved.");
+#endif
 	return false;
 }
 
@@ -336,7 +375,7 @@ void JRoster::_ProcessUserPresence(UserID *user,
 	} else {
 		// they have a JID
 		asker = entity.from().full();
-	}full
+	}
 #endif
 
 	// reflect presence
@@ -344,45 +383,6 @@ void JRoster::_ProcessUserPresence(UserID *user,
 		user->SetOnlineStatus(UserID::OFFLINE);
 	} else if (user && type == gloox::Presence::Available) {
 		user->SetOnlineStatus(UserID::ONLINE);
-#if 0
-	// FIXME we should rather implement RosterManager instead of doing this ourselves
-	} else if (!strcasecmp(availability, "unsubscribe")) {
-		sprintf(buffer, "%s no longer wishes to know your online status.", asker);
-		ModalAlertFactory::NonModalAlert(buffer, "I feel so unloved.");
-	} else if (user && !strcasecmp(availability, "unsubscribed")) {
-		// do nothing?
-		user->SetOnlineStatus(UserID::UNKNOWN);
-	} else if (user && !strcasecmp(availability, "subscribed")) {
-		user->SetOnlineStatus(UserID::ONLINE);
-
-		if (entity->Child("status")) {
-			sprintf(buffer, "[%s]\n\n%s", asker, entity->Child("status")->Data());
-		} else {
-			sprintf(buffer, "Your subscription request was accepted by %s!", asker);
-		}
-		
-		ModalAlertFactory::Alert(buffer, "Hooray!");
-	} else if (!strcasecmp(availability, "subscribe")) {
-		sprintf(buffer, "%s would like to subscribe to your presence so they may know if you're online or not.  Would you like to allow it?", asker);
-
-		// query for presence authorization (for users)
-		int32 answer = 0;
-				
-		if (user->IsUser()) {
-			answer = ModalAlertFactory::Alert(buffer, "No, I prefer privacy.", "Yes, grant them my presence!");
-		} else if (user->UserType() == UserID::TRANSPORT) {
-			answer = 1;
-		}
-
-		// send back the response
-		if (answer == 1) {
-			// presence is granted
-			_AcceptPresence(entity->Attribute("from"));
-		} else if (answer == 0) {
-			// presence is denied
-			_RejectPresence(entity->Attribute("from"));
-		}
-#endif
 	}
 
 	if (user && (type == gloox::Presence::Unavailable
