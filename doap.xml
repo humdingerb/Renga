@@ -57,7 +57,7 @@
     <implements rdf:resource="https://xmpp.org/rfcs/rfc6121.html"/>
 	<!-- Do we handle 6122 or rather 7622? -->
     <implements rdf:resource="https://xmpp.org/rfcs/rfc6122.html"/>
-	<!-- TODO <implements rdf:resource="https://xmpp.org/rfcs/rfc7590.html"/> -->
+	<implements rdf:resource="https://xmpp.org/rfcs/rfc7590.html"/>
 	<!-- TODO: https://github.com/HaikuArchives/Jabber4Haiku/issues/29 -->
     <!--<implements rdf:resource="https://xmpp.org/rfcs/rfc5122.html"/>-->
     <implements>

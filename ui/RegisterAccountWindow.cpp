@@ -345,7 +345,6 @@ RegisterAccountWindow::MessageReceived(BMessage* message)
 				case kRegistrationFields:
 				{
 					// TODO handle only if there is no dataform
-					puts("yay, fields");
 					break;
 				}
 				case kDataForm:
@@ -366,6 +365,7 @@ RegisterAccountWindow::MessageReceived(BMessage* message)
 				}
 				case kOOB:
 				{
+					// TODO handle out of band data
 					message->PrintToStream();
 					//handleOOB(...);
 					break;

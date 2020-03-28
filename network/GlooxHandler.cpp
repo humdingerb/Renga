@@ -219,11 +219,17 @@ void GlooxHandler::onDisconnect(gloox::ConnectionError error)
 }
 
 
-bool GlooxHandler::onTLSConnect(const gloox::CertInfo& info __attribute__((unused)))
+bool GlooxHandler::onTLSConnect(const gloox::CertInfo& info)
 {
+	// TODO let the listener (if any?) decide what to do with invalid
+	// certificates. Add the relevant info to the notice, and wait for a
+	// reply before moving on. But what if the listener does not reply or if
+	// there is no listener? 
+
+	// TODO add the relevant fields to the notice so the listener can make a
+	// decision
 	SendNotices(kTLSConnect);
-	// TODO let the listener (if any?) decide what to do
-	return true;
+	return info.status == gloox::CertOk;
 }
 
 
