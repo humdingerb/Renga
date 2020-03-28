@@ -1,13 +1,9 @@
-Renga is a free XMPP client for Haiku.
+An instant messaging client for Haiku, connecting to the XMPP network.
 
 ![Screenshot](Renga.png)
 
-<hr></hr>
-Features:
+Features
+========
 
-Status<br>
-Chat system<br>
-Individual user groups<br>
-Sound signal<br>
-Chat history<br>
-Interaction with other IRCs<br>
+Nothing too exciting yet. Even most of the core compliance suite things are not
+available yet. Have low expectations for now.

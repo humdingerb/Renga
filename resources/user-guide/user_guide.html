@@ -2,80 +2,72 @@
 
 
 <head>
-<title>The Jabber for BeOS User Guide</title>
+<title>The Renga User Guide</title>
 </head>
 
 <body BGCOLOR=FFFFFF>
-<!--
-	Jabber for BeOS [user_guide.html]
-
-    	The user guide to help navigation through the interface.
--->    
 
 <a NAME="top">
 
 <p ALIGN=CENTER><center><img SRC="rapture-title.gif"></center><br>
-<font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Welcome to Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS v1.0!</h1></u></b></font>
-<p>Jabber is an open chat protocol that allows users to communicate
+<font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Welcome to Renga!</h1></u></b></font>
+<p>XMPP is an open chat protocol that allows users to communicate
 with each other much like <a HREF="http://www.aol.com">AOL Instant Messenger</a> and <a HREF="http://www.mirabilis.com">ICQ</a>.
-In fact, Jabber also allows users to talk to other users who use these external
-chat systems.  In many ways, Jabber is five chat systems in one!
 
-<p>Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS is the client that allows Jabber to be used on the <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS.  This user guide describes how to use the client as well as the Jabber chat system.  Here's what we'll be covering:
+<p>Renga is the client that allows XMPP to be used on Haiku.  This user guide describes how to use the client as well as the XMPP chat system.  Here's what we'll be covering:
 <ol>
-	<li><a HREF="#getting">Getting Started on Jabber</a>
+	<li><a HREF="#getting">Getting Started on XMPP</a>
 	<li><a HREF="#logging">Logging In</a>
 	<li><a HREF="#im">I'm Logged In...So Now What?!</a>
 	<li><a HREF="#chatfeatures">Chat Features</a>
 	<li><a HREF="#groupchat">Group Chat</a>
 	<li><a HREF="#prefs">The Preferences Panel</a>
-	<li><a HREF="#transports">Jabber Transports: Gateways to External Chat Systems</a>
 	<li><a HREF="#further">Further Exploration</a>
 	<li><a HREF="#cause">The Rapture In Venice Cause</a>
 </ol>
 
 <a NAME="getting">
-<font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Getting Started on Jabber</h1></u></b></font>
+<font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Getting Started on XMPP</h1></u></b></font>
 <center><font SIZE=-2><a HREF="#top">top</a></font></center>
 
-<p>Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS is a <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS-native client developed by <a HREF="http://www.users.uswest.net/~jblanco">Rapture In Venice</a>.  At this time,
-it is also the only Jabber client available for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS.  Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS delivers the
-friendly user experience that many Jabber clients do not, much in the style of <a HREF="http://www.jabber.com">JabberIM</a>.
-Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS intends to be simple to use, with recycled GUI metaphors that make
+<p>Renga is a Haiku-native client. It is based on Jabber4BeOS originally developed by <a HREF="http://www.users.uswest.net/~jblanco">Rapture In Venice</a>.
+Renga delivers the
+friendly user experience that many XMPP clients do not, much in the style of <a HREF="http://www.jabber.com">JabberIM</a>.
+Renga intends to be simple to use, with recycled GUI metaphors that make
 using this client as natural as any other you're used to.
 
-As such, let's look at Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS!
+As such, let's look at Renga!
 
 <a NAME="logging">
 <font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Logging In</h1></u></b></font>
 <center><font SIZE=-2><a HREF="#top">top</a></font></center>
 
-<p>When you first run Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS, you will be presented with a window like this:
+<p>When you first run Renga, you will be presented with a window like this:
 
 <p ALIGN=CENTER><img SRC="login-pane.png">
 
-<p>If you've used Jabber in the past then this should look familiar to you.  Just
+<p>If you've used XMPP in the past then this should look familiar to you.  Just
 enter the login information you've always used.  If you haven't seen the nickname field
 before, this is used as a friendly name only for yourself in chat windows.  Nobody else will see this
 information so it's not critical.  As an expert, you'll probably want to check the Auto-login box as well.
 
-<p>If you're new to Jabber, this is an important step in getting online.  You'll want
+<p>If you're new to XMPP, this is an important step in getting online.  You'll want
 to decide on your official username!  Here is what all the fields mean:
 
 <ul>
 	<li><b>Nickname:</b> This is a friendly name for yourself.  It'll only be used in your chat windows and no one else will see it, so feel free to change it to fit your mood.
-	<li><b>Username:</b> This is the username you will be officially referred to with.  Jabber is still young, and individual servers are always sprouting up, so it's easy to get a good one (The most often picked usernames being <i>napalm, kitty, cutie, john, jim,</i> etc...)!
+	<li><b>Username:</b> This is the username you will be officially referred to with. 
 	<li><b>Password:</b> Your password.
 	<li><b>Create This Account:</b> If this is a new account for you, check this box and the account will be created (if possible) before you log in.  In the future, when you login with the same username, you want to keep this box unchecked.
-	<li><b>Auto-login:</b> This is a handy option if you just want Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS to log you in with your last entered username/password automatically.  It's quicker than entering in your information all the time, but also less secure.  If you're on a single-user machine, this is a recommended option.
+	<li><b>Auto-login:</b> This is a handy option if you just want Renga to log you in with your last entered username/password automatically.  It's quicker than entering in your information all the time, but also less secure.  If you're on a single-user machine, this is a recommended option.
 </ul>
 
 <p>There are also some rules you should know about how Auto-login works in specific situations.  Here they are:
 
 <ul>
-	<li><b>Normal login:</b> In the "normal" situation, running Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS will cause the login process to initiate for the last username/password you tried logging in with.
+	<li><b>Normal login:</b> In the "normal" situation, running Renga will cause the login process to initiate for the last username/password you tried logging in with.
 	<li><b>Failed login:</b> If Auto-login fails to log you in because your last username/password is, or is no longer, valid then the login screen will appear and allow you to correct any mistakes.
-	<li><b>Multiple logins:</b> If you already have another instance of Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS running on the machine, Auto-login will not run for that second instance.  The reason is that logging you in with the same name as the one already running will cause the first to disconnect.  Not convenient! 
+	<li><b>Multiple logins:</b> If you already have another instance of Renga running on the machine, Auto-login will not run for that second instance.  The reason is that logging you in with the same name as the one already running will cause the first to disconnect.  Not convenient! 
 	<li><b>Change login:</b> If you use Auto-login, but you want to change your username and log in under another address (stalkers again?), simply logout by selecting "Log Off" from the File menu. 
 </ul>
 
@@ -87,10 +79,10 @@ to decide on your official username!  Here is what all the fields mean:
 
 <p ALIGN=CENTER><img SRC="logged-in.png" HSPACE=5><img SRC="logged-in-with-friends.png">
 
-<p>This is your buddy list, or "roster" as the Jabber group likes to call it.  This is where you'll see your friends and family, their online status and more.  If you just created your account, it will appear empty.  So let's fill it up!
+<p>This is your buddy list, or "roster" as the XMPP group likes to call it.  This is where you'll see your friends and family, their online status and more.  If you just created your account, it will appear empty.  So let's fill it up!
 
 <p>There are two basic concepts when dealing with this list: <i>roster</i> and <i>presence</i>.  While many external chat systems
-treat these concepts as one entity, Jabber keeps them separate.  What you need to rememeber is that even if you add a friend to your list (<i>roster</i>), you don't automatically begin seeing their online status (<i>presence</i>). You need to ask for it.
+treat these concepts as one entity, XMPP keeps them separate.  What you need to rememeber is that even if you add a friend to your list (<i>roster</i>), you don't automatically begin seeing their online status (<i>presence</i>). You need to ask for it.
 Let's illustrate this with an example.
 
 <p>Let's say you wish to add Rapture In Venice to your buddy list.  Don't worry, it's OK, I like to chat. :-)  The first thing you want to do is go to your Edit menu and select "Add New Buddy."
@@ -116,7 +108,7 @@ Right!  The greens are for online, red is for offline.  The <b><font COLOR=00550
 <p>Great!  So the user is online.  Now what?  You want to chat is what!  Isn't that why you downloaded this program? :-)  There are two options for chatting:
 
 <ul>
-	<li><b>Message-based or ICQ-style chat:</b> ICQ users will be familiar with this, and frankly no one else.  Message-based chat lets you send a single message and then your window will go away.  It's quick, it's easy and it can be annoying for the receiving user. :-)  ICQ users should also note one difference in implementation: Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS will queue multiple, unanswered messages in the same window alleviating the pain of a billion windows to read through and answer separately! The ICQ-style of messages can be handy for quick messages that require no, or little response.  They can be handy because the window goes away when you respond to one.
+	<li><b>Message-based or ICQ-style chat:</b> ICQ users will be familiar with this, and frankly no one else.  Message-based chat lets you send a single message and then your window will go away.  It's quick, it's easy and it can be annoying for the receiving user. :-)  ICQ users should also note one difference in implementation: XMPP will queue multiple, unanswered messages in the same window alleviating the pain of a billion windows to read through and answer separately! The ICQ-style of messages can be handy for quick messages that require no, or little response.  They can be handy because the window goes away when you respond to one.
 	<li><b>Scrolling chat or AOL-style chat:</b> This is what most users are familiar with as it's used by AOL, and uncommonly ICQ. It's a one-on-one chat, you and one other user, with messages scrolling on the top of the window and an area below to enter your next message.  This is the most pleasant way to communicate long conversations.
 </ul>
 
@@ -131,12 +123,12 @@ Right!  The greens are for online, red is for offline.  The <b><font COLOR=00550
 <center><font SIZE=-2><a HREF="#top">top</a></font></center>
 
 
-<p>There are several fun chat features available in Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS.  The first you might notice are <i>Canned Quips</i>.  These are pre-generated messages that you define.  You usually want to type phrases and exclamations you say a lot.  As an example, these are my usual quips:
+<p>There are several fun chat features available in Renga.  The first you might notice are <i>Canned Quips</i>.  These are pre-generated messages that you define.  You usually want to type phrases and exclamations you say a lot.  As an example, these are my usual quips:
 
 <ul>
 	<li>For more information about Rapture In Venice, go to http://www.users.uswest.net/~jblanco.
 	<li>Sup.
-	<li>What's that?  You say Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS still hasn't crashed yet?  Not surprising.
+	<li>What's that?  You say Renga still hasn't crashed yet?  Not surprising.
 	<li>blue screen of death
 </ul>
 
@@ -162,7 +154,7 @@ You can edit your canned quips in the preferences panel under the <i>"Messaging"
 
 <p ALIGN=CENTER><img SRC="non-quick-fired-message.png"><br><font SIZE=-2>- I've just pressed <b>Command-4</b> -</font>
 
-<p>Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS also supports what's known as <i>"/me syntax"</i>.  This is when you want to type a message but want to make it as part of an action.  It's almost always used for humorous purposes. Here's an example:
+<p>Renga also supports what's known as <i>"/me syntax"</i>.  This is when you want to type a message but want to make it as part of an action.  It's almost always used for humorous purposes. Here's an example:
 
 <p ALIGN=CENTER><img SRC="me-syntax.png"><br><font SIZE=-2>- Note how /me makes my message an action -</font>
 
@@ -174,7 +166,7 @@ You can edit your canned quips in the preferences panel under the <i>"Messaging"
 
 	<ul><tt>/me is saddened by your remark. :(</tt></ul>
 
-<p>In addition to <i>"/me syntax"</i>, Jabber for <font COLOR=RED>B</font><font COLOR=BLUE>e</font>OS supports other IRC-like and not so IRC-like <i>"slash"</i> commands:
+<p>In addition to <i>"/me syntax"</i>, Renga supports other IRC-like and not so IRC-like <i>"slash"</i> commands:
 
 <ul>
 	<li><b>/me message</b> - As stated above, instead of sending a message you convey an action you are fictionally or non-fictionally performing.
@@ -189,14 +181,14 @@ You can edit your canned quips in the preferences panel under the <i>"Messaging"
 <font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Group Chat</h1></u></b></font>
 <center><font SIZE=-2><a HREF="#top">top</a></font></center>
 
-<p>In addition to one on one chat, Jabber for <font COLOR=RED>B</font><font COLOR=BLUE>e</font>OS also support group chat.  This is when more than two people can chat in the same window at the same time.  The advantages are clear:
+<p>In addition to one on one chat, Renga also support group chat.  This is when more than two people can chat in the same window at the same time.  The advantages are clear:
 
 <ul>
 	<li><b>Group Meeting Place</b> - If you're on a development team or chatting with the rest of the UnReal club, group chat is a great place to get together!
-	<li><b>Privacy</b> - While <a HREF="http://www.lcscanada.com/beshare/index.html">BeShare</a> provides a great way to get together with other <font COLOR=RED>B</font><font COLOR=BLUE>e</font> community members, Jabber group chat lets you create your own rooms without being restricted to the one monolithic room that the server supports.
-	<li><b>Well Known Rooms</b> - Jabber houses some well known rooms, or rooms that people know about and attend.  The most popular is the group chat that the Jabber server developers partake in (see more info below).
+	<li><b>Privacy</b> - While <a HREF="http://www.lcscanada.com/beshare/index.html">BeShare</a> provides a great way to get together with other <font COLOR=RED>B</font><font COLOR=BLUE>e</font> community members, XMPP group chat lets you create your own rooms without being restricted to the one monolithic room that the server supports.
+	<li><b>Well Known Rooms</b> - XMPP houses some well known rooms, or rooms that people know about and attend.  The most popular is the group chat that the XMPP server developers partake in (see more info below).
 	<li><b>Channels</b> - To help organize some nice <font COLOR=RED>B</font><font COLOR=BLUE>e</font> community rooms, check the Channels menu for rooms such as "<font COLOR=RED>B</font><font COLOR=BLUE>e</font> Developers" and <i>"Jabber Developers"</i>.
-	<li><b>Platform Independent Chat</b> - Jabber group chat is not restricted to <font COLOR=RED>B</font><font COLOR=BLUE>e</font>OS users. Anyone with any client on any OS can chat along with you!
+	<li><b>Platform Independent Chat</b> - XMPP group chat is not restricted to Haiku users. Anyone with any client on any OS can chat along with you!
 </ul>	
 
 <p>There are two ways to enter a groupchat.  The first way allows you to create any arbitrary room you want which is what you want if you want to organize a specific meeting place among friends.  From the buddy window, select Talk->Start Group Chat.
@@ -205,7 +197,7 @@ You can edit your canned quips in the preferences panel under the <i>"Messaging"
 
 <p>Where it says <b>Username</b>, type the nickname you'd like to use for the room. Be unique!  Then, where it says <b>Room Name</b>, give the desired name.  Room names are of the form <i>name-of-the-room@conference.jabber.org</i>.
 
-<p>There is a second way to enter a group chat and that's with Jabber for <font COLOR=RED>B</font><font COLOR=BLUE>e</font>OS' own Channels.  Channels are pre-named group chat rooms with friendly titles that other Jabber for <font COLOR=RED>B</font><font COLOR=BLUE>e</font>OS users frequent.  These are great meeting places for people of common interests.  Explore.
+<p>There is a second way to enter a group chat and that's with Renga' own Channels.  Channels are pre-named group chat rooms with friendly titles that other Renga users frequent.  These are great meeting places for people of common interests.  Explore.
 
 <a NAME="prefs">
 <font FACE="Courier New"><b><u><h1 ALIGN=CENTER>The Preferences Panel</h1></u></b></font>
@@ -218,22 +210,22 @@ You can edit your canned quips in the preferences panel under the <i>"Messaging"
 <ul>
 	<li><b>Chat Rules:</b> This is where you can set options about how communication works, such as how new chat windows behave.
 	<li><b>Messages:</b> This is where you can set your canned quips.
-	<li><b>Transports:</b> This is a feature we haven't discussed, and it's core to the Jabber protocol.  You can register with Jabber transports here. See the next section for details!
+	<li><b>Transports:</b> This is a feature we haven't discussed, and it's core to the XMPP protocol.  You can register with XMPP transports here. See the next section for details!
 	<li><b>Sounds:</b> This is where you can customize the sound effects to your tastes.  Sound effects sound out for new chat windows popping up, users coming online and offline as well as incoming <b>/alert</b> calls.
 </ul>
 
 <a NAME="transports">
-<font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Jabber Transports: Gateways to External Chat Systems</h1></u></b></font>
+<font FACE="Courier New"><b><u><h1 ALIGN=CENTER>XMPP Transports: Gateways to External Chat Systems</h1></u></b></font>
 <center><font SIZE=-2><a HREF="#top">top</a></font></center>
 
-<p>If Jabber was just another new chat system, then everyone would just be a little more ill. :-)  But, in fact, Jabber is not.  While it does support it's own network of users who can communicate with each other along with other things like sending files, Jabber allows it's users to talk directly with users of other chat clients!  A little discussion about how it's done is in order.	
+<p>If XMPP was just another new chat system, then everyone would just be a little more ill. :-)  But, in fact, XMPP is not.  While it does support it's own network of users who can communicate with each other along with other things like sending files, XMPP allows it's users to talk directly with users of other chat clients!  A little discussion about how it's done is in order.	
 
 <p>If you're familiar with other <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS apps such as GimICQ and BeAIM, you know that getting unofficial chat clients for popular chat systems is not a new thing.  Anything on the Internet is hackable, so there's no reason to believe AOL and ICQ have secured their networks better than any hackable e-commerce system.
-Well, these unofficial clients are just that -- clients.  GimICQ only lets you talk to other ICQ users, BeAIM the same with AOL users.  However, Jabber lets you talk to both of these systems and more!
+Well, these unofficial clients are just that -- clients.  GimICQ only lets you talk to other ICQ users, BeAIM the same with AOL users.  However, XMPP lets you talk to both of these systems and more!
 
-<p>As with GimICQ and BeAIM, the idea is that you have a login to the external system already.  What you do is <i>register</i> your login information with the Jabber transport that's responsible for talking with that system.  Once complete, you can chat with AOL users just as easily as you can with Jabber users themselves.
+<p>As with GimICQ and BeAIM, the idea is that you have a login to the external system already.  What you do is <i>register</i> your login information with the XMPP transport that's responsible for talking with that system.  Once complete, you can chat with AOL users just as easily as you can with XMPP users themselves.
 
-<p>When you've registered with a transport, Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS has now become just like a login to another chat service.  If you registered as "BeMan" under AOL, then anyone on AOL, or Jabber, who sends a message to your AOL address will reach you on your Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS client.  Basically, you are using one client with one main login (your Jabber ID) and extra virtual logins (your AOL, etc... logins).  Everything is completely transparent from now on.
+<p>When you've registered with a transport, Renga has now become just like a login to another chat service.  If you registered as "BeMan" under AOL, then anyone on AOL, or XMPP, who sends a message to your AOL address will reach you on your Renga client.  Basically, you are using one client with one main login (your Jabber ID) and extra virtual logins (your AOL, etc... logins).  Everything is completely transparent from now on.
 
 <p>Lets try it.  Go to your preferences panel and click the <i>"Transports"</i> tab.  Let's pretend you want to register with the AOL transport (Feel free to go ahead and register with whichever transport you'd like to right now).
 Assuming your username and password is <i>"BjorkLover"</i> and <i>"fulloflove"</i>, select the AOL transport and enter the information in as above:
@@ -253,29 +245,30 @@ Assuming your username and password is <i>"BjorkLover"</i> and <i>"fulloflove"</
 	<li>Microsoft (with a straight face) releases statement, "We no longer wish to risk the security of our users to AOL's attacks and will therefore drop support for AOL clients."
 </ul>
 
-<p>What I'm trying to get at is that the Jabber transports are <b>not</b> always working.  They are subject to changed protocols and downed servers.  When the transports are updated to match the protocols then they'll work again...Basically,
-if a transport doesn't work with Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS, it's probabably not the client's fault.  You'll have to wait for the server's to catch up to the changing protocols. When these situations arise, you'll have two options:
+<p>What I'm trying to get at is that the XMPP transports are <b>not</b> always working.  They are subject to changed protocols and downed servers.  When the transports are updated to match the protocols then they'll work again...Basically,
+if a transport doesn't work with Renga, it's probabably not the client's fault.  You'll have to wait for the server's to catch up to the changing protocols. When these situations arise, you'll have two options:
 
 <ul>
 	<li><b>Check <a HREF="http://www.jabber.org">Jabber.org</a>:</b> This is the website where you'll find updates on what's going on.  If it's a problem with the server code, it'll be posted here.
-	<li><b>Change your server:</b> If you have reason to suspect the Jabber server you're registered with is having the problem, you can get a new login at another server.  Of course, your address changes and if you've ever changed your email address, this is, well, the same thing.  It's a real pain in the neck if you have a lot of contacts you need to communicate the change to.  And you'll need to recreate your entire roster.  Uggg!
+	<li><b>Change your server:</b> If you have reason to suspect the XMPP server you're registered with is having the problem, you can get a new login at another server.  Of course, your address changes and if you've ever changed your email address, this is, well, the same thing.  It's a real pain in the neck if you have a lot of contacts you need to communicate the change to.  And you'll need to recreate your entire roster.  Uggg!
 </ul>
 
-<p>Given a happy world where all transports work, you'll also want to add these external users to your roster.  This is done the same as when adding Jabber users, except you want to change the menu to reflect what chat system they're using.  Notice that the instructions on the "Add New Buddy" screen will change as you flip through the systems.
+<p>Given a happy world where all transports work, you'll also want to add these external users to your roster.  This is done the same as when adding XMPP users, except you want to change the menu to reflect what chat system they're using.  Notice that the instructions on the "Add New Buddy" screen will change as you flip through the systems.
 
 <a NAME="further">
 <font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Further Exploration</h1></u></b></font>
 <center><font SIZE=-2><a HREF="#top">top</a></font></center>
 
-<p>There are several other features that Jabber offers, as well as many nuances that are specific to Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS.  The big one being changing your own online status.  But I'll leave these all for you to explore! :-)  If it's not easy enough to figure out on your own, then Rapture In Venice has failed you as a developer.  So be confident!
+<p>There are several other features that XMPP offers, as well as many nuances that are specific to Renga.  The big one being changing your own online status.  But I'll leave these all for you to explore! :-)  If it's not easy enough to figure out on your own, then Rapture In Venice has failed you as a developer.  So be confident!
 
-<p>If you're a registered user, feel free to ask me for help.  Rapture In Venice's contact information can be found below, but since this is a chat client the most fun way to get in touch is through Jabber!  As I said before, my Jabber ID is rapture@jabber.org.  I hope this user manual is a friendly springboard to the world of Jabber and Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS.  Have fun!
+<p>If you're a registered user, feel free to ask me for help.  Rapture In Venice's contact information can be found below, but since this is a chat client the most fun way to get in touch is through XMPP!  As I said before, my Jabber ID is rapture@jabber.org.  I hope this user manual is a friendly springboard to the world of XMPP and Renga.  Have fun!
 
 <a NAME="cause">
 <font FACE="Courier New"><b><u><h1 ALIGN=CENTER>The Rapture In Venice Cause</h1></u></b></font>
 <center><font SIZE=-2><a HREF="#top">top</a></font></center>
 
-<p>Rapture In Venice was born to help <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS become the #1 desktop OS on the consumer market.  A lofty goal, but Be, Inc. started it. :-)  As such, Rapture In Venice needs your support.  If we're going to be able to create top quality applications that help bolster the existing <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS library, we need you to support us back.  If you like Jabber for <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS, please register it!  It's quick and easy and can all be done at <a HREF="http://www.bebits.com">BeBits</a>.  If you're using this application without paying for it, shame on you.  If <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS is truly your favorite OS, it won't be for long because everyone in the community needs <b>your</b> support.  If that doesn't happen, there will be no OS to come to anymore.  Below is how you can get in contact with Rapture In Venice with question, tips, business proposals and whatever else you may need.  As always, thank you for choosing Rapture In Venice.
+<p>Rapture In Venice was born to help <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS become the #1 desktop OS on the consumer market.  A lofty goal, but Be, Inc. started it. :-)  As such, Rapture In Venice needs your support.  If we're going to be able to create top quality applications that help bolster the existing <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS library, we need you to support us back.
+Below is how you can get in contact with Rapture In Venice with question, tips, business proposals and whatever else you may need.  As always, thank you for choosing Rapture In Venice.
 
 <ul>
 <p>Rapture In Venice<br>2663 S. Moore Dr. #B<br>Lakewood CO 80227<br>(720) 962-0898<br><a HREF="mailto:jblanco@uswest.net">jblanco@uswest.net</a><br><a HREF="http://www.users.uswest.net/~jblanco">http://www.users.uswest.net/~jblanco</a>
