@@ -131,8 +131,6 @@ private:
 	BScrollView        *_message_scroller;
 	ChatTextView       *_chat;
 	BetterTextView     *_message;
-	BTextView          *_enter_note;
-	BCheckBox          *_command_enter;
 	BButton            *_send_message;
 
 	BListView          *_people;

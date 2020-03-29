@@ -272,41 +272,23 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	AddCommonFilter(new RotateChatFilter(this));
 
 	// send button
-	_send_message = new BButton("send", "Send", new BMessage(JAB_CHAT_SENT));
+	_send_message = new BButton("send", "\xe2\x96\xb6", new BMessage(JAB_CHAT_SENT));
 	_send_message->MakeDefault(true);
 	_send_message->SetTarget(this);
+	_send_message->SetFlat(true);
+	_send_message->SetExplicitSize(BSize(_send_message->StringWidth("WWWW"), B_SIZE_UNSET));
 	
 	// add alt-enter note
 
-	_command_enter = new BCheckBox(NULL, "Newlines allowed?", new BMessage(NEWLINE_TOGGLE));
-	_command_enter->SetValue(BlabberSettings::Instance()->Tag("last-command-enter"));
-	
-	rgb_color note = {0, 0, 0, 255};
-	BFont black_8(be_plain_font);
-	black_8.SetSize(8.0);
-
-	_enter_note = new BTextView(NULL, &black_8, &note, B_WILL_DRAW);
-	_enter_note->SetViewColor(216, 216, 216, 255);
-	_enter_note->MakeEditable(false);
-	_enter_note->MakeSelectable(false);
-
-	// post message
-	PostMessage(NEWLINE_TOGGLE);
-
 	BLayoutBuilder::Grid<>(_sending)
-		.Add(_message_scroller, 0, 0, 1, 3)
-		.Add(_send_message,     1, 0, 1, 1)
-		.Add(_command_enter,    1, 1, 1, 1)
-		.Add(_enter_note,       1, 2, 1, 1)
+		.Add(_message_scroller, 0, 0)
+		.Add(_send_message,     1, 0)
 	.End();
 	
 	// handle splits
-	BSplitView* _split_talk = new BSplitView(B_VERTICAL);
+	BGroupView* _split_talk = new BGroupView(B_VERTICAL);
 	_split_talk->AddChild(_chat_scroller);
 	_split_talk->AddChild(_sending);
-	_split_talk->SetItemWeight(0, 3, false);
-	_split_talk->SetItemWeight(1, 1, false);
-	_split_talk->SetSpacing(0);
 	
 	_people = new BListView(NULL, B_SINGLE_SELECTION_LIST);
 	_scrolled_people_pane = new BScrollView(NULL, _people, 0, false, true, B_PLAIN_BORDER);
@@ -314,7 +296,7 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	BSplitView* _split_group_people = new BSplitView(B_HORIZONTAL);
 	_split_group_people->AddChild(_split_talk);
 	_split_group_people->AddChild(_scrolled_people_pane);
-	_split_group_people->SetItemWeight(0, 3, false);
+	_split_group_people->SetItemWeight(0, 5, false);
 	_split_group_people->SetItemWeight(1, 1, false);
 	_split_group_people->SetSpacing(0);
 
@@ -643,20 +625,6 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 			// dirty work
 			_am_logging = false;
 			fclose(_log);
-			
-			break;
-		}
-		
-		case NEWLINE_TOGGLE: {
-			if (NewlinesAllowed()) {
-				_enter_note->SetText("Enter adds newline; Command-Enter sends message.");
-			} else {
-				_enter_note->SetText("Command-Enter adds newline; Enter sends message.");
-			}
-			
-			// save last value
-			BlabberSettings::Instance()->SetTag("last-command-enter", NewlinesAllowed());
-			BlabberSettings::Instance()->WriteToFile();
 			
 			break;
 		}
@@ -1358,7 +1326,7 @@ string TalkWindow::GetGroupUsername() {
 }
 
 bool TalkWindow::NewlinesAllowed() {
-	return _command_enter->Value();
+	return false;
 }
 
 int TalkWindow::CountHyperlinks(string message) {
