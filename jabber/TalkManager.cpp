@@ -394,7 +394,7 @@ void
 TalkManager::handleMUCError(gloox::MUCRoom *room,
 							gloox::StanzaError error)
 {
-	fprintf(stderr, "%s(%p, %d)\n", __PRETTY_FUNCTION__, room, error);
+	fprintf(stderr, "%s(%s, %d)\n", __PRETTY_FUNCTION__, room->name().c_str(), error);
 }
 
 
