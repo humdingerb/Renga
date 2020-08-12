@@ -7,7 +7,7 @@
 #ifndef TALK_MANAGER_H
 #define TALK_MANAGER_H
 
-#include <gloox/messagehandler.h>
+#include <gloox/messagesessionhandler.h>
 #include <gloox/message.h>
 #include <gloox/mucroomhandler.h>
 
@@ -22,7 +22,7 @@ enum {
 };
 
 // FIXME could we replace this with MessageSessionHandler?
-class TalkManager : public BHandler, public gloox::MessageHandler, gloox::MUCRoomHandler {
+class TalkManager : public BHandler, public gloox::MessageSessionHandler, gloox::MUCRoomHandler {
 public:
 	typedef  std::map<std::string, TalkWindow *>                   TalkMap;
 	typedef  std::map<std::string, TalkWindow *>::iterator         TalkIter;
@@ -39,7 +39,6 @@ public:
 							const gloox::JID* user,
 				std::string group_room, std::string group_username, 
 				std::string thread = GenericFunctions::GenerateUniqueID(), bool sound_on_new = false);
-	void                 handleMessage (const gloox::Message &msg, gloox::MessageSession *session) final;
 
 	std::string          IsExistingWindowToUser(gloox::Message::MessageType type,
 							std::string username);
@@ -71,12 +70,16 @@ public:
 							const gloox::DataForm *infoForm);
 	void				handleMUCItems(gloox::MUCRoom *room,
 							const gloox::Disco::ItemList &items);
+
+	// MessageSessionHandler hooks
+	void handleMessageSession(gloox::MessageSession* session) final;
 protected:
  	                     TalkManager();
 
 private:
 	static TalkManager *_instance;
 
+	// FIXME remove
 	TalkMap             _talk_map;
 };
 

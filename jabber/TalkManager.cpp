@@ -93,101 +93,28 @@ TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType typ
 	return window;
 }
 
+
 void
-TalkManager::handleMessage(const gloox::Message &msg,
-	__attribute__((unused)) gloox::MessageSession *session)
+TalkManager::handleMessageSession(gloox::MessageSession* session)
 {
-	gloox::Message::MessageType type;
-	string                thread_id;
-	string                sender;
-	TalkWindow           *window = NULL;
-
-	string                group_room;
-	string                group_server;
-	string                group_identity;
-	string                group_username;
-
-	// must be content to continue
-	if (msg.body() == "") {
-		return;
-	}
-
-	// configure type
-	type = msg.subtype();
-	if (type == gloox::Message::Normal) {
-		if (BlabberSettings::Instance()->Tag("convert-messages-to-chat"))
-			type = gloox::Message::Chat;
-	} else if (type == gloox::Message::Error) {
+	if (session->types() & gloox::Message::MessageType::Error) {
 		char buffer[2048];
 		
-		sprintf(buffer, "An error occurred when you tried sending a message to %s.  The reason is as follows:\n\n%s", msg.from().full().c_str(), msg.body().c_str());
+		sprintf(buffer, "An error occurred when you tried sending a message to %s.",
+			session->target().full().c_str());
 		ModalAlertFactory::Alert(buffer, "Oh, well.", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		
 		return;
-	} else {
-		// ignore other messages
-		return;
 	}
 
-	// configure sender
-	sender = msg.from().full();
-
-	// configure thread ID
-	thread_id = msg.thread();
-
-	if (type == gloox::Message::Chat && _talk_map.count(thread_id) == 0) {
-		// is there a window with the same sender already open? (only for chat)
-		if (!IsExistingWindowToUser(type, sender).empty()) {
-			thread_id = IsExistingWindowToUser(type, sender);
-		}
-	} else if (type == gloox::Message::Groupchat) {
-		fprintf(stderr, "received group message at %s\n", __PRETTY_FUNCTION__);
-	}
-
-	// create new thread ID
-	if (thread_id.empty() || _talk_map.count(thread_id) == 0) {
-		if (type == gloox::Message::Groupchat) {
-			return;
-		}
-
-		thread_id = GenericFunctions::GenerateUniqueID();
-
-		// configure user ID
-		gloox::JID user;
-
-		JRoster::Instance()->Lock();
-
-		if (JRoster::Instance()->FindUser(JRoster::HANDLE, gloox::JID(sender).bare())) {
-			UserID *tmp_user = JRoster::Instance()->FindUser(JRoster::HANDLE,gloox::JID(sender).bare());
-			user = tmp_user->JID();
-		} else {
-			user.setJID(sender);
-		}
-
-		JRoster::Instance()->Unlock();
-
-		// create the new session								
-		window = CreateTalkSession(type, &user, group_room, group_username, thread_id, true);
-	} else {
-		window = _talk_map[thread_id];
-	}
-
-	// submit the chat
-	if (window) {
-		window->Lock();
-
-		if (type == gloox::Message::Groupchat) {
-			if (group_username.empty()) {
-				window->AddToTalk("System:", msg.body(), TalkWindow::OTHER);
-			} else {
-				window->NewMessage(group_username, msg.body());
-			}
-		} else {
-			window->NewMessage(msg.body());
-		}
-		window->Unlock();
-	}
+	// create the window and register it with the session
+	// FIXME the window should get a pointer to the session so it can unregister
+	// itself on destruction
+	TalkWindow* window = CreateTalkSession((gloox::Message::MessageType)session->types(),
+		&session->target(), "", "", session->threadID(), true);
+	session->registerMessageHandler(window);
 }
+
 
 string
 TalkManager::IsExistingWindowToUser(gloox::Message::MessageType type,

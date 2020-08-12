@@ -162,14 +162,6 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 				// process based on the intent
 				iq_intent intent = _iq_map[iq_id];
 
-				// for errors on login				
-				if (intent == LOGIN) {
-					sprintf(buffer, "Your login attempt failed due to the following reason:\n\n%s", entity->Child("error")->Data());
-					ModalAlertFactory::Alert(buffer, "I'll try again", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
-
-					Reset();
-				}
-
 				// for errors on registration
 				if (intent == REGISTER) {
 					if (entity->Attribute("from") && AgentList::Instance()->GetAgentByID(entity->Attribute("from"))) {
@@ -371,36 +363,34 @@ void JabberSpeak::_ConnectionThread() {
 	fClient = new gloox::Client(jid, _password);
 
 	fClient->rosterManager()->registerRosterListener(JRoster::Instance());
+
+	// Register for logging
 	fClient->logInstance().registerLogHandler(gloox::LogLevelDebug,
 		gloox::LogAreaXmlOutgoing, new LogHandler);
+
+	// Register for connection events
 	fClient->registerConnectionListener(this);
-	fClient->registerMessageHandler(TalkManager::Instance());
+
+	// Register for incoming chat sessions
+	fClient->registerMessageSessionHandler(TalkManager::Instance());
+
+	// Prepare our answer to version requests for disco
 	_ProcessVersionRequest();
 
+	// And let's go!
 	fClient->connect();
 }
 
 
 void JabberSpeak::SendDisconnect() {
-	XMLEntity *end_stream;
-	
 	_am_logged_in = false;
-
-	end_stream = new XMLEntity("stream:stream", NULL);
-	
-	char *str = end_stream->EndToString();
-	free(str);
-
-	delete end_stream;
+	fClient->disconnect();
 }
 
 void JabberSpeak::SendSubscriptionRequest(string username) {
 	gloox::Subscription subscription(gloox::Subscription::Subscribe,
 		gloox::JID(username));
 	fClient->send(subscription);
-
-	// log command
-	_iq_map[subscription.id()] = LOGIN;
 }
 
 void JabberSpeak::SendUnsubscriptionRequest(string username) {
