@@ -7,6 +7,7 @@
 #define TALK_WINDOW_H
 
 #include <gloox/message.h>
+#include <gloox/messagehandler.h>
 
 #include <cstdio>
 #include <deque>
@@ -31,7 +32,7 @@
 #include "StatusView.h"
 #include "UserID.h"
 
-class TalkWindow : public BWindow {
+class TalkWindow : public BWindow, public gloox::MessageHandler {
 public:
 	enum                 user_type {MAIN_RECIPIENT, LOCAL, OTHER};
 
@@ -71,9 +72,11 @@ public:
 	void                 AddGroupChatter(std::string username);
 	void                 RemoveGroupChatter(std::string username);
 
-	void                 RevealPreviousHistory();		
-	void                 RevealNextHistory();		
+	void                 RevealPreviousHistory();
+	void                 RevealNextHistory();
 
+	// gloox MessageHandler
+	void handleMessage(const gloox::Message&, gloox::MessageSession*);
 private:
     //xed: new message window title notification
     void 				WindowActivated(bool active);

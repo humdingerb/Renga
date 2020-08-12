@@ -1661,7 +1661,7 @@ void TalkWindow::RevealNextHistory() {
 	}
 }
 
-void 				
+void
 TalkWindow::WindowActivated(bool active)
 {
 	if(Title() && 
@@ -1671,6 +1671,26 @@ TalkWindow::WindowActivated(bool active)
 		SetTitle(originalWindowTitle.String());
 	}
 }
+
+
+void TalkWindow::handleMessage(const gloox::Message& msg, gloox::MessageSession*)
+{
+	// submit the chat
+	Lock();
+
+	if (msg.subtype() == gloox::Message::Groupchat) {
+		if (msg.from().full().empty()) {
+			AddToTalk("System:", msg.body(), TalkWindow::OTHER);
+		} else {
+			NewMessage(msg.from().full(), msg.body());
+		}
+	} else {
+		NewMessage(msg.body());
+	}
+	Unlock();
+}
+
+
 void
 TalkWindow::NotifyWindowTitle()
 {
