@@ -18,7 +18,7 @@ JRoster *JRoster::Instance() {
 		_instance = new JRoster();
 	}
 	
-	return _instance;	
+	return _instance;
 }
 
 JRoster::~JRoster() {

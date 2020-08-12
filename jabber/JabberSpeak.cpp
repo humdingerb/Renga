@@ -433,11 +433,9 @@ void JabberSpeak::RemoveFromRoster(const UserID *removed_user) {
 
 
 void JabberSpeak::SendMessage(const gloox::Message::MessageType type,
-	const UserID *user, string body, string thread_id)
+	const gloox::JID& user, string body, string thread_id)
 {
-	gloox::Message message(type,
-		gloox::JID(user->JabberCompleteHandle()), body, gloox::EmptyString,
-		thread_id);
+	gloox::Message message(type, user, body, gloox::EmptyString, thread_id);
 	fClient->send(message);
 }
 

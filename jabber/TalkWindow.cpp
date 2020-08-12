@@ -53,15 +53,16 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	MessageRepeater::Instance()->AddTarget(this);
 
 	_type           = type;
-	if (user)
-		_user = JRoster::Instance()->FindUser(*user);
-	else
-		_user = NULL;
+	UserID* uid = NULL;
+	if (user) {
+		_user = *user;
+		uid = JRoster::Instance()->FindUser(*user);
+	}
 	_group_room     = group_room;
 	_group_username = group_username;
 
-	if (_type != gloox::Message::Groupchat && _user) {
-		_current_status = _user->OnlineStatus();
+	if (_type != gloox::Message::Groupchat && uid) {
+		_current_status = uid->OnlineStatus();
 	}
 
 	// generate a thread ID
@@ -324,18 +325,18 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 		// identify the user
 		sprintf(buffer, "your identity is %s", _group_username.c_str());
 		_status_view->SetMessage(buffer); 
-	} else if (_user->UserType() == UserID::JABBER) {
+	} else if (!uid || uid->UserType() == UserID::JABBER) {
 		// identify the user
 		sprintf(buffer, "your identity is %s", JabberSpeak::Instance()->CurrentLogin().c_str());
 		_status_view->SetMessage(buffer); 
 	} else {
-		user_representation = _user->FriendlyName();
+		user_representation = uid->FriendlyName();
 		
 		if (user_representation.empty()) {
-			user_representation = _user->JabberUsername();
+			user_representation = uid->JabberUsername();
 		}
 
-		if (_user->UserType() == UserID::ICQ) {
+		if (uid->UserType() == UserID::ICQ) {
 			user_representation += " (ICQ)";
 
 			// identify the user
@@ -350,7 +351,10 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	}
 
 	if (_type != gloox::Message::Groupchat && user_representation.empty()) {
-		user_representation = _user->FriendlyName();
+		if (uid)
+			user_representation = uid->FriendlyName();
+		else
+			user_representation = _user.bare();
 	}
 
 	if (type == gloox::Message::Normal) {
@@ -635,23 +639,18 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				break;
 			}
 
-			JRoster::Instance()->Lock();
-
-			// get REAL pointer to existing user
-			UserID *user = JRoster::Instance()->FindUser(JRoster::HANDLE, _user->JabberHandle());
-
 			// get new status
-			if (user == NULL) {
-				// may have been removed?
+			JRoster::Instance()->Lock();
+			UserID* user = JRoster::Instance()->FindUser(_user);
+			if (!user) {
 				JRoster::Instance()->Unlock();
 				break;
 			}
-			
 			UserID::online_status new_status = user->OnlineStatus();
 
-			// if we have one, check their presence			
+			// if we have one, check their presence
 			if (_current_status != new_status) {
-				char buffer[2048];				
+				char buffer[2048];
 
 				if (_current_status == UserID::ONLINE && new_status == UserID::OFFLINE) {
 					sprintf(buffer, "This user is now offline.");
@@ -1297,10 +1296,11 @@ void TalkWindow::NewMessage(string new_message) {
 	if (_type == gloox::Message::Groupchat) {
 		return; // GCHAT
 	} else {
-		if (!_user->FriendlyName().empty()) {
-			AddToTalk(_user->FriendlyName().c_str(), new_message, MAIN_RECIPIENT);
+		UserID* uid = JRoster::Instance()->FindUser(_user);
+		if (uid && !uid->FriendlyName().empty()) {
+			AddToTalk(uid->FriendlyName().c_str(), new_message, MAIN_RECIPIENT);
 		} else {
-			AddToTalk(_user->JabberUsername().c_str(), new_message, MAIN_RECIPIENT);
+			AddToTalk(_user.bare().c_str(), new_message, MAIN_RECIPIENT);
 		}
 	}
 }
@@ -1314,7 +1314,7 @@ void TalkWindow::SetThreadID(string id) {
 }
 
 const UserID *TalkWindow::GetUserID() {
-	return _user;
+	return JRoster::Instance()->FindUser(_user);
 }
 
 string TalkWindow::GetGroupRoom() {

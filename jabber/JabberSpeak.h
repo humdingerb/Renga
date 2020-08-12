@@ -58,7 +58,7 @@ public:
 	void                     SetFriendlyName(const gloox::JID& who, BString name);
 	void                     RemoveFromRoster(const UserID *removed_user);
 	void                     SendMessage(const gloox::Message::MessageType type,
-								const UserID *user, string message,
+								const gloox::JID&, string message,
 								string thread_id);
 	void                     SendMessage(const gloox::Message::MessageType type,
 								string group_room, string message);

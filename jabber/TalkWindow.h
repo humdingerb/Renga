@@ -80,7 +80,7 @@ private:
     void				NotifyWindowTitle();
     BString				originalWindowTitle;
 
-	const UserID          *_user;
+	gloox::JID             _user;
 	std::string            _group_room;
 	std::string            _group_username;
 	UserID::online_status  _current_status;
