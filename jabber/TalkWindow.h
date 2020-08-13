@@ -32,7 +32,7 @@
 #include "StatusView.h"
 #include "UserID.h"
 
-class TalkWindow : public BWindow, public gloox::MessageHandler {
+class TalkWindow : public BWindow {
 public:
 	enum                 user_type {MAIN_RECIPIENT, LOCAL, OTHER};
 
@@ -61,7 +61,7 @@ public:
 
 	bool                 NewlinesAllowed();
 
-	const UserID        *GetUserID();
+	const gloox::JID&    GetUserID();
 	std::string          GetGroupRoom();
 	std::string          GetGroupUsername();
 

@@ -2,9 +2,12 @@
 // Blabber [TalkManager.cpp]
 //////////////////////////////////////////////////
 
+#include <gloox/carbons.h>
 #include <gloox/instantmucroom.h>
+#include <gloox/rostermanager.h>
 
 #include <cstdio>
+#include <stdexcept>
 
 #include <interface/Window.h>
 
@@ -46,7 +49,7 @@ TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType typ
 	// is there a window already?
 	if (type != gloox::Message::Groupchat) {
 		if (IsExistingWindowToUser(user->bare()).size()) {
-			window = _talk_map[IsExistingWindowToUser(user->bare())];
+			window = _talk_map.at(IsExistingWindowToUser(user->bare()));
 
 			// activate it
 			if (!sound_on_new) {
@@ -54,8 +57,15 @@ TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType typ
 			}
 		} else {
 			if (session == NULL) {
+				gloox::JID fullJID = *user;
+				gloox::RosterManager* rm = JabberSpeak::Instance()->GlooxClient()->rosterManager();
+				gloox::RosterItem* ri = rm->getRosterItem(fullJID);
+				if (ri) {
+					std::string res = ri->resources().begin()->first;
+					fullJID.setResource(res);
+				}
 				session = new gloox::MessageSession(
-					JabberSpeak::Instance()->GlooxClient(), *user);
+					JabberSpeak::Instance()->GlooxClient(), fullJID);
 			}
 			// create a new window
 			window = new TalkWindow(type, user, group_room, group_username, session, sound_on_new);
@@ -71,7 +81,7 @@ TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType typ
 		}
 	} else {
 		if (IsExistingWindowToGroup(group_room).size()) {
-			window = _talk_map[IsExistingWindowToGroup(group_room)];
+			window = _talk_map.at(IsExistingWindowToGroup(group_room));
 
 			// activate it
 			if (!sound_on_new) {
@@ -96,31 +106,77 @@ TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType typ
 			SendNotices(kWindowList);
 		}
 	}
-	
+
+	session->registerMessageHandler(this);
+
 	// return a reference as well
 	return window;
+}
+
+
+void TalkManager::handleMessage(const gloox::Message& msg, gloox::MessageSession* session)
+{
+	// TODO First check if it's a carbon, in which case the session is incorrect :|
+	if (msg.hasEmbeddedStanza()) {
+		// get the possible carbon extension
+		const gloox::Carbons *carbon = msg.findExtension<const gloox::Carbons>(
+			gloox::ExtCarbons);
+
+		// if the extension exists and contains a message, use it as the real message
+		if (carbon && carbon->embeddedStanza()) {
+			const gloox::Message* message = static_cast<gloox::Message*>(
+				carbon->embeddedStanza());
+
+			try {
+				TalkWindow* window = _talk_map.at(IsExistingWindowToUser(message->from().full()));
+				window->Lock();
+				window->AddToTalk(window->OurRepresentation().c_str(), message->body(), TalkWindow::LOCAL);
+				window->Unlock();
+			} catch (const std::out_of_range&) {
+			}
+
+			return;
+		}
+	}
+
+	TalkWindow* window;
+	try {
+		window = _talk_map.at(IsExistingWindowToUser(session->target().full()));
+	} catch (const std::out_of_range&) {
+		return;
+	}
+
+	// submit the chat
+	window->Lock();
+
+	if (msg.subtype() == gloox::Message::Groupchat) {
+		if (msg.from().full().empty()) {
+			window->AddToTalk("System:", msg.body(), TalkWindow::OTHER);
+		} else {
+			window->NewMessage(msg.from().resource(), msg.body());
+		}
+	} else {
+		window->NewMessage(msg.body());
+	}
+	window->Unlock();
 }
 
 
 void
 TalkManager::handleMessageSession(gloox::MessageSession* session)
 {
-	if (session->types() & gloox::Message::MessageType::Error) {
-		char buffer[2048];
-		
-		sprintf(buffer, "An error occurred when you tried sending a message to %s.",
-			session->target().full().c_str());
-		ModalAlertFactory::Alert(buffer, "Oh, well.", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		
+	// don't create a window for the carbons session, but still register to
+	// get the messages.
+	if (session->threadID().empty()) {
+		session->registerMessageHandler(this);
 		return;
 	}
 
-	// create the window and register it with the session
-	// FIXME the window should get a pointer to the session so it can unregister
-	// itself on destruction
-	TalkWindow* window = CreateTalkSession((gloox::Message::MessageType)session->types(),
+	printf("create window for %s\n", session->threadID().c_str());
+	
+	// create the window
+	CreateTalkSession((gloox::Message::MessageType)session->types(),
 		&session->target(), "", "", session, true);
-	session->registerMessageHandler(window);
 }
 
 
@@ -129,16 +185,16 @@ TalkManager::IsExistingWindowToUser(string username)
 {
 	// check handles (with resource)
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		const UserID* id = i->second->GetUserID();
-		if (id && id->JID() == gloox::JID(username)) {
+		const gloox::JID& id = i->second->GetUserID();
+		if (id == gloox::JID(username)) {
 			return (*i).first;
 		}
 	}
 
 	// check handles (without resource)
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		const UserID* id = i->second->GetUserID();
-		if (id && id->JID().bare() == gloox::JID(username).bare()) {
+		const gloox::JID& id = i->second->GetUserID();
+		if (id.bare() == gloox::JID(username).bare()) {
 			return (*i).first;
 		}
 	}
@@ -162,8 +218,8 @@ string TalkManager::IsExistingWindowToGroup(string group_room) {
 void TalkManager::UpdateWindowTitles(const gloox::JID& jid, BString newTitle) {
 	// check handles (without resource)
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		const UserID* id = (*i).second->GetUserID();
-		if (id && id->JabberHandle() == jid.full()) {
+		const gloox::JID& id = i->second->GetUserID();
+		if (id == jid) {
 			(*i).second->SetTitle(newTitle);
 		}
 	}
@@ -285,7 +341,7 @@ TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 		fprintf(stderr, "Failed to find chat window\n");
 		return;
 	}
-	window = _talk_map[thread_id];
+	window = _talk_map.at(thread_id);
 	// submit the chat
 	if (window) {
 		window->Lock();

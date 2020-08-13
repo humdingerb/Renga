@@ -3,8 +3,10 @@
 //////////////////////////////////////////////////
 
 #include <gloox/jid.h>
+#include <gloox/carbons.h>
 #include <gloox/dataformitem.h>
 #include <gloox/disco.h>
+#include <gloox/forward.h>
 #include <gloox/registration.h>
 #include <gloox/rostermanager.h>
 
@@ -362,6 +364,11 @@ void JabberSpeak::_ConnectionThread() {
 	gloox::JID jid(_curr_login);
 	fClient = new gloox::Client(jid, _password);
 
+	// Prepare for handling carbons
+	fClient->registerStanzaExtension(new gloox::Forward());
+	fClient->registerStanzaExtension(new gloox::Carbons());
+
+	// Register for roster events
 	fClient->rosterManager()->registerRosterListener(JRoster::Instance());
 
 	// Register for logging
@@ -591,9 +598,14 @@ JabberSpeak::onConnect()
 {
 	fprintf(stderr, "Logged in!\n");
 	MessageRepeater::Instance()->PostMessage(JAB_LOGGED_IN);
-	//SendLastPresence();	
+	//SendLastPresence();
 	
 	BookmarkManager::Instance().Connect();
+
+	// Enable message carbons
+	gloox::IQ iq(gloox::IQ::Set, gloox::JID());
+	iq.addExtension(new gloox::Carbons(gloox::Carbons::Enable));
+	fClient->send(iq, this, 1);
 
 	_reconnecting = false;
 }
@@ -640,7 +652,18 @@ JabberSpeak::onDisconnect(gloox::ConnectionError e)
 bool
 JabberSpeak::onTLSConnect(__attribute__((unused)) const gloox::CertInfo& info)
 {
-	// TODO verify certificate
+	// Certificate is verified as valid by gloox already
 	return true;
 }
 
+bool
+JabberSpeak::handleIq(const gloox::IQ&)
+{
+	return true;
+}
+
+
+void
+JabberSpeak::handleIqID(const gloox::IQ&, int)
+{
+}

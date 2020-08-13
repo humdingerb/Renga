@@ -22,7 +22,7 @@ enum {
 };
 
 // FIXME could we replace this with MessageSessionHandler?
-class TalkManager : public BHandler, public gloox::MessageSessionHandler, gloox::MUCRoomHandler {
+class TalkManager : public BHandler, public gloox::MessageSessionHandler, gloox::MUCRoomHandler, gloox::MessageHandler {
 public:
 	typedef  std::map<std::string, TalkWindow *>                   TalkMap;
 	typedef  std::map<std::string, TalkWindow *>::iterator         TalkIter;
@@ -72,6 +72,9 @@ public:
 
 	// MessageSessionHandler hooks
 	void handleMessageSession(gloox::MessageSession* session) final;
+
+	// gloox::MessageHandler hooks
+	void handleMessage(const gloox::Message& msg, gloox::MessageSession* session) final;
 protected:
  	                     TalkManager();
 

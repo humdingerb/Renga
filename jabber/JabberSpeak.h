@@ -30,7 +30,7 @@ enum {
 };
 
 class JabberSpeak : public BHandler, public XMLReader,
-	public gloox::ConnectionListener
+	public gloox::ConnectionListener, public gloox::IqHandler
 {
 public:
 	enum iq_intent {LOGIN, ROSTER, AGENTS, REGISTER, SEND_REGISTER, UNREGISTER, SEND_UNREGISTER, NEW_USER, MESSAGE, CHAT};
@@ -79,10 +79,14 @@ public:
 	string					GetRealServer();
 	int						GetRealPort();
 
-	// GLOOX LISTENERS
+	// gloox::ConnectionListener
 	void					onConnect() final;
 	void					onDisconnect(gloox::ConnectionError e) final;
 	bool					onTLSConnect(const gloox::CertInfo& info) final;
+
+	// gloox::IqHandler
+	bool					handleIq(const gloox::IQ&) final;
+	void					handleIqID(const gloox::IQ&, int) final;
 
 	gloox::Client* 			GlooxClient() { return fClient; }
 

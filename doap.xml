@@ -143,7 +143,7 @@
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0221.html"/>
             <xmpp:status>partial</xmpp:status>
             <xmpp:since>1.22.0</xmpp:since>
-			<xmpp:note>only images, only for in-band registration</xmpp:note>
+            <xmpp:note>only images, only for in-band registration</xmpp:note>
         </xmpp:SupportedXep>
     </implements>
     <implements>
@@ -153,16 +153,25 @@
             <xmpp:status>partial</xmpp:status>
             <xmpp:version>1.0</xmpp:version>
             <xmpp:since>1.22.0</xmpp:since>
-			<xmpp:note>only receiving, for in-band registration</xmpp:note>
+            <xmpp:note>only receiving, for in-band registration</xmpp:note>
         </xmpp:SupportedXep>
     </implements>
     <implements>
         <xmpp:SupportedXep>
-			<!-- /me command -->
+            <!-- /me command -->
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0245.html"/>
             <xmpp:status>complete</xmpp:status>
             <xmpp:version>1.0</xmpp:version>
             <xmpp:since>1.2</xmpp:since>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <!-- Carbons -->
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0280.html"/>
+            <xmpp:status>complete</xmpp:status>
+            <xmpp:version>0.13.2</xmpp:version>
+            <xmpp:since>1.22.0</xmpp:since>
         </xmpp:SupportedXep>
     </implements>
     <implements>

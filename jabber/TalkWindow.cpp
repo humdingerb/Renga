@@ -33,6 +33,8 @@
 #include <malloc.h>
 #include <stdlib.h>
 
+#include "gloox/rostermanager.h"
+
 #define NOTIFICATION_CHAR "√"
 
 
@@ -53,8 +55,6 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	
 	// add self to message family
 	MessageRepeater::Instance()->AddTarget(this);
-
-	_session->registerMessageHandler(this);
 
 	UserID* uid = NULL;
 	if (user) {
@@ -393,8 +393,6 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 }
 
 TalkWindow::~TalkWindow() {
-	_session->removeMessageHandler();
-
 	string message;
 	message.resize(128);
 	time_t now = time(NULL);
@@ -1251,9 +1249,10 @@ void TalkWindow::NewMessage(string new_message) {
 	if (IsGroupChat()) {
 		return; // GCHAT
 	} else {
-		const UserID* uid = GetUserID();
-		if (uid && !uid->FriendlyName().empty()) {
-			AddToTalk(uid->FriendlyName().c_str(), new_message, MAIN_RECIPIENT);
+		gloox::RosterManager* rm = JabberSpeak::Instance()->GlooxClient()->rosterManager();
+		gloox::RosterItem* item = rm->getRosterItem(_session->target());
+		if (item && !item->name().empty()) {
+			AddToTalk(item->name().c_str(), new_message, MAIN_RECIPIENT);
 		} else {
 			AddToTalk(_session->target().bare().c_str(), new_message, MAIN_RECIPIENT);
 		}
@@ -1264,8 +1263,8 @@ void TalkWindow::NewMessage(string username, string new_message) {
 	AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT);
 }
 	 
-const UserID *TalkWindow::GetUserID() {
-	return JRoster::Instance()->FindUser(_session->target());
+const gloox::JID& TalkWindow::GetUserID() {
+	return _session->target();
 }
 
 string TalkWindow::GetGroupRoom() {
@@ -1621,24 +1620,6 @@ TalkWindow::WindowActivated(bool active)
 	{
 		SetTitle(originalWindowTitle.String());
 	}
-}
-
-
-void TalkWindow::handleMessage(const gloox::Message& msg, gloox::MessageSession*)
-{
-	// submit the chat
-	Lock();
-
-	if (msg.subtype() == gloox::Message::Groupchat) {
-		if (msg.from().full().empty()) {
-			AddToTalk("System:", msg.body(), TalkWindow::OTHER);
-		} else {
-			NewMessage(msg.from().full(), msg.body());
-		}
-	} else {
-		NewMessage(msg.body());
-	}
-	Unlock();
 }
 
 
