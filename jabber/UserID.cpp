@@ -157,12 +157,6 @@ const std::string UserID::TransportPassword() const {
 	return _transport_password;
 }
 
-void UserID::StripJabberResource() {
-	if (WhyNotValidJabberHandle(_handle.full()).size()) {
-		_handle.setResource("");
-	}
-}
-
 std::string UserID::WhyNotValidJabberHandle(std::string jidCandidate)
 {
 	gloox::JID jid(jidCandidate);

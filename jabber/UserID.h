@@ -44,7 +44,6 @@ public:
 	const std::string    TransportUsername() const;
 	const std::string    TransportPassword() const;
 
-	void                 StripJabberResource();        // xxx@yyy/zzz -> xxx@yyy
 	static std::string   WhyNotValidJabberHandle(std::string jidCandidate);
 
 	// MANIPULATORS
