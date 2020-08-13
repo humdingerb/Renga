@@ -49,27 +49,6 @@ BRect GenericFunctions::CenteredFrame(float window_width, float window_height) {
 	return BRect(frame_start_x, frame_start_y, frame_end_x, frame_end_y);
 }
 
-std::string GenericFunctions::GenerateUniqueID() {
-	static long counter = 0;
-
-	// element #1: PID of process (same through application run-time)
-	pid_t pid = getpid();
-
-	// element #2: seconds since Jan. 1, 1970 (new value every second)
-	time_t secs = time(NULL);
-
-	// element #3: private counter (new value every call)
-	++counter;
-
-	// glue number together
-	char buffer[100];
-
-	sprintf(buffer, "%" B_PRIu32 ":%lu:%lu", pid, secs, counter);
-
-	// return value
-	return std::string(buffer);
-}
-
 std::string GenericFunctions::TimeStamp() {
 	// get current time in seconds
 	time_t t = time(NULL);

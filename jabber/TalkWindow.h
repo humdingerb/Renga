@@ -43,10 +43,10 @@ public:
 public:  
 						TalkWindow(gloox::Message::MessageType type,
 							const gloox::JID *user, std::string group_room,
-							std::string group_username, bool follow_focus_rules = false);
+							std::string group_username,
+							gloox::MessageSession* session,
+							bool follow_focus_rules = false);
 						~TalkWindow();
-
-	gloox::Message::MessageType 	Type();
 
 	void                 FrameResized(float width, float height);
 	void                 MenusBeginning();
@@ -58,7 +58,6 @@ public:
 	void                 AddToTalk(std::string username, std::string message, user_type type);
 	void                 NewMessage(std::string new_message);
 	void                 NewMessage(std::string username, std::string new_message);
-	void                 SetThreadID(std::string id);
 
 	bool                 NewlinesAllowed();
 
@@ -81,14 +80,19 @@ private:
     //xed: new message window title notification
     void 				WindowActivated(bool active);
     void				NotifyWindowTitle();
+
+	// Message types testing
+	bool				IsGroupChat();
+	bool				IsNormal();
+	bool				IsChat();
+
+private:
     BString				originalWindowTitle;
 
-	gloox::JID             _user;
 	std::string            _group_room;
 	std::string            _group_username;
 	UserID::online_status  _current_status;
-	gloox::Message::MessageType _type;
-	std::string            _thread;
+	gloox::MessageSession* _session;
 	
 	// GUI
 	BView              *_full_view;

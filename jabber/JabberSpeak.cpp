@@ -100,14 +100,14 @@ void JabberSpeak::JabberSpeakReset() {
 
 char **JabberSpeak::CreateAttributeMemory(int num_items) {
 	char **atts;
-	
+
 	atts = (char **)malloc((num_items + 2) * sizeof(char *));
 	for (int i=0; i<num_items; ++i)
 		atts[i] = (char *)malloc(96 * sizeof(char));
-	
+
 	atts[num_items] = NULL;
 	atts[num_items+1] = NULL;
-	
+
 	return atts;
 }
 
@@ -115,7 +115,7 @@ void JabberSpeak::DestroyAttributeMemory(char **atts, int num_items) {
 	for (int i=0; i<(num_items + 2); ++i) {
 		free(atts[i]);
 	}
-	
+
 	free(atts);
 }
 
@@ -492,7 +492,7 @@ void JabberSpeak::RegisterWithAgent(string agent) {
 	strcpy(atts[1], "get");
 
 	strcpy(atts[2], "id");
-	strcpy(atts[3], GenericFunctions::GenerateUniqueID().c_str());
+	//strcpy(atts[3], GenericFunctions::GenerateUniqueID().c_str());
 
 	strcpy(atts[4], "to");
 	strcpy(atts[5], AgentList::Instance()->GetAgentByService(agent)->JID().c_str());

@@ -39,54 +39,62 @@ TalkManager::~TalkManager() {
 
 TalkWindow *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
 	const gloox::JID* user, string group_room, string group_username,
-	string thread, bool sound_on_new)
+	gloox::MessageSession* session, bool sound_on_new)
 {
 	TalkWindow *window = NULL;
-	
+
 	// is there a window already?
-	if (type != gloox::Message::Groupchat && IsExistingWindowToUser(type, user->bare()).size()) {
-		window = _talk_map[IsExistingWindowToUser(type, user->bare())];
+	if (type != gloox::Message::Groupchat) {
+		if (IsExistingWindowToUser(user->bare()).size()) {
+			window = _talk_map[IsExistingWindowToUser(user->bare())];
 
-		// activate it
-		if (!sound_on_new) {
-			window->Activate();
-		}
-	} else if (type != gloox::Message::Groupchat) {
-		// create a new window
-		window = new TalkWindow(type, user, "", "", sound_on_new);
+			// activate it
+			if (!sound_on_new) {
+				window->Activate();
+			}
+		} else {
+			if (session == NULL) {
+				session = new gloox::MessageSession(
+					JabberSpeak::Instance()->GlooxClient(), *user);
+			}
+			// create a new window
+			window = new TalkWindow(type, user, group_room, group_username, session, sound_on_new);
+
+			if (sound_on_new) {
+				// play a sound
+				SoundSystem::Instance()->PlayNewMessageSound();
+			}
 		
-		window->SetThreadID(thread);
-
-		if (sound_on_new) {
-			// play a sound
-			SoundSystem::Instance()->PlayNewMessageSound();
+			// add it to the known list BUGBUG we need to remove this when window closes
+			_talk_map[session->threadID()] = window;
+			SendNotices(kWindowList);
 		}
-		
-		// add it to the known list BUGBUG we need to remove this when window closes
-		_talk_map[thread] = window;
-		SendNotices(kWindowList);
-	} else if (type == gloox::Message::Groupchat && IsExistingWindowToGroup(group_room).size()) {
-		window = _talk_map[IsExistingWindowToGroup(group_room)];
+	} else {
+		if (IsExistingWindowToGroup(group_room).size()) {
+			window = _talk_map[IsExistingWindowToGroup(group_room)];
 
-		// activate it
-		if (!sound_on_new) {
-			window->Activate();
+			// activate it
+			if (!sound_on_new) {
+				window->Activate();
+			}
+		} else {
+			if (session == NULL) {
+				session = new gloox::MessageSession(
+					JabberSpeak::Instance()->GlooxClient(), group_room);
+			}
+			// create a new window
+			window = new TalkWindow(type, user, group_room, group_username, session, sound_on_new);
+
+			// add it to the known list BUGBUG we need to remove this when window closes
+			_talk_map[session->threadID()] = window;
+
+			// FIXME we need to free this when leaving the room!
+			gloox::JID jid(group_room);
+			jid.setResource(group_username);
+			(new gloox::InstantMUCRoom(JabberSpeak::Instance()->GlooxClient(),
+				jid, this))->join();
+			SendNotices(kWindowList);
 		}
-	} else if (type == gloox::Message::Groupchat) {
-		// create a new window
-		window = new TalkWindow(type, user, group_room, group_username, sound_on_new);
-		
-		window->SetThreadID(thread);
-
-		// add it to the known list BUGBUG we need to remove this when window closes
-		_talk_map[thread] = window;
-
-		// FIXME we need to free this when leaving the room!
-		gloox::JID jid(group_room);
-		jid.setResource(group_username);
-		(new gloox::InstantMUCRoom(JabberSpeak::Instance()->GlooxClient(),
-			jid, this))->join();
-		SendNotices(kWindowList);
 	}
 	
 	// return a reference as well
@@ -111,25 +119,26 @@ TalkManager::handleMessageSession(gloox::MessageSession* session)
 	// FIXME the window should get a pointer to the session so it can unregister
 	// itself on destruction
 	TalkWindow* window = CreateTalkSession((gloox::Message::MessageType)session->types(),
-		&session->target(), "", "", session->threadID(), true);
+		&session->target(), "", "", session, true);
 	session->registerMessageHandler(window);
 }
 
 
 string
-TalkManager::IsExistingWindowToUser(gloox::Message::MessageType type,
-	string username)
+TalkManager::IsExistingWindowToUser(string username)
 {
 	// check handles (with resource)
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		if ((*i).second->Type() == type && (*i).second->GetUserID()->JID() == gloox::JID(username)) {
+		const UserID* id = i->second->GetUserID();
+		if (id && id->JID() == gloox::JID(username)) {
 			return (*i).first;
 		}
 	}
 
 	// check handles (without resource)
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		if ((*i).second->Type() == type && (*i).second->GetUserID()->JID().bare() == gloox::JID(username).bare()) {
+		const UserID* id = i->second->GetUserID();
+		if (id && id->JID().bare() == gloox::JID(username).bare()) {
 			return (*i).first;
 		}
 	}
@@ -141,7 +150,7 @@ TalkManager::IsExistingWindowToUser(gloox::Message::MessageType type,
 string TalkManager::IsExistingWindowToGroup(string group_room) {
 	// check names
 	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		if ((*i).second->Type() == gloox::Message::Groupchat && (*i).second->GetGroupRoom() == group_room) {
+		if ((*i).second->GetGroupRoom() == group_room) {
 			return (*i).first;
 		}
 	}

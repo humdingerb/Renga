@@ -191,7 +191,7 @@ void SendTalkWindow::MessageReceived(BMessage *msg) {
 				BlabberSettings::Instance()->SetData("last-group-username", _name->Text());
 
 				// create session
-				TalkManager::Instance()->CreateTalkSession(_type, NULL, _handle->Text(), _name->Text());
+				TalkManager::Instance()->CreateTalkSession(_type, NULL, _handle->Text(), _name->Text(), NULL);
 
 				// Add to bookmarks - TODO let user decide if they want autojoin?
 				BookmarkManager::Instance().SetBookmark(_handle->Text(), _name->Text(), "", true);
@@ -205,7 +205,7 @@ void SendTalkWindow::MessageReceived(BMessage *msg) {
 
 					// create session
 					gloox::JID jid(user);
-					TalkManager::Instance()->CreateTalkSession(_type, &jid, "", "");
+					TalkManager::Instance()->CreateTalkSession(_type, &jid, "", "", NULL);
 				}
 
 				PostMessage(B_QUIT_REQUESTED);

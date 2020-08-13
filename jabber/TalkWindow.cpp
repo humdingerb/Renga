@@ -40,9 +40,11 @@ float TalkWindow::x_placement_offset = -100;
 float TalkWindow::y_placement_offset = -100;
 
 TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
-		string group_room, string group_username, bool follow_focus_rules)
+		string group_room, string group_username,
+		gloox::MessageSession* session, bool follow_focus_rules)
 	: BWindow(BRect(0, 0, 0, 0), "<talk window>", B_DOCUMENT_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS)
+	, _session(session)
 {
 	_am_logging = false;
 	_log        = NULL;
@@ -52,21 +54,18 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	// add self to message family
 	MessageRepeater::Instance()->AddTarget(this);
 
-	_type           = type;
+	_session->registerMessageHandler(this);
+
 	UserID* uid = NULL;
 	if (user) {
-		_user = *user;
 		uid = JRoster::Instance()->FindUser(*user);
 	}
 	_group_room     = group_room;
 	_group_username = group_username;
 
-	if (_type != gloox::Message::Groupchat && uid) {
+	if (!IsGroupChat() && uid) {
 		_current_status = uid->OnlineStatus();
 	}
-
-	// generate a thread ID
-	_thread = GenericFunctions::GenerateUniqueID();
 
     bool bAutoOpenChatLog = BlabberSettings::Instance()->Tag("autoopen-chatlog");
 	string chatlog_path = "";
@@ -111,7 +110,7 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 		_close_item = new BMenuItem("Close", new BMessage(JAB_CLOSE_CHAT));
 		_close_item->SetShortcut('W', 0);
 
-	if (_type == gloox::Message::Chat) {
+	if (IsChat()) {
 		if(0 != _record_item) {
 		  _file_menu->AddItem(_record_item);
 		}
@@ -301,7 +300,7 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	_split_group_people->SetItemWeight(1, 1, false);
 	_split_group_people->SetSpacing(0);
 
-	if (_type != gloox::Message::Groupchat) {
+	if (!IsGroupChat()) {
 		_split_group_people->SetItemCollapsed(1, true);
 		_split_group_people->SetSplitterSize(0);
 	}	
@@ -321,7 +320,7 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	char buffer[1024];
 	string user_representation;
 	
-	if (_type == gloox::Message::Groupchat) {
+	if (!IsGroupChat()) {
 		// identify the user
 		sprintf(buffer, "your identity is %s", _group_username.c_str());
 		_status_view->SetMessage(buffer); 
@@ -350,11 +349,11 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 		}
 	}
 
-	if (_type != gloox::Message::Groupchat && user_representation.empty()) {
+	if (!IsGroupChat() && user_representation.empty()) {
 		if (uid)
 			user_representation = uid->FriendlyName();
 		else
-			user_representation = _user.bare();
+			user_representation = _session->target().bare();
 	}
 
 	if (type == gloox::Message::Normal) {
@@ -394,6 +393,8 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 }
 
 TalkWindow::~TalkWindow() {
+	_session->removeMessageHandler();
+
 	string message;
 	message.resize(128);
 	time_t now = time(NULL);
@@ -408,10 +409,6 @@ TalkWindow::~TalkWindow() {
 
 	// remove self from message family
 	MessageRepeater::Instance()->RemoveTarget(this);
-}
-
-gloox::Message::MessageType TalkWindow::Type() {
-	return _type;
 }
 
 void TalkWindow::FrameResized(float width, float height) {
@@ -433,7 +430,7 @@ void TalkWindow::FrameResized(float width, float height) {
 	_chat_scroller->Invalidate();
 	
 	// remember sizes of message windows
-	if (_type == gloox::Message::Normal) {
+	if (IsNormal()) {
 		BlabberSettings::Instance()->SetFloatData("message-window-width", width);
 		BlabberSettings::Instance()->SetFloatData("message-window-height", height);
 	}
@@ -546,7 +543,7 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_GROUP_CHATTER_ONLINE: {
 			// only for groupchat
-			if (_type != gloox::Message::Groupchat) {
+			if (!IsGroupChat()) {
 				break;
 			}
 
@@ -559,7 +556,7 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_GROUP_CHATTER_OFFLINE: {
 			// only for groupchat
-			if (_type != gloox::Message::Groupchat) {
+			if (!IsGroupChat()) {
 				break;
 			}
 
@@ -635,13 +632,13 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 		
 		case BLAB_UPDATE_ROSTER: {
 			// doesn't apply to groupchat
-			if (_type == gloox::Message::Groupchat) {
+			if (!IsGroupChat()) {
 				break;
 			}
 
 			// get new status
 			JRoster::Instance()->Lock();
-			UserID* user = JRoster::Instance()->FindUser(_user);
+			UserID* user = JRoster::Instance()->FindUser(_session->target());
 			if (!user) {
 				JRoster::Instance()->Unlock();
 				break;
@@ -673,13 +670,9 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 			
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-1")) {
 				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, message.c_str());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, message.c_str(), _thread);
-				}
+				_session->send(message);
 				
-				if (_type == gloox::Message::Normal) {
+				if (IsNormal()) {
 					PostMessage(B_QUIT_REQUESTED);
 				} else {
 					// client part
@@ -697,13 +690,9 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-2")) {
 				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, message.c_str());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, message.c_str(), _thread);
-				}
+				_session->send(message);
 				
-				if (_type == gloox::Message::Normal) {
+				if (IsNormal()) {
 					PostMessage(B_QUIT_REQUESTED);
 				} else {
 					// client part
@@ -721,13 +710,9 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-3")) {
 				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, message.c_str());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, message.c_str(), _thread);
-				}
+				_session->send(message);
 				
-				if (_type == gloox::Message::Normal) {
+				if (IsNormal()) {
 					PostMessage(B_QUIT_REQUESTED);
 				} else {
 					// client part
@@ -745,13 +730,9 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-4")) {
 				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, message.c_str());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, message.c_str(), _thread);
-				}
+				_session->send(message);
 				
-				if (_type == gloox::Message::Normal) {
+				if (IsNormal()) {
 					PostMessage(B_QUIT_REQUESTED);
 				} else {
 					// client part
@@ -769,13 +750,9 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-5")) {
 				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, message.c_str());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, message.c_str(), _thread);
-				}
+				_session->send(message);
 				
-				if (_type == gloox::Message::Normal) {
+				if (IsNormal()) {
 					PostMessage(B_QUIT_REQUESTED);
 				} else {
 					// client part
@@ -793,13 +770,9 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-6")) {
 				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, message.c_str());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, message.c_str(), _thread);
-				}
+				_session->send(message);
 				
-				if (_type == gloox::Message::Normal) {
+				if (IsNormal()) {
 					PostMessage(B_QUIT_REQUESTED);
 				} else {
 					// client part
@@ -817,13 +790,9 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-7")) {
 				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, message.c_str());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, message.c_str(), _thread);
-				}
+				_session->send(message);
 				
-				if (_type == gloox::Message::Normal) {
+				if (IsNormal()) {
 					PostMessage(B_QUIT_REQUESTED);
 				} else {
 					// client part
@@ -841,13 +810,9 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-8")) {
 				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, message.c_str());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, message.c_str(), _thread);
-				}
+				_session->send(message);
 				
-				if (_type == gloox::Message::Normal) {
+				if (IsNormal()) {
 					PostMessage(B_QUIT_REQUESTED);
 				} else {
 					// client part
@@ -864,14 +829,9 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 			string message = BlabberSettings::Instance()->Data("message-9");
 
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-9")) {
-				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, message.c_str());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, message.c_str(), _thread);
-				}
+				_session->send(message);
 				
-				if (_type == gloox::Message::Normal) {
+				if (IsNormal()) {
 					PostMessage(B_QUIT_REQUESTED);
 				} else {
 					// client part
@@ -893,15 +853,10 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 			}
 
 			if (!CommandMessage::IsCommand(message) || CommandMessage::IsLegalCommand(message)) {
-				// network part
-				if (_type == gloox::Message::Groupchat) {
-					JabberSpeak::Instance()->SendMessage(_type, _group_room, _message->Text());
-				} else {
-					JabberSpeak::Instance()->SendMessage(_type, _user, _message->Text(), _thread);
-				}
+				_session->send(_message->Text());
 			}
-						
-			if (_type == gloox::Message::Normal) {
+
+			if (IsNormal()) {
 				PostMessage(B_QUIT_REQUESTED);
 				break;
 			}
@@ -1051,11 +1006,11 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 }
 
 bool TalkWindow::QuitRequested() {
-	if (_type == gloox::Message::Groupchat) {
+	if (IsGroupChat()) {
 		JabberSpeak::Instance()->SendGroupUnvitation(_group_room, _group_username);	
 	}
 
-	TalkManager::Instance()->RemoveWindow(_thread);
+	TalkManager::Instance()->RemoveWindow(_session->threadID());
 	
 	return true;
 }
@@ -1074,7 +1029,7 @@ string TalkWindow::OurRepresentation() {
 
 void TalkWindow::AddToTalk(string username, string message, user_type type) {
 	// transform local identity
-	if (_type == gloox::Message::Groupchat && type == LOCAL) {
+	if (IsGroupChat() && type == LOCAL) {
 		username = _group_username;
 	}
 
@@ -1093,7 +1048,7 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 	}
 
 	// no duplicates
-	if (_type == gloox::Message::Groupchat && type == MAIN_RECIPIENT && username == _group_username) {
+	if (IsGroupChat() && type == MAIN_RECIPIENT && username == _group_username) {
 		return;
 	}
 	
@@ -1147,14 +1102,14 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 	if (comm_type == CommandMessage::NORMAL) {
 		if (type == MAIN_RECIPIENT) {
 			if (_chat->TextLength() > 0) {
-				if (_type != gloox::Message::Groupchat || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
+				if (!IsGroupChat() || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
 					SoundSystem::Instance()->PlayMessageSound();
 					NotifyWindowTitle();
 				}
 			}
 			
 			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_blue);
-		} else if (type == LOCAL || (_type == gloox::Message::Groupchat && GetGroupUsername() == username)) {
+		} else if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
 			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_red);
 		} else {
 			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_black);
@@ -1163,7 +1118,7 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 		// log?
 		Log(message.c_str());
 	} else if (comm_type == CommandMessage::BAD_SYNTAX) {
-		if (type == LOCAL || (_type == gloox::Message::Groupchat && GetGroupUsername() == username)) {
+		if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
 			// this command was illegal and now it belongs to the system
 			type = OTHER;
 
@@ -1174,7 +1129,7 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 			Log(message.c_str());
 		}
 	} else if (is_command && comm_type == CommandMessage::NOT_A_COMMAND) {
-		if (type == LOCAL || (_type == gloox::Message::Groupchat && GetGroupUsername() == username)) {
+		if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
 			message = "You specified an illegal command.\n";
 
 			// this command was illegal and now it belongs to the system
@@ -1189,7 +1144,7 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 	} else {
 		if (type == MAIN_RECIPIENT) {
 			if (comm_type != CommandMessage::NORMAL_ALERT && SoundSystem::Instance()->AlertSound() != "<none>" && _chat->TextLength() > 0) {
-				if (_type != gloox::Message::Groupchat || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
+				if (!IsGroupChat() || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
 					SoundSystem::Instance()->PlayMessageSound();
 					NotifyWindowTitle();
 				}
@@ -1225,7 +1180,7 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 
 			// log?
 			Log("\n");
-		} else if (type == LOCAL || (_type == gloox::Message::Groupchat && GetGroupUsername() == username)) {
+		} else if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
 			if (BlabberSettings::Instance()->Tag("show-timestamp")) {
 				_chat->Insert(_chat->TextLength(), time_stamp.c_str(), time_stamp.size(), &tra_thin_black);
 
@@ -1293,14 +1248,14 @@ void TalkWindow::Log(const char *buffer) {
 }
 	
 void TalkWindow::NewMessage(string new_message) {
-	if (_type == gloox::Message::Groupchat) {
+	if (IsGroupChat()) {
 		return; // GCHAT
 	} else {
-		UserID* uid = JRoster::Instance()->FindUser(_user);
+		const UserID* uid = GetUserID();
 		if (uid && !uid->FriendlyName().empty()) {
 			AddToTalk(uid->FriendlyName().c_str(), new_message, MAIN_RECIPIENT);
 		} else {
-			AddToTalk(_user.bare().c_str(), new_message, MAIN_RECIPIENT);
+			AddToTalk(_session->target().bare().c_str(), new_message, MAIN_RECIPIENT);
 		}
 	}
 }
@@ -1309,12 +1264,8 @@ void TalkWindow::NewMessage(string username, string new_message) {
 	AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT);
 }
 	 
-void TalkWindow::SetThreadID(string id) {
-	_thread = id;
-}
-
 const UserID *TalkWindow::GetUserID() {
-	return JRoster::Instance()->FindUser(_user);
+	return JRoster::Instance()->FindUser(_session->target());
 }
 
 string TalkWindow::GetGroupRoom() {
@@ -1702,3 +1653,23 @@ TalkWindow::NotifyWindowTitle()
 	}
 }
 
+
+bool
+TalkWindow::IsGroupChat()
+{
+	return !_group_room.empty();
+}
+
+
+bool
+TalkWindow::IsNormal()
+{
+	return false;
+}
+
+
+bool
+TalkWindow::IsChat()
+{
+	return !IsGroupChat();
+}

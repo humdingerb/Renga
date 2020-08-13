@@ -174,7 +174,7 @@ BookmarkManager::handleBookmarks(const gloox::BookmarkList& bList,
 	for (auto i: cList) {
 		if (i.autojoin) {
 			TalkManager::Instance()->CreateTalkSession(gloox::Message::Groupchat, NULL,
-				i.jid.c_str(), i.nick.c_str());
+				i.jid.c_str(), i.nick.c_str(), NULL);
 		}
 		bookmarks->AddString("name", i.name.c_str());
 		bookmarks->AddString("jid", i.jid.c_str());

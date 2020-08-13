@@ -37,11 +37,10 @@ public:
 						// TODO split out into CreateTalkSession / CreateGroupSession
 	TalkWindow          *CreateTalkSession(const gloox::Message::MessageType type,
 							const gloox::JID* user,
-				std::string group_room, std::string group_username, 
-				std::string thread = GenericFunctions::GenerateUniqueID(), bool sound_on_new = false);
+							std::string group_room, std::string group_username, 
+							gloox::MessageSession* session, bool sound_on_new = false);
 
-	std::string          IsExistingWindowToUser(gloox::Message::MessageType type,
-							std::string username);
+	std::string          IsExistingWindowToUser(std::string username);
 	std::string          IsExistingWindowToGroup(std::string group_room);
 	void                 UpdateWindowTitles(const gloox::JID& user, BString newTitle);
 	void                 RemoveWindow(std::string thread_id);

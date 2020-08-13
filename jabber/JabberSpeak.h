@@ -50,7 +50,6 @@ public:
 	// OUTGOING COMMUNICATION
 	char                   **CreateAttributeMemory(int num_items);
 	void                     DestroyAttributeMemory(char **atts, int num_items);
-	static string            GenerateUniqueID();
 	void                     SendConnect(string username = "", string password = "", string realname = "", bool suppress_auto_connect = false);
 	void                     SendDisconnect();
 	void                     SendSubscriptionRequest(string username); 

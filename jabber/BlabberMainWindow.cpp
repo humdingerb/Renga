@@ -341,7 +341,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 				// open chat window
 				TalkManager::Instance()->CreateTalkSession(gloox::Message::Chat,
-					&user->JID(), "", "");
+					&user->JID(), "", "", NULL);
 			}
 
 			// if there's a current selection, begin chat with that group
@@ -354,7 +354,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 				// open chat window
 				TalkManager::Instance()->CreateTalkSession(gloox::Message::Groupchat,
-					NULL, group.full(), info->nick);
+					NULL, group.full(), info->nick, NULL);
 
 				// Enable autojoin if needed
 				BookmarkManager::Instance().SetBookmark(group.full().c_str(),
@@ -412,7 +412,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			const UserID *user = item->GetUserID();
 
 			// open message window
-			TalkManager::Instance()->CreateTalkSession(gloox::Message::Normal, &user->JID(), "", "");
+			TalkManager::Instance()->CreateTalkSession(gloox::Message::Normal, &user->JID(), "", "", NULL);
 			
 			break;
 		}
