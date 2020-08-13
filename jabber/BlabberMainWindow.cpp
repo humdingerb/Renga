@@ -942,26 +942,23 @@ bool BlabberMainWindow::ValidateLogin() {
 		BString buffer;
 		buffer.SetToFormat("The Jabber ID you specified must not be yours because it's invalid for the following reason:\n\n%s\n\nIf you can't remember it, it's OK to create a new one by checking the \"Create a new Jabber Account!\" box.", validate.c_str());
 
-		ModalAlertFactory::Alert(buffer, "OK", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
+		ModalAlertFactory::Alert(buffer, "OK", NULL, NULL,
+			B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_username->MakeFocus(true);
 
 		return false;
-	}	
+	}
 
 	gloox::JID username(_login_username->Text());
 
-	// append default resource if missing
-	if (username.resource().empty()) {
-		username.setResource("haiku");
-		_login_username->SetText(username.full().c_str());
-	}
-	
-	// 	existance of password
+	// check existance of password
 	if (!strcmp(_login_password->Text(), "")) {
 		char buffer[1024];
-		sprintf(buffer, "You must specify a password so I can make sure it's you, %s.", username.username().c_str());
+		sprintf(buffer, "You must specify a password so I can make sure it's you, %s.",
+			username.username().c_str());
 
-		ModalAlertFactory::Alert(buffer, "Sorry!", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
+		ModalAlertFactory::Alert(buffer, "Sorry!", NULL, NULL,
+			B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_password->MakeFocus(true);
 
 		return false;
