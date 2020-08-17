@@ -702,10 +702,10 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_status_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	// menubar
-	_menubar = new BMenuBar("menubar");
+	BMenuBar* menubar = new BMenuBar("menubar");
 
 	// FILE MENU
-	_file_menu = new BMenu("File");
+	BMenu* file_menu = new BMenu("File");
 
 		_connect_item    = new BMenuItem("Log On", new BMessage(JAB_CONNECT));
 		_connect_item->SetShortcut('N', 0);
@@ -718,16 +718,16 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_quit_item = new BMenuItem("Quit", new BMessage(JAB_QUIT));
 		_quit_item->SetShortcut('Q', 0);
 
-//	_file_menu->AddItem(_connect_item);
-	_file_menu->AddItem(_disconnect_item);
-	_file_menu->AddSeparatorItem();
-	_file_menu->AddItem(_about_item);
-	_file_menu->AddSeparatorItem();
-	_file_menu->AddItem(_quit_item);
-	_file_menu->SetTargetForItems(MessageRepeater::Instance());
+//	file_menu->AddItem(_connect_item);
+	file_menu->AddItem(_disconnect_item);
+	file_menu->AddSeparatorItem();
+	file_menu->AddItem(_about_item);
+	file_menu->AddSeparatorItem();
+	file_menu->AddItem(_quit_item);
+	file_menu->SetTargetForItems(MessageRepeater::Instance());
 
 	// EDIT MENU
-	_edit_menu = new BMenu("Edit");
+	BMenu* edit_menu = new BMenu("Edit");
 
 		_add_buddy_item = new BMenuItem("Add New Buddy", new BMessage(JAB_OPEN_ADD_BUDDY_WINDOW));
 		_add_buddy_item->SetShortcut('N', 0);
@@ -746,19 +746,19 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		
 		_preferences_item = new BMenuItem("Preferences...", new BMessage(JAB_PREFERENCES));
 
-	_edit_menu->AddItem(_add_buddy_item);
-	_edit_menu->AddItem(_change_buddy_item);
-	_edit_menu->AddItem(_remove_buddy_item);
-	_edit_menu->AddSeparatorItem();
-	_edit_menu->AddItem(_user_info_item);
-	_edit_menu->AddSeparatorItem();
-	_edit_menu->AddItem(_user_chatlog_item);
-	_edit_menu->AddSeparatorItem();
-	_edit_menu->AddItem(_preferences_item);
-	_edit_menu->SetTargetForItems(this);
+	edit_menu->AddItem(_add_buddy_item);
+	edit_menu->AddItem(_change_buddy_item);
+	edit_menu->AddItem(_remove_buddy_item);
+	edit_menu->AddSeparatorItem();
+	edit_menu->AddItem(_user_info_item);
+	edit_menu->AddSeparatorItem();
+	edit_menu->AddItem(_user_chatlog_item);
+	edit_menu->AddSeparatorItem();
+	edit_menu->AddItem(_preferences_item);
+	edit_menu->SetTargetForItems(this);
 
 	// STATUS MENU
-	_status_menu = new BMenu("Status");
+	BMenu* status_menu = new BMenu("Status");
 	
 		_chat_item = new BMenuItem("I'm available for chat.", new BMessage(BLAB_AVAILABLE_FOR_CHAT));
 		_away_item = new BMenuItem("I will be away temporarily.", new BMessage(BLAB_AWAY_TEMPORARILY));
@@ -771,27 +771,27 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_sleep_item = new BMenuItem("Sleeping", new BMessage(BLAB_SLEEP));
 		_custom_item = new BMenuItem("Custom...", new BMessage(BLAB_CUSTOM_STATUS));
 
-	_status_menu->AddItem(_chat_item);
-	_status_menu->AddSeparatorItem();
-	_status_menu->AddItem(_away_item);
-	_status_menu->AddItem(_dnd_item);
-	_status_menu->AddItem(_xa_item);
-	_status_menu->AddSeparatorItem();
+	status_menu->AddItem(_chat_item);
+	status_menu->AddSeparatorItem();
+	status_menu->AddItem(_away_item);
+	status_menu->AddItem(_dnd_item);
+	status_menu->AddItem(_xa_item);
+	status_menu->AddSeparatorItem();
 
-	_status_menu->AddItem(_school_item);
-	_status_menu->AddItem(_work_item);
-	_status_menu->AddItem(_lunch_item);
-	_status_menu->AddItem(_dinner_item);
-	_status_menu->AddItem(_sleep_item);
-	
-	_status_menu->AddSeparatorItem();
-	_status_menu->AddItem(_custom_item);
+	status_menu->AddItem(_school_item);
+	status_menu->AddItem(_work_item);
+	status_menu->AddItem(_lunch_item);
+	status_menu->AddItem(_dinner_item);
+	status_menu->AddItem(_sleep_item);
 
-	_status_menu->SetRadioMode(true);
+	status_menu->AddSeparatorItem();
+	status_menu->AddItem(_custom_item);
+
+	status_menu->SetRadioMode(true);
 	_chat_item->SetMarked(true);
 	
 	// TALK MENU
-	_talk_menu = new BMenu("Talk");
+	BMenu* talk_menu = new BMenu("Talk");
 
 		_rotate_chat_forward_item = new BMenuItem("Rotate Chat Forward", new BMessage(JAB_ROTATE_CHAT_FORWARD));
 		_rotate_chat_forward_item->SetShortcut('.', 0);
@@ -808,32 +808,31 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_send_groupchat_item = new BMenuItem("Start Group Chat...", new BMessage(JAB_OPEN_NEW_GROUP_CHAT));
 		_send_groupchat_item->SetShortcut('G', 0);
 
-	_talk_menu->AddItem(_rotate_chat_forward_item);
-	_talk_menu->AddItem(_rotate_chat_backward_item);
-	_talk_menu->AddSeparatorItem();
-	_talk_menu->AddItem(_send_message_item);
-	_talk_menu->AddItem(_send_chat_item);
-	_talk_menu->AddItem(_send_groupchat_item);
-	_talk_menu->SetTargetForItems(this);
+	talk_menu->AddItem(_rotate_chat_forward_item);
+	talk_menu->AddItem(_rotate_chat_backward_item);
+	talk_menu->AddSeparatorItem();
+	talk_menu->AddItem(_send_message_item);
+	talk_menu->AddItem(_send_chat_item);
+	talk_menu->AddItem(_send_groupchat_item);
+	talk_menu->SetTargetForItems(this);
 
-	_menubar->AddItem(_file_menu);
-	_menubar->AddItem(_edit_menu);
-	_menubar->AddItem(_status_menu);
-	_menubar->AddItem(_talk_menu);
-	//_menubar->AddItem(_help_menu);	
+	menubar->AddItem(file_menu);
+	menubar->AddItem(edit_menu);
+	menubar->AddItem(status_menu);
+	menubar->AddItem(talk_menu);
 
 	// tabbed view
 	// roster view
 	_roster          = new RosterView();
-	_roster_scroller = new BScrollView(NULL, _roster, 0, false, true,
+	BScrollView* roster_scroller = new BScrollView(NULL, _roster, 0, false, true,
 		B_NO_BORDER);
-	_roster->TargetedByScrollView(_roster_scroller);
+	_roster->TargetedByScrollView(roster_scroller);
 
 	// chat service
 	BLayoutBuilder::Group<>(_full_view, B_VERTICAL, 0)
 		.SetInsets(0, 0, 0, 0)
-		.Add(_menubar)
-		.Add(_roster_scroller)
+		.Add(menubar)
+		.Add(roster_scroller)
 		.Add(_status_view)
 	.End();
 	

@@ -56,14 +56,6 @@ private:
 	
 	BButton                  *_login_login;
 
-	BMenuBar                 *_menubar;
-	BMenu                    *_file_menu;
-	BMenu                    *_edit_menu;
-	BMenu                    *_status_menu;
-	BMenu                    *_talk_menu;
-
-	BMenu                    *_common_status_menu;
-	BMenu                    *_help_menu;
 	BMenuItem                *_connect_item;
 	BMenuItem                *_disconnect_item;
 	BMenuItem                *_about_item;
@@ -110,7 +102,6 @@ private:
 	BMenuField               *_online_status;
 
 	RosterView               *_roster;
-	BScrollView              *_roster_scroller;
 };
 
 #endif
