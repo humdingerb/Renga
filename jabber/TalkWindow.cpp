@@ -38,9 +38,6 @@
 #define NOTIFICATION_CHAR "√"
 
 
-float TalkWindow::x_placement_offset = -100;
-float TalkWindow::y_placement_offset = -100;
-
 TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 		string group_room, string group_username,
 		gloox::MessageSession* session, bool follow_focus_rules)
@@ -110,7 +107,7 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 		_close_item = new BMenuItem("Close", new BMessage(JAB_CLOSE_CHAT));
 		_close_item->SetShortcut('W', 0);
 
-	if (IsChat()) {
+	if (!IsGroupChat()) {
 		if(0 != _record_item) {
 		  _file_menu->AddItem(_record_item);
 		}
@@ -426,12 +423,6 @@ void TalkWindow::FrameResized(float width, float height) {
 
 	_chat->Invalidate();
 	_chat_scroller->Invalidate();
-	
-	// remember sizes of message windows
-	if (IsNormal()) {
-		BlabberSettings::Instance()->SetFloatData("message-window-width", width);
-		BlabberSettings::Instance()->SetFloatData("message-window-height", height);
-	}
 }
 
 void TalkWindow::MenusBeginning() {
@@ -588,7 +579,7 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 			BlabberMainWindow::Instance()->PostMessage(msgForward);
 			break;
 		}
-							   
+
 		case B_SAVE_REQUESTED: {
 			// collect data
 			char abs_path[B_PATH_NAME_LENGTH];
@@ -597,7 +588,7 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 			string filename;
 
 			msg->FindRef("directory", &dir);
-			filename = msg->FindString("name");			
+			filename = msg->FindString("name");
 
 			// construct path (sigh)
 			BDirectory dir_object(&dir);
@@ -611,7 +602,7 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 
 			// log existing data
 			Log(_chat->Text());
-						
+
 			break;
 		}
 
@@ -670,12 +661,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				// network part
 				_session->send(message);
 				
-				if (IsNormal()) {
-					PostMessage(B_QUIT_REQUESTED);
-				} else {
-					// client part
-					AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
-				}
+				// client part
+				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -690,12 +677,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				// network part
 				_session->send(message);
 				
-				if (IsNormal()) {
-					PostMessage(B_QUIT_REQUESTED);
-				} else {
-					// client part
-					AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
-				}
+				// client part
+				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -710,12 +693,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				// network part
 				_session->send(message);
 				
-				if (IsNormal()) {
-					PostMessage(B_QUIT_REQUESTED);
-				} else {
-					// client part
-					AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
-				}
+				// client part
+				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -730,12 +709,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				// network part
 				_session->send(message);
 				
-				if (IsNormal()) {
-					PostMessage(B_QUIT_REQUESTED);
-				} else {
-					// client part
-					AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
-				}
+				// client part
+				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -750,12 +725,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				// network part
 				_session->send(message);
 				
-				if (IsNormal()) {
-					PostMessage(B_QUIT_REQUESTED);
-				} else {
-					// client part
-					AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
-				}
+				// client part
+				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -770,12 +741,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				// network part
 				_session->send(message);
 				
-				if (IsNormal()) {
-					PostMessage(B_QUIT_REQUESTED);
-				} else {
-					// client part
-					AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
-				}
+				// client part
+				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -790,12 +757,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				// network part
 				_session->send(message);
 				
-				if (IsNormal()) {
-					PostMessage(B_QUIT_REQUESTED);
-				} else {
-					// client part
-					AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
-				}
+				// client part
+				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -810,12 +773,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				// network part
 				_session->send(message);
 				
-				if (IsNormal()) {
-					PostMessage(B_QUIT_REQUESTED);
-				} else {
-					// client part
-					AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
-				}
+				// client part
+				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -829,12 +788,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-9")) {
 				_session->send(message);
 				
-				if (IsNormal()) {
-					PostMessage(B_QUIT_REQUESTED);
-				} else {
-					// client part
-					AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
-				}
+				// client part
+				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -854,11 +809,6 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 				_session->send(_message->Text());
 			}
 
-			if (IsNormal()) {
-				PostMessage(B_QUIT_REQUESTED);
-				break;
-			}
-			
 			// user part
 			AddToTalk(OurRepresentation().c_str(), message, LOCAL);
 
@@ -1639,18 +1589,4 @@ bool
 TalkWindow::IsGroupChat()
 {
 	return !_group_room.empty();
-}
-
-
-bool
-TalkWindow::IsNormal()
-{
-	return false;
-}
-
-
-bool
-TalkWindow::IsChat()
-{
-	return !IsGroupChat();
 }

@@ -36,10 +36,6 @@ class TalkWindow : public BWindow {
 public:
 	enum                 user_type {MAIN_RECIPIENT, LOCAL, OTHER};
 
-public:
-	static float         x_placement_offset;
-	static float         y_placement_offset;
-	
 public:  
 						TalkWindow(gloox::Message::MessageType type,
 							const gloox::JID *user, std::string group_room,
@@ -83,7 +79,6 @@ private:
 
 	// Message types testing
 	bool				IsGroupChat();
-	bool				IsNormal();
 	bool				IsChat();
 
 private:
