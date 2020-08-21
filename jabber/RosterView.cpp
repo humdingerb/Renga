@@ -48,7 +48,7 @@ void RosterView::AttachedToWindow() {
 	BOutlineListView::AttachedToWindow();
 
 	// on double-click
-	SetInvocationMessage(new BMessage(JAB_OPEN_CHAT_WITH_DOUBLE_CLICK));
+	SetSelectionMessage(new BMessage(JAB_OPEN_CHAT_WITH_DOUBLE_CLICK));
 
 	// popup menu
 	_popup = new BPopUpMenu(NULL, false, false);
@@ -79,9 +79,6 @@ void RosterView::AttachedToWindow() {
 	_popup->AddItem(_user_chatlog_item);
 	_popup->AddSeparatorItem();
 	_popup->AddItem(_presence);
-
-	// initialize menu
-	UpdatePopUpMenu();
 
 	// create top level lists
 	AddItem(_online  = new RosterSuperitem("Online"));
@@ -187,9 +184,6 @@ void RosterView::RemoveSelected() {
 }
 
 void RosterView::SelectionChanged() {
-	// customize popup menu
-	UpdatePopUpMenu();
-	
 	BOutlineListView::SelectionChanged();
 }
 
@@ -298,7 +292,7 @@ int32 RosterView::FindUser(const gloox::JID& compare_user) {
 		}
 				
 		// compare against RosterView
-		if (item->GetUserID()->JID() == compare_user) {
+		if (item->GetUserID()->JID().bare() == compare_user.bare()) {
 			return i;
 		}
 	}
@@ -397,7 +391,7 @@ void RosterView::UpdatePopUpMenu() {
 		_user_chatlog_item->SetEnabled(false);
 
 		_presence->SetEnabled(false);
-	} else {		
+	} else {
 		// if not
 		_chat_item->SetEnabled(false);
 		_message_item->SetEnabled(false);

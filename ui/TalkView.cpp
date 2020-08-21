@@ -808,6 +808,9 @@ void TalkView::NewMessage(string username, string new_message) {
 }
 	 
 const gloox::JID& TalkView::GetUserID() {
+	if (_session == NULL)
+		debugger("Getting user ID not possible for group chat");
+
 	return _session->target();
 }
 

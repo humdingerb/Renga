@@ -594,7 +594,18 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 			if (++currentIndex >= itemCount)
 				currentIndex = 0;
-			fTalkCards->SetVisibleItem(currentIndex);
+
+			if (currentIndex < itemCount) {
+				fTalkCards->SetVisibleItem(currentIndex);
+				TalkView* v = (TalkView*)fTalkCards->ItemAt(currentIndex)->View();
+				if (v->IsGroupChat()) {
+					int item = _roster->FindBookmark(gloox::JID(v->GetGroupRoom()));
+					_roster->Select(item);
+				} else {
+					int item = _roster->FindUser(v->GetUserID());
+					_roster->Select(item);
+				}
+			}
 			break;
 		}
 
@@ -605,7 +616,18 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 			if (--currentIndex < 0)
 				currentIndex = itemCount - 1;
-			fTalkCards->SetVisibleItem(currentIndex);
+
+			if (currentIndex > 0) {
+				fTalkCards->SetVisibleItem(currentIndex);
+				TalkView* v = (TalkView*)fTalkCards->ItemAt(currentIndex)->View();
+				if (v->IsGroupChat()) {
+					int item = _roster->FindBookmark(gloox::JID(v->GetGroupRoom()));
+					_roster->Select(item);
+				} else {
+					int item = _roster->FindUser(v->GetUserID());
+					_roster->Select(item);
+				}
+			}
 			break;
 		}
 
