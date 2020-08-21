@@ -1051,6 +1051,20 @@ void TalkView::GenerateHyperlinkText(string message, text_run standard, text_run
 	}
 }
 
+
+static int compareStrings(const char* a, const char* b)
+{
+	// FIXME use ICU locale aware comparison instead
+	int icompare = strcasecmp(a, b);
+	if (icompare != 0)
+		return icompare;
+
+	// In case the names are case-insensitive-equal, still sort them in a
+	// predictible way
+	return strcmp(a, b);
+}
+
+
 void TalkView::AddGroupChatter(string user) {
 	int i;
 
@@ -1066,51 +1080,27 @@ void TalkView::AddGroupChatter(string user) {
 	}
 
 	// add it to the list
+	// FIXME we should binary search for the correct position
 	for (i=0; i < _people->CountItems(); ++i) {
 		PeopleListItem *iterating_item = dynamic_cast<PeopleListItem *>(_people->ItemAt(i));
 
-		if (strcasecmp(iterating_item->User().c_str(), user.c_str()) > 0) {
-			// add the new user
-			_people->AddItem(people_item, i);
-			break;
-		} else if (!strcasecmp(iterating_item->User().c_str(), user.c_str()) && strcmp(iterating_item->User().c_str(), user.c_str()) > 0) {
-			// add the new user
-			_people->AddItem(people_item, i);
-			break;
-		} else if (!strcasecmp(iterating_item->User().c_str(), user.c_str()) && !strcmp(iterating_item->User().c_str(), user.c_str())) {
+		int compare = compareStrings(iterating_item->User().c_str(), user.c_str());
+
+		if (compare == 0) {
+			// Update existing user
 			_people->InvalidateItem(i);
-			break;
-		} else if (!strcasecmp(iterating_item->User().c_str(), user.c_str()) && strcmp(iterating_item->User().c_str(), user.c_str()) < 0) {
-			if (i == (_people->CountItems() - 1)) {
-				// add the new user
-				_people->AddItem(people_item);
-			} else {
-				PeopleListItem *next_item = dynamic_cast<PeopleListItem *>(_people->ItemAt(i + 1));
-				
-				if (!next_item) {
-					// add the new user
-					_people->AddItem(people_item);
-
-					break;					
-				}
-
-				if (strcasecmp(user.c_str(), next_item->User().c_str()) < 0) {
-					// add the new user
-					_people->AddItem(people_item, i + 1);
-				} else if (!strcasecmp(user.c_str(), next_item->User().c_str())) {
-					continue;
-				}
-			}
-
-			break;
-		} else if ((strcasecmp(iterating_item->User().c_str(), user.c_str()) < 0) && (i == (_people->CountItems() - 1))) {
-			// add the new user
+		} else if (compare > 0) {
+			// add the new user in the middle
+			_people->AddItem(people_item, i);
+		} else if (i == (_people->CountItems() - 1)) {
+			// add the new user at the end
 			_people->AddItem(people_item);
-
-			break;
-		} else if (strcasecmp(iterating_item->User().c_str(), user.c_str()) < 0) {
+		} else {
+			// continue searching for the correct place
 			continue;
 		}
+
+		break;
 	}
 }
 
