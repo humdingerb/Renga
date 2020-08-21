@@ -8,12 +8,13 @@
 
 #include "BlabberApp.h"
 
-#include "../ui/AboutWindow.h"
-#include "BlabberMainWindow.h"
 #include "BlabberSettings.h"
 #include "JabberSpeak.h"
 #include "MessageRepeater.h"
-#include "../ui/ModalAlertFactory.h"
+
+#include "ui/AboutWindow.h"
+#include "ui/MainWindow.h"
+#include "ui/ModalAlertFactory.h"
 
 const char* kAppMIMEType = "application/x-vnd.Haiku-Jabber";
 

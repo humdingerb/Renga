@@ -12,7 +12,8 @@
 #include <gloox/bookmarkstorage.h>
 #include <gloox/client.h>
 
-#include "../jabber/JabberSpeak.h"
+#include "jabber/JabberSpeak.h"
+
 #include "bookmark2storage.h"
 
 #include <Handler.h>

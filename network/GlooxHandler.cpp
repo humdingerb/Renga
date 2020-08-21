@@ -10,7 +10,8 @@
 #include "BobStore.h"
 #include "Extensions.h"
 #include "media.h"
-#include "../support/LogHandler.h"
+
+#include "support/LogHandler.h"
 
 #include <GridView.h>
 #include <LayoutBuilder.h>

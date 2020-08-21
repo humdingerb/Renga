@@ -26,12 +26,13 @@
 #include <interface/Window.h>
 #include <storage/FilePanel.h>
 
-#include "../jabber/BetterTextView.h"
-#include "../jabber/ChatTextView.h"
-#include "../jabber/ChatWidget.h"
-#include "../jabber/EditingFilter.h"
-#include "../jabber/StatusView.h"
-#include "../jabber/UserID.h"
+#include "jabber/BetterTextView.h"
+#include "jabber/ChatTextView.h"
+#include "jabber/ChatWidget.h"
+#include "jabber/StatusView.h"
+#include "jabber/UserID.h"
+
+#include "ui/EditingFilter.h"
 
 class TalkView : public BGroupView {
 public:

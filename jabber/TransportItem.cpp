@@ -2,25 +2,14 @@
 // Blabber [TransportItem.cpp]
 //////////////////////////////////////////////////
 
-#ifndef TRANSPORT_ITEM_H
-	#include "TransportItem.h"
-#endif
+#include "TransportItem.h"
 
-#ifndef AGENT_H
-	#include "Agent.h"
-#endif
+#include "Agent.h"
+#include "AgentList.h"
 
-#ifndef AGENT_LIST_H
-	#include "AgentList.h"
-#endif
+#include "support/AppLocation.h"
 
-#ifndef APP_LOCATION_H
-	#include "../support/AppLocation.h"
-#endif
-
-#ifndef _TRANSLATION_UTILS_H
-	#include <TranslationUtils.h>
-#endif
+#include <TranslationUtils.h>
 
 BBitmap *TransportItem::_offline_icon = NULL;
 BBitmap *TransportItem::_online_icon  = NULL;

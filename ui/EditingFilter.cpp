@@ -5,9 +5,10 @@
 #include <interface/InterfaceDefs.h>
 #include <app/Message.h>
 
-#include "EditingFilter.h"
-#include "Messages.h"
-#include "../ui/TalkView.h"
+#include "jabber/Messages.h"
+
+#include "ui/EditingFilter.h"
+#include "ui/TalkView.h"
 
 EditingFilter::EditingFilter(BTextView *view, TalkView *window)
 	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN, NULL) {

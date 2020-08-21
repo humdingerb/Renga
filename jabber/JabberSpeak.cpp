@@ -15,13 +15,14 @@
 #include <unistd.h>
 #include <sys/utsname.h>
 
+#include "support/LogHandler.h"
+#include "ui/ModalAlertFactory.h"
+
 #include "BlabberApp.h"
 #include "AgentList.h"
 #include "GenericFunctions.h"
 #include "JabberSpeak.h"
 #include "JRoster.h"
-#include "../support/LogHandler.h"
-#include "../ui/ModalAlertFactory.h"
 #include "MessageRepeater.h"
 #include "Messages.h"
 #include "TalkManager.h"

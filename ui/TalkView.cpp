@@ -18,19 +18,22 @@
 #include <storage/Path.h>
 #include <SplitView.h>
 
-#include "../support/AppLocation.h"
-#include "../jabber/BlabberSettings.h"
-#include "../jabber/CommandMessage.h"
-#include "../jabber/GenericFunctions.h"
-#include "../jabber/JabberSpeak.h"
-#include "../jabber/MessageRepeater.h"
-#include "../jabber/Messages.h"
-#include "../jabber/PeopleListItem.h"
-#include "../jabber/PreferencesWindow.h"
-#include "../jabber/RotateChatFilter.h"
-#include "../jabber/SoundSystem.h"
-#include "../jabber/TalkListItem.h"
-#include "../jabber/TalkManager.h"
+#include "support/AppLocation.h"
+
+#include "jabber/BlabberSettings.h"
+#include "jabber/CommandMessage.h"
+#include "jabber/GenericFunctions.h"
+#include "jabber/JabberSpeak.h"
+#include "jabber/MessageRepeater.h"
+#include "jabber/Messages.h"
+#include "jabber/PreferencesWindow.h"
+#include "jabber/SoundSystem.h"
+#include "jabber/TalkListItem.h"
+#include "jabber/TalkManager.h"
+
+#include "ui/PeopleListItem.h"
+#include "ui/RotateChatFilter.h"
+
 #include "TalkView.h"
 
 #include "gloox/rostermanager.h"

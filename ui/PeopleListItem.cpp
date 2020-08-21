@@ -2,21 +2,12 @@
 // Jabber [PeopleListItem.cpp]
 //////////////////////////////////////////////////
 
-#ifndef PEOPLE_LIST_ITEM_H
-	#include "PeopleListItem.h"
-#endif
+#include "PeopleListItem.h"
 
-#ifndef _FONT_H
-	#include <interface/Font.h>
-#endif
+#include <interface/Font.h>
+#include <interface/View.h>
 
-#ifndef _VIEW_H
-	#include <interface/View.h>
-#endif
-
-#ifndef JABBER_SPEAK_H
-	#include "JabberSpeak.h"
-#endif
+#include "jabber/JabberSpeak.h"
 
 PeopleListItem::PeopleListItem(std::string user, gloox::MUCRoomAffiliation affiliation)
 	: BListItem() {

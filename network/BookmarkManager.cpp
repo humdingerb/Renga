@@ -6,7 +6,7 @@
 
 #include "BookmarkManager.h"
 
-#include "../jabber/TalkManager.h"
+#include "jabber/TalkManager.h"
 
 #include <Message.h>
 

@@ -10,13 +10,15 @@
 #include <Button.h>
 #include <StringView.h>
 
-#include "../support/AppLocation.h"
-#include "BlabberMainWindow.h"
+#include "support/AppLocation.h"
+
+#include "ui/PictureView.h"
+#include "ui/MainWindow.h"
+
 #include "BlabberSettings.h"
 #include "GenericFunctions.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
-#include "../ui/PictureView.h"
 
 CustomStatusWindow *CustomStatusWindow::_instance = NULL;
 

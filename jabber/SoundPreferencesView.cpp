@@ -8,12 +8,14 @@
 
 #include <storage/Path.h>
 
-#include "../support/AppLocation.h"
+#include "support/AppLocation.h"
+
+#include "ui/ModalAlertFactory.h"
+
 #include "BlabberSettings.h"
 #include "FileItem.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
-#include "../ui/ModalAlertFactory.h"
 #include "SoundSystem.h"
 
 SoundPreferencesView::SoundPreferencesView(BRect frame)

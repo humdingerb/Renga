@@ -12,10 +12,11 @@
 #include <interface/OutlineListView.h>
 #include <interface/PopUpMenu.h>
 
-#include "../ui/BookmarkItem.h"
+#include "ui/BookmarkItem.h"
+#include "ui/RosterSuperitem.h"
+
 #include "JRoster.h"
 #include "RosterItem.h"
-#include "../ui/RosterSuperitem.h"
 #include "TransportItem.h"
 #include "UserID.h"
 

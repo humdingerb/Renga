@@ -2,21 +2,13 @@
 // Blabber [EditingFilter.cpp]
 //////////////////////////////////////////////////
 
-#ifndef _INTERFACE_DEFS_H
-	#include <interface/InterfaceDefs.h>
-#endif
+#include <interface/InterfaceDefs.h>
 
-#ifndef _MESSAGE_H
-	#include <app/Message.h>
-#endif
+#include <app/Message.h>
 
-#ifndef ROTATE_CHAT_FILTER_H
-	#include "RotateChatFilter.h"
-#endif
+#include "ui/RotateChatFilter.h"
 
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
+#include "jabber/Messages.h"
 
 RotateChatFilter::RotateChatFilter()
 	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN, NULL) {

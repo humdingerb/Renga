@@ -6,10 +6,12 @@
 
 #include <interface/Button.h>
 
-#include "../support/AppLocation.h"
+#include "support/AppLocation.h"
+
+#include "ui/PictureView.h"
+
 #include "GenericFunctions.h"
 #include "Messages.h"
-#include "../ui/PictureView.h"
 
 BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	: BWindow(BRect(0, 0, 0, 0), "User Information Summary", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE) {

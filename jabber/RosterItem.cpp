@@ -2,17 +2,11 @@
 // Blabber [RosterItem.cpp]
 //////////////////////////////////////////////////
 
-#ifndef ROSTER_ITEM_H
-	#include "RosterItem.h"
-#endif
+#include "RosterItem.h"
 
-#ifndef APP_LOCATION_H
-	#include "../support/AppLocation.h"
-#endif
+#include "support/AppLocation.h"
 
-#ifndef _TRANSLATION_UTILS_H
-	#include <TranslationUtils.h>
-#endif
+#include <TranslationUtils.h>
 
 BBitmap *RosterItem::_kinda_online_icon = NULL;
 BBitmap *RosterItem::_offline_icon      = NULL;

@@ -4,7 +4,7 @@
 
 #include "AppLocation.h"
 
-#include "../jabber/BlabberApp.h"
+#include "jabber/BlabberApp.h"
 
 int main(__attribute__((unused)) int argc, char **argv) {
 	// record app location

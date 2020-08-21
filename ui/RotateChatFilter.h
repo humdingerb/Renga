@@ -6,8 +6,10 @@
 #define ROTATE_CHAT_FILTER_H
 
 #include <MessageFilter.h>
-#include "TalkManager.h"
-#include "../ui/TalkView.h"
+
+#include "jabber/TalkManager.h"
+
+#include "ui/TalkView.h"
 
 
 class RotateChatFilter : public BMessageFilter {

@@ -15,9 +15,10 @@
 #include <TextControl.h>
 #include <Window.h>
 
-#include "../ui/PictureView.h"
-#include "RosterView.h"
-#include "StatusView.h"
+#include "ui/PictureView.h"
+
+#include "jabber/RosterView.h"
+#include "jabber/StatusView.h"
 
 
 class TalkView;

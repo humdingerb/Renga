@@ -17,13 +17,10 @@ add_executable(Renga
 	 jabber/ChatTextView.cpp
 	 jabber/CustomStatusWindow.cpp
 	 jabber/LoginPreferencesView.cpp
-	 jabber/EditingFilter.cpp
 	 jabber/MessagesPreferencesView.cpp
-	 jabber/PeopleListItem.cpp
 	 jabber/PreferencesWindow.cpp
 	 jabber/RosterItem.cpp
 	 jabber/RosterView.cpp
-	 jabber/RotateChatFilter.cpp
 	 jabber/SendTalkWindow.cpp
 	 jabber/SoundPreferencesView.cpp
 	 jabber/TalkListItem.cpp
@@ -32,7 +29,6 @@ add_executable(Renga
 	 jabber/TransportPreferencesView.cpp
 	 jabber/BlabberApp.cpp
 	 jabber/AgentList.cpp
-	 jabber/BlabberMainWindow.cpp
 	 jabber/BlabberSettings.cpp
 	 jabber/BuddyWindow.cpp
 	 jabber/JabberSpeak.cpp
@@ -64,10 +60,14 @@ add_executable(Renga
 	ui/AboutWindow.cpp
 	ui/BookmarkItem.cpp
 	ui/ChangeNameWindow.cpp
+	ui/EditingFilter.cpp
+	ui/MainWindow.cpp
 	ui/ModalAlertFactory.cpp
+	ui/PeopleListItem.cpp
 	ui/PictureView.cpp
 	ui/RegisterAccountWindow.cpp
 	ui/RosterSuperitem.cpp
+	ui/RotateChatFilter.cpp
 	ui/TalkView.cpp
 )
 
@@ -102,6 +102,8 @@ add_custom_command(TARGET Renga POST_BUILD
 )
 
 install(TARGETS Renga RUNTIME DESTINATION apps/)
+
+include_directories(${CMAKE_SOURCE_DIR})
 
 # Testing support
 

@@ -9,15 +9,17 @@
 #include <Button.h>
 #include <StringView.h>
 
+#include "support/AppLocation.h"
+
+#include "ui/ModalAlertFactory.h"
+#include "ui/PictureView.h"
+
 #include "Agent.h"
 #include "AgentList.h"
-#include "../support/AppLocation.h"
 #include "BlabberSettings.h"
 #include "GenericFunctions.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
-#include "../ui/ModalAlertFactory.h"
-#include "../ui/PictureView.h"
 #include "TalkManager.h"
 #include "UserID.h"
 

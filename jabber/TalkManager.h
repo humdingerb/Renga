@@ -15,7 +15,8 @@
 #include <string>
 
 #include "GenericFunctions.h"
-#include "../ui/TalkView.h"
+
+#include "ui/TalkView.h"
 
 enum {
 	kWindowList = 'winl'

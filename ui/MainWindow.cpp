@@ -2,28 +2,30 @@
 // Blabber [BlabberMainWindow.cpp]
 //////////////////////////////////////////////////
 
-#include "BlabberMainWindow.h"
+#include "MainWindow.h"
 
 #include <gloox/jid.h>
 
-#include "../support/AppLocation.h"
-#include "BlabberSettings.h"
-#include "BuddyWindow.h"
-#include "BuddyInfoWindow.h"
-#include "../ui/ChangeNameWindow.h"
-#include "CustomStatusWindow.h"
-#include "GenericFunctions.h"
-#include "JabberSpeak.h"
-#include "Messages.h"
-#include "MessageRepeater.h"
-#include "../ui/ModalAlertFactory.h"
-#include "PreferencesWindow.h"
-#include "../ui/RegisterAccountWindow.h"
-#include "RosterItem.h"
-#include "RotateChatFilter.h"
-#include "SendTalkWindow.h"
-#include "TalkManager.h"
-#include "../ui/TalkView.h"
+#include "support/AppLocation.h"
+
+#include "ui/ChangeNameWindow.h"
+#include "ui/ModalAlertFactory.h"
+#include "ui/RegisterAccountWindow.h"
+#include "ui/RotateChatFilter.h"
+#include "ui/TalkView.h"
+
+#include "jabber/BlabberSettings.h"
+#include "jabber/BuddyWindow.h"
+#include "jabber/BuddyInfoWindow.h"
+#include "jabber/CustomStatusWindow.h"
+#include "jabber/GenericFunctions.h"
+#include "jabber/JabberSpeak.h"
+#include "jabber/Messages.h"
+#include "jabber/MessageRepeater.h"
+#include "jabber/PreferencesWindow.h"
+#include "jabber/RosterItem.h"
+#include "jabber/SendTalkWindow.h"
+#include "jabber/TalkManager.h"
 
 #include <Application.h>
 #include <CardLayout.h>

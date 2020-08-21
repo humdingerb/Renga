@@ -2,25 +2,15 @@
 // Blabber [SoundSystem.cpp]
 //////////////////////////////////////////////////
 
-#ifndef SOUND_SYSTEM_H
-	#include "SoundSystem.h"
-#endif
+#include "SoundSystem.h"
 
-#ifndef _ENTRY_H
-	#include <storage/Entry.h>
-#endif
+#include <storage/Entry.h>
 
-#ifndef _PATH_H
-	#include <storage/Path.h>
-#endif
+#include <storage/Path.h>
 
-#ifndef APP_LOCATION_H
-	#include "../support/AppLocation.h"
-#endif
+#include "support/AppLocation.h"
 
-#ifndef BLABBER_SETTINGS_H
-	#include "BlabberSettings.h"
-#endif
+#include "BlabberSettings.h"
 
 SoundSystem *SoundSystem::_instance = NULL;
 

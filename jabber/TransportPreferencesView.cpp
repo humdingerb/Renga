@@ -10,7 +10,8 @@
 #include "BlabberSettings.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
-#include "../ui/ModalAlertFactory.h"
+
+#include "ui/ModalAlertFactory.h"
 
 TransportPreferencesView::TransportPreferencesView(BRect frame)
 	: BView (frame, NULL, B_FOLLOW_ALL, B_WILL_DRAW) {

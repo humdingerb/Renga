@@ -6,15 +6,17 @@
 
 #include <Application.h>
 
+#include "support/AppLocation.h"
+
+#include "ui/ModalAlertFactory.h"
+#include "ui/PictureView.h"
+
 #include "Agent.h"
 #include "AgentList.h"
-#include "../support/AppLocation.h"
 #include "BlabberSettings.h"
 #include "GenericFunctions.h"
 #include "Messages.h"
-#include "../ui/ModalAlertFactory.h"
 #include "JRoster.h"
-#include "../ui/PictureView.h"
 
 #include <cstdio>
 #include <string.h>

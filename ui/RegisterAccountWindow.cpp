@@ -6,9 +6,12 @@
 
 #include "RegisterAccountWindow.h"
 
-#include "../jabber/BlabberMainWindow.h"
-#include "../jabber/BlabberSettings.h"
-#include "../network/BobStore.h"
+#include "jabber/BlabberSettings.h"
+
+#include "network/BobStore.h"
+
+#include "ui/MainWindow.h"
+
 #include "PictureView.h"
 
 #include <Button.h>

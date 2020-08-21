@@ -11,11 +11,12 @@
 
 #include <interface/Window.h>
 
+#include "ui/ModalAlertFactory.h"
+
 #include "BlabberSettings.h"
 #include "JabberSpeak.h"
 #include "MessageRepeater.h"
 #include "Messages.h"
-#include "../ui/ModalAlertFactory.h"
 #include "SoundSystem.h"
 #include "TalkManager.h"
 

@@ -6,13 +6,9 @@
 #ifndef CHAT_WIDGET_H
 #define CHAT_WIDGET_H
 
-#ifndef _LIST_VIEW_H
-	#include <interface/ListView.h>
-#endif
+#include <interface/ListView.h>
 
-#ifndef BLABBER_MAIN_WINDOW_H
-	#include "BlabberMainWindow.h"
-#endif
+#include "ui/MainWindow.h"
 
 class ChatWidget : public BListView {
 	public:
