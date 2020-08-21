@@ -44,8 +44,8 @@ TalkView *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
 
 	// is there a window already?
 	if (type != gloox::Message::Groupchat) {
-		if (IsExistingWindowToUser(user->bare()).size()) {
-			window = _talk_map.at(IsExistingWindowToUser(user->bare()));
+		if (session && fTalkMap.find(session) != fTalkMap.end()) {
+			window = fTalkMap.at(session);
 		} else {
 			if (session == NULL) {
 				gloox::JID fullJID = *user;
@@ -66,34 +66,31 @@ TalkView *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
 				SoundSystem::Instance()->PlayNewMessageSound();
 			}
 		
-			// add it to the known list BUGBUG we need to remove this when window closes
-			_talk_map[session->threadID()] = window;
+			// add it to the known list
+			fTalkMap[session] = window;
 			SendNotices(kWindowList);
+			session->registerMessageHandler(this);
 		}
 	} else {
-		if (IsExistingWindowToGroup(group_room).size()) {
-			window = _talk_map.at(IsExistingWindowToGroup(group_room));
-		} else {
-			if (session == NULL) {
-				session = new gloox::MessageSession(
-					JabberSpeak::Instance()->GlooxClient(), group_room);
-			}
+		if (IsExistingWindowToGroup(group_room))
+			window = fGroupMap.at((gloox::MUCRoom*)IsExistingWindowToGroup(group_room));
+		else {
 			// create a new window
-			window = new TalkView(user, group_room, group_username, session);
+			window = new TalkView(user, group_room, group_username, NULL);
 
-			// add it to the known list BUGBUG we need to remove this when window closes
-			_talk_map[session->threadID()] = window;
-
-			// FIXME we need to free this when leaving the room!
 			gloox::JID jid(group_room);
 			jid.setResource(group_username);
-			(new gloox::InstantMUCRoom(JabberSpeak::Instance()->GlooxClient(),
-				jid, this))->join();
+			gloox::MUCRoom* room = new gloox::InstantMUCRoom(
+					JabberSpeak::Instance()->GlooxClient(), jid, this);
+
+			// add it to the known list
+			fGroupMap[room] = window;
+
+			room->join();
 			SendNotices(kWindowList);
 		}
 	}
 
-	session->registerMessageHandler(this);
 	BlabberMainWindow::Instance()->AddTalkView(window);
 
 	// return a reference as well
@@ -103,7 +100,7 @@ TalkView *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
 
 void TalkManager::handleMessage(const gloox::Message& msg, gloox::MessageSession* session)
 {
-	// TODO First check if it's a carbon, in which case the session is incorrect :|
+	// First check if it's a carbon
 	if (msg.hasEmbeddedStanza()) {
 		// get the possible carbon extension
 		const gloox::Carbons *carbon = msg.findExtension<const gloox::Carbons>(
@@ -115,36 +112,23 @@ void TalkManager::handleMessage(const gloox::Message& msg, gloox::MessageSession
 				carbon->embeddedStanza());
 
 			try {
-				TalkView* window = _talk_map.at(IsExistingWindowToUser(message->from().full()));
+				TalkView* window = fTalkMap.at(session);
 				window->LockLooper();
 				window->AddToTalk(window->OurRepresentation().c_str(), message->body(), TalkView::LOCAL);
 				window->UnlockLooper();
 			} catch (const std::out_of_range&) {
+				// In case we get a carbon for a chat we have not joined?
 			}
 
 			return;
 		}
 	}
 
-	TalkView* window;
-	try {
-		window = _talk_map.at(IsExistingWindowToUser(session->target().full()));
-	} catch (const std::out_of_range&) {
-		return;
-	}
+	TalkView* window = fTalkMap.at(session);
 
-	// submit the chat
+	// submit the chat FIXME use a BMessage and let the view handle it asynchronously
 	window->LockLooper();
-
-	if (msg.subtype() == gloox::Message::Groupchat) {
-		if (msg.from().full().empty()) {
-			window->AddToTalk("System:", msg.body(), TalkView::OTHER);
-		} else {
-			window->NewMessage(msg.from().resource(), msg.body());
-		}
-	} else {
-		window->NewMessage(msg.body());
-	}
+	window->NewMessage(msg.body());
 	window->UnlockLooper();
 }
 
@@ -159,61 +143,49 @@ TalkManager::handleMessageSession(gloox::MessageSession* session)
 		return;
 	}
 
-	printf("create window for %s\n", session->threadID().c_str());
-	
 	// create the window
 	CreateTalkSession((gloox::Message::MessageType)session->types(),
 		&session->target(), "", "", session, true);
 }
 
 
-string
-TalkManager::IsExistingWindowToUser(string username)
-{
-	// check handles (with resource)
-	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		const gloox::JID& id = i->second->GetUserID();
-		if (id == gloox::JID(username)) {
-			return (*i).first;
-		}
-	}
-
-	// check handles (without resource)
-	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
-		const gloox::JID& id = i->second->GetUserID();
-		if (id.bare() == gloox::JID(username).bare()) {
-			return (*i).first;
-		}
-	}
-
-	// no matches
-	return "";
-}
-
-string TalkManager::IsExistingWindowToGroup(string group_room) {
+void* TalkManager::IsExistingWindowToGroup(string group_room) {
 	// check names
-	for (TalkIter i = _talk_map.begin(); i != _talk_map.end(); ++i) {
+	for (auto i = fGroupMap.begin(); i != fGroupMap.end(); ++i) {
 		if ((*i).second->GetGroupRoom() == group_room) {
 			return (*i).first;
 		}
 	}
 
 	// no matches
-	return "";
+	return nullptr;
 }
 
 
-void TalkManager::RemoveWindow(string thread_id) {
-	if (_talk_map.count(thread_id) > 0) {
-		_talk_map.erase(thread_id);
-		SendNotices(kWindowList);
+void TalkManager::RemoveWindow(TalkView* window) {
+	for (GroupMap::iterator i = fGroupMap.begin(); i != fGroupMap.end(); ++i) {
+		if ((*i).second == window) {
+			delete (*i).first;
+			fGroupMap.erase(i);
+			SendNotices(kWindowList);
+			return;
+		}
+	}
+
+	for (TalkMap::iterator i = fTalkMap.begin(); i != fTalkMap.end(); ++i) {
+		if ((*i).second == window) {
+			fTalkMap.erase(i);
+			SendNotices(kWindowList);
+			return;
+		}
 	}
 }
 
 
 void TalkManager::Reset() {
 	MessageRepeater::Instance()->PostMessage(JAB_CLOSE_TALKS);
-	_talk_map.clear();
+	fTalkMap.clear();
+	fGroupMap.clear();
 }
 
 
@@ -241,34 +213,14 @@ void
 TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 	const gloox::Message &msg, bool priv __attribute__((unused)))
 {
-	string thread_id;
 	TalkView *window = NULL;
 
-	string group_room;
-	string group_server;
 	string group_username;
-	string group_identity;
 
-	// get group room
-	group_room = room->name();
-			
 	// clear out text
 	group_username = msg.from().resource();
-			
-	// get server
-	group_server = room->service();
 
-	// create identity
-	group_identity = group_room + '@' + group_server;
-		
-	// is there a window with the same sender already open? (only for chat)
-	if (!IsExistingWindowToGroup(group_identity).empty()) {
-		thread_id = IsExistingWindowToGroup(group_identity);
-	} else {
-		fprintf(stderr, "Failed to find chat window\n");
-		return;
-	}
-	window = _talk_map.at(thread_id);
+	window = fGroupMap.at(room);
 	// submit the chat
 	if (window) {
 		window->LockLooper();
@@ -292,11 +244,22 @@ TalkManager::handleMUCRoomCreation(gloox::MUCRoom *room __attribute__((unused)))
 
 
 void
-TalkManager::handleMUCSubject(gloox::MUCRoom *room __attribute__((unused)),
-							const std::string &nick __attribute__((unused)),
-							const std::string &subject __attribute__((unused)))
+TalkManager::handleMUCSubject(gloox::MUCRoom *room,
+							const std::string &nick,
+							const std::string &subject)
 {
-	fprintf(stderr, "%s\n", __PRETTY_FUNCTION__);
+	TalkView* window = fGroupMap.at(room);
+	BString topic;
+	topic.SetToFormat("set topic to %s\n", subject.c_str());
+
+	// FIXME just send a BMessage to the view and let it handle this
+	window->LockLooper();
+	window->SetStatus(subject);
+	if (!nick.empty()) {
+		// Do it only for topic chnages (not for the initial topic setting)
+		window->AddToTalk(nick, topic.String(), TalkView::OTHER);
+	}
+	window->UnlockLooper();
 }
 
 

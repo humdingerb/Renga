@@ -71,6 +71,8 @@ public:
 	bool				IsLogging() { return _am_logging; }
 	bool				IsGroupChat();
 
+	void				SetStatus(std::string message);
+
 	// gloox MessageHandler
 	void handleMessage(const gloox::Message&, gloox::MessageSession*);
 

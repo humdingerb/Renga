@@ -35,7 +35,7 @@ BookmarkItem::~BookmarkItem() {
 void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete) {
 	// get online status
 	UserID::online_status status;
-	if (TalkManager::Instance()->IsExistingWindowToGroup(_userid.full()).size())
+	if (TalkManager::Instance()->IsExistingWindowToGroup(_userid.full()) != nullptr)
 		status = UserID::TRANSPORT_ONLINE;
 	else
 		status = UserID::UNKNOWN;

@@ -1219,5 +1219,9 @@ void BlabberMainWindow::SetCustomStatus(string status) {
 void
 BlabberMainWindow::AddTalkView(TalkView* view)
 {
-	fTalkCards->AddView(view);
+	if (view->Window() != this) {
+		fTalkCards->AddView(view);
+	}
+
+	fTalkCards->SetVisibleItem(fTalkCards->IndexOfView(view));
 }

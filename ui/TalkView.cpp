@@ -223,7 +223,7 @@ TalkView::~TalkView() {
 		JabberSpeak::Instance()->SendGroupUnvitation(_group_room, _group_username);	
 	}
 
-	TalkManager::Instance()->RemoveWindow(_session->threadID());
+	TalkManager::Instance()->RemoveWindow(this);
 }
 
 
@@ -1160,4 +1160,11 @@ bool
 TalkView::IsGroupChat()
 {
 	return !_group_room.empty();
+}
+
+
+void
+TalkView::SetStatus(std::string message)
+{
+	_status_view->SetMessage(message);
 }

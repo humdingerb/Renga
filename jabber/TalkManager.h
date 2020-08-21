@@ -24,9 +24,8 @@ enum {
 // FIXME could we replace this with MessageSessionHandler?
 class TalkManager : public BHandler, public gloox::MessageSessionHandler, gloox::MUCRoomHandler, gloox::MessageHandler {
 public:
-	typedef  std::map<std::string, TalkView *>                   TalkMap;
-	typedef  std::map<std::string, TalkView *>::iterator         TalkIter;
-	typedef  std::map<std::string, TalkView *>::const_iterator   ConstTalkIter;
+	typedef  std::map<gloox::MessageSession*, TalkView *>        TalkMap;
+	typedef  std::map<gloox::MUCRoom*, TalkView *>        GroupMap;
 
 public:
 	static TalkManager  *Instance();
@@ -38,10 +37,9 @@ public:
 							std::string group_room, std::string group_username, 
 							gloox::MessageSession* session, bool sound_on_new = false);
 
-	std::string          IsExistingWindowToUser(std::string username);
-	std::string          IsExistingWindowToGroup(std::string group_room);
+	void*                IsExistingWindowToGroup(std::string group_room);
 	void                 UpdateWindowTitles(const gloox::JID& user, BString newTitle);
-	void                 RemoveWindow(std::string thread_id);
+	void                 RemoveWindow(TalkView* view);
 
 	void                 Reset();
 	
@@ -78,7 +76,8 @@ private:
 	static TalkManager *_instance;
 
 	// FIXME remove
-	TalkMap             _talk_map;
+	TalkMap             fTalkMap;
+	GroupMap            fGroupMap;
 };
 
 #endif
