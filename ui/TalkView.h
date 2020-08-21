@@ -3,8 +3,7 @@
 //     A session with another user.
 //////////////////////////////////////////////////
 
-#ifndef TALK_WINDOW_H
-#define TALK_WINDOW_H
+#pragma once
 
 #include <gloox/message.h>
 #include <gloox/messagehandler.h>
@@ -16,39 +15,38 @@
 #include <interface/Box.h>
 #include <interface/Button.h>
 #include <interface/CheckBox.h>
+#include <GroupView.h>
 #include <interface/ListView.h>
 #include <interface/MenuBar.h>
 #include <interface/MenuItem.h>
 #include <interface/ScrollView.h>
 #include <interface/StringView.h>
+#include <String.h>
 #include <interface/TextView.h>
 #include <interface/Window.h>
 #include <storage/FilePanel.h>
-	
-#include "BetterTextView.h"
-#include "ChatTextView.h"
-#include "ChatWidget.h"
-#include "EditingFilter.h"
-#include "StatusView.h"
-#include "UserID.h"
 
-class TalkWindow : public BWindow {
+#include "../jabber/BetterTextView.h"
+#include "../jabber/ChatTextView.h"
+#include "../jabber/ChatWidget.h"
+#include "../jabber/EditingFilter.h"
+#include "../jabber/StatusView.h"
+#include "../jabber/UserID.h"
+
+class TalkView : public BGroupView {
 public:
 	enum                 user_type {MAIN_RECIPIENT, LOCAL, OTHER};
 
-public:  
-						TalkWindow(gloox::Message::MessageType type,
-							const gloox::JID *user, std::string group_room,
+public:
+						TalkView(const gloox::JID *user, std::string group_room,
 							std::string group_username,
-							gloox::MessageSession* session,
-							bool follow_focus_rules = false);
-						~TalkWindow();
+							gloox::MessageSession* session);
+						~TalkView();
 
-	void                 FrameResized(float width, float height);
-	void                 MenusBeginning();
-	void                 MessageReceived(BMessage *msg);
-	bool                 QuitRequested();
-	
+	void				AttachedToWindow() override;
+	void                 FrameResized(float width, float height) override;
+	void                 MessageReceived(BMessage *msg) override;
+
 	void                 Log(const char *buffer);
 	std::string          OurRepresentation();
 	void                 AddToTalk(std::string username, std::string message, user_type type);
@@ -70,16 +68,11 @@ public:
 	void                 RevealPreviousHistory();
 	void                 RevealNextHistory();
 
+	bool				IsLogging() { return _am_logging; }
+	bool				IsGroupChat();
+
 	// gloox MessageHandler
 	void handleMessage(const gloox::Message&, gloox::MessageSession*);
-private:
-    //xed: new message window title notification
-    void 				WindowActivated(bool active);
-    void				NotifyWindowTitle();
-
-	// Message types testing
-	bool				IsGroupChat();
-	bool				IsChat();
 
 private:
     BString				originalWindowTitle;
@@ -88,47 +81,10 @@ private:
 	std::string            _group_username;
 	UserID::online_status  _current_status;
 	gloox::MessageSession* _session;
-	
-	// GUI
-	BView              *_full_view;
 
+	// GUI
 	StatusView         *_status_view;
-	
-	BMenuBar           *_menubar;
-	BMenu              *_file_menu;
-	BMenu              *_edit_menu;
-	BMenu              *_talk_menu;
-	BMenu              *_help_menu;
-	BMenu              *_message_menu;
-	BMenuItem          *_record_item;
-	BMenuItem          *_preferences_item;
-	BMenuItem          *_copy_item;
-	BMenuItem          *_cut_item;
-	BMenuItem          *_paste_item;
-	BMenuItem          *_select_all_item;
-	BMenuItem          *_undo_item;
-	BMenuItem          *_record_entire_item;
-	BMenuItem          *_close_item;
-	BMenuItem          *_message_1_item;
-	BMenuItem          *_message_2_item;
-	BMenuItem          *_message_3_item;
-	BMenuItem          *_message_4_item;
-	BMenuItem          *_message_5_item;
-	BMenuItem          *_message_6_item;
-	BMenuItem          *_message_7_item;
-	BMenuItem          *_message_8_item;
-	BMenuItem          *_message_9_item;
-	BMenuItem          *_rotate_chat_forward_item;
-	BMenuItem          *_rotate_chat_backward_item;
-	BMenuItem          *_rotate_buddy_list_item;
-	BMenuItem          *_beos_user_item;
-	BMenuItem          *_riv_item;
-	BMenuItem          *_jabber_org_item;
-	BMenuItem          *_jabber_central_org_item;
-	BMenuItem          *_jabber_view_com_item;
-	BMenuItem          *_user_guide_item;
-	BMenuItem          *_faq_item;
-	
+
 	BScrollView        *_chat_scroller;
 	BScrollView        *_message_scroller;
 	ChatTextView       *_chat;
@@ -136,20 +92,17 @@ private:
 	BButton            *_send_message;
 
 	BListView          *_people;
-	
-	BScrollView        *_scrolled_chat_pane;
+
 	BBox               *_chat_pane;
 	BScrollView        *_scrolled_people_pane;
-	
+
 	// user history
 	std::deque<std::string>  _chat_history;
 	std::string              _chat_buffer;
 	int                 _chat_index;
-	
+
 	BFilePanel         *_fp;
 	bool                _am_logging;
 	FILE               *_log;
 
 };
-
-#endif

@@ -2,27 +2,14 @@
 // Blabber [EditingFilter.cpp]
 //////////////////////////////////////////////////
 
-#ifndef _INTERFACE_DEFS_H
-	#include <interface/InterfaceDefs.h>
-#endif
+#include <interface/InterfaceDefs.h>
+#include <app/Message.h>
 
-#ifndef _MESSAGE_H
-	#include <app/Message.h>
-#endif
+#include "EditingFilter.h"
+#include "Messages.h"
+#include "../ui/TalkView.h"
 
-#ifndef EDITING_FILTER_H
-	#include "EditingFilter.h"
-#endif
-
-#ifndef MESSAGES_H
-	#include "Messages.h"
-#endif
-
-#ifndef TALK_WINDOW_H
-	#include "TalkWindow.h"
-#endif
-
-EditingFilter::EditingFilter(BTextView *view, TalkWindow *window)
+EditingFilter::EditingFilter(BTextView *view, TalkView *window)
 	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN, NULL) {
 	_view   = view;
 	_window = window;
@@ -53,7 +40,8 @@ filter_result EditingFilter::Filter(BMessage *message, __attribute__((unused)) B
 
 		return B_SKIP_MESSAGE;
 	} else if (_window->NewlinesAllowed() && (modifiers & B_COMMAND_KEY) != 0 && byte == B_ENTER) {
-		_window->PostMessage(JAB_CHAT_SENT);
+		puts("Go!");
+		BMessenger(_window).SendMessage(JAB_CHAT_SENT);
 	}
 	
 	return B_DISPATCH_MESSAGE;

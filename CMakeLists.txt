@@ -28,7 +28,6 @@ add_executable(Renga
 	 jabber/SoundPreferencesView.cpp
 	 jabber/TalkListItem.cpp
 	 jabber/TalkManager.cpp
-	 jabber/TalkWindow.cpp
 	 jabber/TransportItem.cpp
 	 jabber/TransportPreferencesView.cpp
 	 jabber/BlabberApp.cpp
@@ -69,6 +68,7 @@ add_executable(Renga
 	ui/PictureView.cpp
 	ui/RegisterAccountWindow.cpp
 	ui/RosterSuperitem.cpp
+	ui/TalkView.cpp
 )
 
 set_property(TARGET Renga PROPERTY CXX_STANDARD 14)

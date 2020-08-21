@@ -3,10 +3,10 @@
 //     Central information display.
 //////////////////////////////////////////////////
 
-#ifndef BLABBER_MAIN_WINDOW_H
-#define BLABBER_MAIN_WINDOW_H
+#pragma once
 
 #include <Button.h>
+#include <CardLayout.h>
 #include <CheckBox.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -19,6 +19,9 @@
 #include "RosterView.h"
 #include "StatusView.h"
 
+
+class TalkView;
+
 enum {
 	kResetWindow = 'Wrst'
 };
@@ -26,7 +29,7 @@ enum {
 class BlabberMainWindow : public BWindow {
 public:
 	static BlabberMainWindow  *Instance();
-	                          ~BlabberMainWindow();
+                              ~BlabberMainWindow();
 
 	virtual void               MessageReceived(BMessage *msg);
 	virtual void               MenusBeginning();
@@ -35,14 +38,16 @@ public:
 	bool                       ValidateLogin();
 	void                       ShowLogin();
 	void                       SetCustomStatus(std::string status);
-	
+
+	void						AddTalkView(TalkView* view);
+
 protected:
-	                           BlabberMainWindow(BRect frame);
-		                           
+                                BlabberMainWindow(BRect frame);
+
 private:
 	// singleton
 	static BlabberMainWindow *_instance;
-	
+
 	// GUI
 	BView                    *_login_full_view;
 
@@ -53,8 +58,11 @@ private:
 
 	BButton                  *_login_new_account;
 	BCheckBox                *_login_auto_login;
-	
+
 	BButton                  *_login_login;
+
+	BMenuItem          *_record_item;
+	BMenuItem          *_record_entire_item;
 
 	BMenuItem                *_connect_item;
 	BMenuItem                *_disconnect_item;
@@ -76,8 +84,6 @@ private:
 	BMenuItem                *_sleep_item;
 	BMenuItem                *_custom_item;
 
-	BMenuItem                *_rotate_chat_forward_item;
-	BMenuItem                *_rotate_chat_backward_item;
 	BMenuItem                *_send_message_item;
 	BMenuItem                *_send_chat_item;
 	BMenuItem                *_send_groupchat_item;
@@ -91,17 +97,28 @@ private:
 	BMenuItem                *_user_guide_item;
 	BMenuItem                *_faq_item;
 
+	BMenu              *_message_menu;
+	BMenuItem          *_message_1_item;
+	BMenuItem          *_message_2_item;
+	BMenuItem          *_message_3_item;
+	BMenuItem          *_message_4_item;
+	BMenuItem          *_message_5_item;
+	BMenuItem          *_message_6_item;
+	BMenuItem          *_message_7_item;
+	BMenuItem          *_message_8_item;
+	BMenuItem          *_message_9_item;
+
 	int32                     _deskbar_id;
-	
+
 	BView                    *_full_view;
 
 	PictureView              *_title;
 	StatusView               *_status_view;
-	
+
 	BPopUpMenu               *_online_status_selection;
 	BMenuField               *_online_status;
 
 	RosterView               *_roster;
-};
 
-#endif
+	BCardLayout*			fTalkCards;
+};

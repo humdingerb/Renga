@@ -13,17 +13,17 @@
 	#include <interface/TextView.h>
 #endif
 
-class TalkWindow;
+class TalkView;
 
 class EditingFilter : public BMessageFilter {
 public:
-	                      EditingFilter(BTextView *view, TalkWindow *window);
+	                      EditingFilter(BTextView *view, TalkView *window);
 
 	virtual filter_result Filter(BMessage *message, BHandler **target);
 
 private:
 	BTextView           *_view;
-	TalkWindow          *_window;
+	TalkView          *_window;
 };
 #endif
 

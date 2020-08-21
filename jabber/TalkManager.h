@@ -15,7 +15,7 @@
 #include <string>
 
 #include "GenericFunctions.h"
-#include "TalkWindow.h"
+#include "../ui/TalkView.h"
 
 enum {
 	kWindowList = 'winl'
@@ -24,18 +24,16 @@ enum {
 // FIXME could we replace this with MessageSessionHandler?
 class TalkManager : public BHandler, public gloox::MessageSessionHandler, gloox::MUCRoomHandler, gloox::MessageHandler {
 public:
-	typedef  std::map<std::string, TalkWindow *>                   TalkMap;
-	typedef  std::map<std::string, TalkWindow *>::iterator         TalkIter;
-	typedef  std::map<std::string, TalkWindow *>::const_iterator   ConstTalkIter;
+	typedef  std::map<std::string, TalkView *>                   TalkMap;
+	typedef  std::map<std::string, TalkView *>::iterator         TalkIter;
+	typedef  std::map<std::string, TalkView *>::const_iterator   ConstTalkIter;
 
-	enum     rotation   {ROTATE_FORWARD, ROTATE_BACKWARD};
-		
 public:
 	static TalkManager  *Instance();
       	                ~TalkManager();
 
 						// TODO split out into CreateTalkSession / CreateGroupSession
-	TalkWindow          *CreateTalkSession(const gloox::Message::MessageType type,
+	TalkView*			CreateTalkSession(const gloox::Message::MessageType type,
 							const gloox::JID* user,
 							std::string group_room, std::string group_username, 
 							gloox::MessageSession* session, bool sound_on_new = false);
@@ -45,8 +43,6 @@ public:
 	void                 UpdateWindowTitles(const gloox::JID& user, BString newTitle);
 	void                 RemoveWindow(std::string thread_id);
 
-	void                 RotateToNextWindow(TalkWindow *current, rotation direction);
-	
 	void                 Reset();
 	
 	// MUC handlers from gloox

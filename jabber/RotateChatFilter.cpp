@@ -18,23 +18,21 @@
 	#include "Messages.h"
 #endif
 
-RotateChatFilter::RotateChatFilter(TalkWindow *window)
+RotateChatFilter::RotateChatFilter()
 	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN, NULL) {
-	_window = window;
 }
 
 filter_result RotateChatFilter::Filter(BMessage *message, __attribute__((unused)) BHandler **target) {
 	int8 byte;
 	message->FindInt8("byte", &byte);
 
-	// if the Alt key jives with the command_enter status
 	if (byte == B_FUNCTION_KEY) {
 		int32 key;
 
 		message->FindInt32("key", &key);
 		
 		if (key == B_F8_KEY) {
-			TalkManager::Instance()->RotateToNextWindow(_window, TalkManager::ROTATE_FORWARD);
+			BlabberMainWindow::Instance()->PostMessage(JAB_ROTATE_CHAT_FORWARD);
 			return B_SKIP_MESSAGE;
 		}
 	}

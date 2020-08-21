@@ -7,29 +7,12 @@
 #ifndef SEND_TALK_WINDOW_H
 #define SEND_TALK_WINDOW_H
 
-#ifndef _MENU_FIELD_H
-	#include <interface/MenuField.h>
-#endif
-
-#ifndef _MENU_ITEM_H
-	#include <interface/MenuItem.h>
-#endif
-
-#ifndef _POP_UP_MENU_H
-	#include <interface/PopUpMenu.h>
-#endif
-
-#ifndef _TEXT_CONTROL_H
-	#include <interface/TextControl.h>
-#endif
-
-#ifndef _WINDOW_H
-	#include <interface/Window.h>
-#endif
-
-#ifndef TALK_WINDOW_H
-	#include "TalkWindow.h"
-#endif
+#include <interface/MenuField.h>
+#include <interface/MenuItem.h>
+#include <interface/PopUpMenu.h>
+#include <interface/TextControl.h>
+#include <interface/Window.h>
+#include "../ui/TalkView.h"
 
 #include <string>
 

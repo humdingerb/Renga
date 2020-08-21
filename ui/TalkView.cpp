@@ -1,12 +1,15 @@
 //////////////////////////////////////////////////
-// Blabber [TalkWindow.cpp]
+// Blabber [TalkView.cpp]
 //////////////////////////////////////////////////
 
 #include <cstdio>
 #include <ctime>
+#include <malloc.h>
+#include <stdlib.h>
 
 #include <Box.h>
 #include <be_apps/NetPositive/NetPositive.h>
+#include <FindDirectory.h>
 #include <GridView.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
@@ -16,42 +19,33 @@
 #include <SplitView.h>
 
 #include "../support/AppLocation.h"
-#include "BlabberSettings.h"
-#include "CommandMessage.h"
-#include "GenericFunctions.h"
-#include "JabberSpeak.h"
-#include "MessageRepeater.h"
-#include "Messages.h"
-#include "PeopleListItem.h"
-#include "PreferencesWindow.h"
-#include "RotateChatFilter.h"
-#include "SoundSystem.h"
-#include "TalkListItem.h"
-#include "TalkManager.h"
-#include "TalkWindow.h"
-#include <FindDirectory.h>
-#include <malloc.h>
-#include <stdlib.h>
+#include "../jabber/BlabberSettings.h"
+#include "../jabber/CommandMessage.h"
+#include "../jabber/GenericFunctions.h"
+#include "../jabber/JabberSpeak.h"
+#include "../jabber/MessageRepeater.h"
+#include "../jabber/Messages.h"
+#include "../jabber/PeopleListItem.h"
+#include "../jabber/PreferencesWindow.h"
+#include "../jabber/RotateChatFilter.h"
+#include "../jabber/SoundSystem.h"
+#include "../jabber/TalkListItem.h"
+#include "../jabber/TalkManager.h"
+#include "TalkView.h"
 
 #include "gloox/rostermanager.h"
 
 #define NOTIFICATION_CHAR "√"
 
 
-TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
-		string group_room, string group_username,
-		gloox::MessageSession* session, bool follow_focus_rules)
-	: BWindow(BRect(0, 0, 0, 0), "<talk window>", B_DOCUMENT_WINDOW,
-		B_AUTO_UPDATE_SIZE_LIMITS)
+TalkView::TalkView(const gloox::JID *user, string group_room,
+		string group_username, gloox::MessageSession* session)
+	: BGroupView("<talk window>", B_VERTICAL)
 	, _session(session)
 {
 	_am_logging = false;
 	_log        = NULL;
 	_chat_index = -1;
-	_record_item = 0;
-	
-	// add self to message family
-	MessageRepeater::Instance()->AddTarget(this);
 
 	UserID* uid = NULL;
 	if (user) {
@@ -87,157 +81,7 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 		_am_logging = (0 != _log);
 	}
 	
-	_menubar = new BMenuBar("menubar");
-
 	// FILE MENU
-	_file_menu = new BMenu("File");
-
-	if(bAutoOpenChatLog) {
-		BMessage *msg = new BMessage(JAB_SHOW_CHATLOG);
-		msg->AddString("path", chatlog_path.c_str());
-		_record_entire_item = new BMenuItem("Show Chat Log", msg);
-		_record_entire_item->SetEnabled(true);
-		_record_entire_item->SetShortcut('H', 0);
-	} else {
-		_record_item = new BMenuItem("Start Chat Log", new BMessage(JAB_START_RECORD));
-		_record_item->SetEnabled(!_am_logging);
-		_record_entire_item = new BMenuItem("Stop Chat Log", new BMessage(JAB_STOP_RECORD));
-		_record_entire_item->SetEnabled(_am_logging);
-	}
-		_close_item = new BMenuItem("Close", new BMessage(JAB_CLOSE_CHAT));
-		_close_item->SetShortcut('W', 0);
-
-	if (!IsGroupChat()) {
-		if(0 != _record_item) {
-		  _file_menu->AddItem(_record_item);
-		}
-		_file_menu->AddItem(_record_entire_item);
-		_file_menu->AddSeparatorItem();
-	}
-		
-	_file_menu->AddItem(_close_item);
-	_file_menu->SetTargetForItems(this);
-
-	// EDIT MENU
-	_edit_menu = new BMenu("Edit");
-
-		_copy_item = new BMenuItem("Cut", new BMessage(B_CUT));
-		_copy_item->SetShortcut('C', 0);
-
-		_cut_item = new BMenuItem("Copy", new BMessage(B_COPY));
-		_cut_item->SetShortcut('X', 0);
-
-		_paste_item = new BMenuItem("Paste", new BMessage(B_PASTE));
-		_paste_item->SetShortcut('V', 0);
-
-		_select_all_item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL));
-		_select_all_item->SetShortcut('A', 0);
-
-		_preferences_item = new BMenuItem("Preferences...", new BMessage(JAB_PREFERENCES));
-
-//	_edit_menu->AddItem(_cut_item);
-//	_edit_menu->AddItem(_copy_item);
-//	_edit_menu->AddItem(_paste_item);
-//	_edit_menu->AddItem(_select_all_item);
-//	_edit_menu->AddSeparatorItem();
-	_edit_menu->AddItem(_preferences_item);
-
-	// MESSAGE MENU
-	_message_menu = new BMenu("Messages");
-
-		_message_1_item = new BMenuItem("Message #1", new BMessage(JAB_MESSAGE_1));
-		_message_1_item->SetShortcut('1', 0);
-		_message_1_item->SetEnabled(false);
-
-		_message_2_item = new BMenuItem("Message #2", new BMessage(JAB_MESSAGE_2));
-		_message_2_item->SetShortcut('2', 0);
-		_message_2_item->SetEnabled(false);
-
-		_message_3_item = new BMenuItem("Message #3", new BMessage(JAB_MESSAGE_3));
-		_message_3_item->SetShortcut('3', 0);
-		_message_3_item->SetEnabled(false);
-
-		_message_4_item = new BMenuItem("Message #4", new BMessage(JAB_MESSAGE_4));
-		_message_4_item->SetShortcut('4', 0);
-		_message_4_item->SetEnabled(false);
-
-		_message_5_item = new BMenuItem("Message #5", new BMessage(JAB_MESSAGE_5));
-		_message_5_item->SetShortcut('5', 0);
-		_message_5_item->SetEnabled(false);
-
-		_message_6_item = new BMenuItem("Message #6", new BMessage(JAB_MESSAGE_6));
-		_message_6_item->SetShortcut('6', 0);
-		_message_6_item->SetEnabled(false);
-
-		_message_7_item = new BMenuItem("Message #7", new BMessage(JAB_MESSAGE_7));
-		_message_7_item->SetShortcut('7', 0);
-		_message_7_item->SetEnabled(false);
-
-		_message_8_item = new BMenuItem("Message #8", new BMessage(JAB_MESSAGE_8));
-		_message_8_item->SetShortcut('8', 0);
-		_message_8_item->SetEnabled(false);
-		
-		_message_9_item = new BMenuItem("Message #9", new BMessage(JAB_MESSAGE_9));
-		_message_9_item->SetShortcut('9', 0);
-		_message_9_item->SetEnabled(false);
-
-	_message_menu->AddItem(_message_1_item);
-	_message_menu->AddItem(_message_2_item);
-	_message_menu->AddItem(_message_3_item);
-	_message_menu->AddItem(_message_4_item);
-	_message_menu->AddItem(_message_5_item);
-	_message_menu->AddItem(_message_6_item);
-	_message_menu->AddItem(_message_7_item);
-	_message_menu->AddItem(_message_8_item);
-	_message_menu->AddItem(_message_9_item);
-	_message_menu->SetTargetForItems(this);
-
-	// TALK MENU
-	_talk_menu = new BMenu("Talk");
-
-		_rotate_chat_forward_item = new BMenuItem("Rotate Chat Forward", new BMessage(JAB_ROTATE_CHAT_FORWARD));
-		_rotate_chat_forward_item->SetShortcut('.', 0);
-
-		_rotate_chat_backward_item = new BMenuItem("Rotate Chat Backward", new BMessage(JAB_ROTATE_CHAT_BACKWARD));
-		_rotate_chat_backward_item->SetShortcut(',', 0);
-
-		_rotate_buddy_list_item = new BMenuItem("Buddy List", new BMessage(JAB_FOCUS_BUDDY));
-		_rotate_buddy_list_item->SetShortcut('/', 0);
-
-	_talk_menu->AddItem(_rotate_chat_forward_item);
-	_talk_menu->AddItem(_rotate_chat_backward_item);
-	_talk_menu->AddSeparatorItem();
-	_talk_menu->AddItem(_rotate_buddy_list_item);
-	_talk_menu->SetTargetForItems(this);
-
-	// HELP MENU
-	_help_menu = new BMenu("Help");
-
-		//_jabber_org_item = new BMenuItem("Jabber.org", new BMessage(JAB_JABBER_ORG));
-		//_riv_item = new BMenuItem("OsDrawer Web site", new BMessage(JAB_RIV));
-		//_jabber_central_org_item = new BMenuItem("JabberCentral.org", new BMessage(JAB_JABBER_CENTRAL_ORG));
-		//_jabber_view_com_item = new BMenuItem("JabberView.com", new BMessage(JAB_JABBER_VIEW_COM));
-		_user_guide_item = new BMenuItem("Renga Manual", new BMessage(JAB_USER_GUIDE));
-		_faq_item = new BMenuItem("Renga FAQ", new BMessage(JAB_FAQ));
-		//_beos_user_item = new BMenuItem("Haiku Users Directory", haiku_channel);
-
-	_help_menu->AddItem(_user_guide_item);
-	_help_menu->AddItem(_faq_item);
-	//_help_menu->AddItem(_beos_user_item);
-	//_help_menu->AddSeparatorItem();
-	//_help_menu->AddItem(_riv_item);
-	//_help_menu->AddSeparatorItem();
-	//_help_menu->AddItem(_jabber_org_item);
-	//_help_menu->AddItem(_jabber_central_org_item);
-	//_help_menu->AddItem(_jabber_view_com_item);
-	_help_menu->SetTargetForItems(this);
-
-	_menubar->AddItem(_file_menu);
-	_menubar->AddItem(_edit_menu);
-	_menubar->AddItem(_message_menu);
-	_menubar->AddItem(_talk_menu);
-	_menubar->AddItem(_help_menu);
-
 	// status bar
 	_status_view = new StatusView();
 	_status_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
@@ -263,15 +107,11 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	_message->SetWordWrap(true);
 
 	// editing filter for messaging
-	AddCommonFilter(new EditingFilter(_message, this));
-
-	// editing filter for taksing
-	AddCommonFilter(new RotateChatFilter(this));
+	_message->AddFilter(new EditingFilter(_message, this));
 
 	// send button
 	_send_message = new BButton("send", "\xe2\x96\xb6", new BMessage(JAB_CHAT_SENT));
 	_send_message->MakeDefault(true);
-	_send_message->SetTarget(this);
 	_send_message->SetFlat(true);
 	_send_message->SetExplicitSize(BSize(_send_message->StringWidth("WWWW"), B_SIZE_UNSET));
 	
@@ -288,6 +128,7 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	_split_talk->AddChild(_sending);
 	
 	_people = new BListView(NULL, B_SINGLE_SELECTION_LIST);
+	_people->SetExplicitMinSize(BSize(StringWidth("Firstname M. Lastname"), B_SIZE_UNSET));
 	_scrolled_people_pane = new BScrollView(NULL, _people, 0, false, true, B_PLAIN_BORDER);
 
 	BSplitView* _split_group_people = new BSplitView(B_HORIZONTAL);
@@ -307,7 +148,6 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	SetLayout(layout);
 	layout->SetSpacing(0);
 
-	AddChild(_menubar);
 	AddChild(_split_group_people);
 	AddChild(_status_view);
 
@@ -353,28 +193,6 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 			user_representation = _session->target().bare();
 	}
 
-	if (type == gloox::Message::Normal) {
-		sprintf(buffer, "[message] %s", user_representation.c_str()); 
-	} else if (type == gloox::Message::Chat) {
-		sprintf(buffer, "[chat] %s", user_representation.c_str()); 
-	} else if (type == gloox::Message::Groupchat) {
-		sprintf(buffer, "[groupchat] %s", group_room.c_str()); 
-	}
-		
-	SetTitle(buffer);
-	originalWindowTitle.SetTo(buffer);
-
-	// do this to allow the following...
-	Show();
-	
-	// reset flags
-	SetFlags(Flags() & ~B_AVOID_FOCUS);
-
-	// focus rules
-	if (!follow_focus_rules || !BlabberSettings::Instance()->Tag("suppress-chat-focus")) {
-		Activate();
-	}
-
 	// put Session started message
 	// construct timestamp
 	string message;
@@ -382,14 +200,13 @@ TalkWindow::TalkWindow(gloox::Message::MessageType type, const gloox::JID *user,
 	time_t now = time(NULL);
 	struct tm *time_struct = localtime(&now);
 	strftime(&message[0], message.size()-1, "Session started  %e %b %y [%R:%S]", time_struct);
-	Lock();
 	AddToTalk("", message.c_str(), OTHER);
-	Unlock();
 
-	CenterOnScreen();
+	TalkManager::Instance()->StartWatchingAll(this);
 }
 
-TalkWindow::~TalkWindow() {
+
+TalkView::~TalkView() {
 	string message;
 	message.resize(128);
 	time_t now = time(NULL);
@@ -402,12 +219,23 @@ TalkWindow::~TalkWindow() {
 		fclose(_log);
 	}
 
-	// remove self from message family
-	MessageRepeater::Instance()->RemoveTarget(this);
+	if (IsGroupChat()) {
+		JabberSpeak::Instance()->SendGroupUnvitation(_group_room, _group_username);	
+	}
+
+	TalkManager::Instance()->RemoveWindow(_session->threadID());
 }
 
-void TalkWindow::FrameResized(float width, float height) {
-	BWindow::FrameResized(width, height);
+
+void TalkView::AttachedToWindow()
+{
+	_send_message->SetTarget(this);
+}
+
+
+void TalkView::FrameResized(float width, float height)
+{
+	BView::FrameResized(width, height);
 
 	BRect chat_rect    = _chat->Frame();
 	BRect message_rect = _message->Frame();
@@ -425,138 +253,39 @@ void TalkWindow::FrameResized(float width, float height) {
 	_chat_scroller->Invalidate();
 }
 
-void TalkWindow::MenusBeginning() {
-	const char *message_1 = BlabberSettings::Instance()->Data("message-1");
-	const char *message_2 = BlabberSettings::Instance()->Data("message-2");
-	const char *message_3 = BlabberSettings::Instance()->Data("message-3");
-	const char *message_4 = BlabberSettings::Instance()->Data("message-4");
-	const char *message_5 = BlabberSettings::Instance()->Data("message-5");
-	const char *message_6 = BlabberSettings::Instance()->Data("message-6");
-	const char *message_7 = BlabberSettings::Instance()->Data("message-7");
-	const char *message_8 = BlabberSettings::Instance()->Data("message-8");
-	const char *message_9 = BlabberSettings::Instance()->Data("message-9");
-	
-	if (message_1) {
-		_message_1_item->SetLabel(message_1);
-		_message_1_item->SetEnabled(true);
-	} else {
-		_message_1_item->SetLabel("Message 1");
-		_message_1_item->SetEnabled(false);
-	}
 
-	if (message_2) {
-		_message_2_item->SetLabel(message_2);
-		_message_2_item->SetEnabled(true);
-	} else {
-		_message_2_item->SetLabel("Message 2");
-		_message_2_item->SetEnabled(false);
-	}
-
-	if (message_3) {
-		_message_3_item->SetLabel(message_3);
-		_message_3_item->SetEnabled(true);
-	} else {
-		_message_3_item->SetLabel("Message 3");
-		_message_3_item->SetEnabled(false);
-	}
-
-	if (message_4) {
-		_message_4_item->SetLabel(message_4);
-		_message_4_item->SetEnabled(true);
-	} else {
-		_message_4_item->SetLabel("Message 4");
-		_message_4_item->SetEnabled(false);
-	}
-
-	if (message_5) {
-		_message_5_item->SetLabel(message_5);
-		_message_5_item->SetEnabled(true);
-	} else {
-		_message_5_item->SetLabel("Message 5");
-		_message_5_item->SetEnabled(false);
-	}
-
-	if (message_6) {
-		_message_6_item->SetLabel(message_6);
-		_message_6_item->SetEnabled(true);
-	} else {
-		_message_6_item->SetLabel("Message 6");
-		_message_6_item->SetEnabled(false);
-	}
-
-	if (message_7) {
-		_message_7_item->SetLabel(message_7);
-		_message_7_item->SetEnabled(true);
-	} else {
-		_message_7_item->SetLabel("Message 7");
-		_message_7_item->SetEnabled(false);
-	}
-
-	if (message_8) {
-		_message_8_item->SetLabel(message_8);
-		_message_8_item->SetEnabled(true);
-	} else {
-		_message_8_item->SetLabel("Message 8");
-		_message_8_item->SetEnabled(false);
-	}
-
-	if (message_9) {
-		_message_9_item->SetLabel(message_9);
-		_message_9_item->SetEnabled(true);
-	} else {
-		_message_9_item->SetLabel("Message 9");
-		_message_9_item->SetEnabled(false);
-	}
-
-	// logging
-/*	if (_am_logging) {
-		_record_item->SetEnabled(false);
-		_record_entire_item->SetEnabled(true);
-	} else {
-		_record_item->SetEnabled(true);
-		_record_entire_item->SetEnabled(false);
-	} */
-
-	if(0 != _record_item) {
-	  _record_item->SetEnabled(!_am_logging);
-	}
-	_record_entire_item->SetEnabled(_am_logging);
-}
-
-void TalkWindow::MessageReceived(BMessage *msg) {
+void TalkView::MessageReceived(BMessage *msg) {
 	switch(msg->what) {
-		case JAB_CLOSE_TALKS: {
-			PostMessage(B_QUIT_REQUESTED);
+		case JAB_CLOSE_TALKS:
+		{
+			RemoveSelf();
+			delete this;
 			break;
 		}
 
-		case JAB_GROUP_CHATTER_ONLINE: {
+		case B_OBSERVER_NOTICE_CHANGE:
+		{
 			// only for groupchat
 			if (!IsGroupChat()) {
 				break;
 			}
 
-			if (GetGroupRoom() == msg->FindString("room")) {
-				AddGroupChatter(msg->FindString("username"));
-			}
-			
-			break;
-		}
+			switch(msg->FindInt32("be:observe_orig_what"))
+			{
+				case JAB_GROUP_CHATTER_ONLINE:
+				{
+					if (GetGroupRoom() == msg->FindString("room")) {
+						AddGroupChatter(msg->FindString("username"));
+					}
+					break;
+				}
 
-		case JAB_GROUP_CHATTER_OFFLINE: {
-			// only for groupchat
-			if (!IsGroupChat()) {
+				case JAB_GROUP_CHATTER_OFFLINE: {
+					RemoveGroupChatter(msg->FindString("username"));
+					break;
+				}
 				break;
 			}
-
-			RemoveGroupChatter(msg->FindString("username"));
-			
-			break;
-		}
-		
-		case JAB_PREFERENCES: {
-			PreferencesWindow::Instance()->Show();
-			PreferencesWindow::Instance()->Activate();
 			break;
 		}
 		
@@ -567,7 +296,7 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 			}
 			
 			// just open file panel for now
-			_fp = new BFilePanel(B_SAVE_PANEL, new BMessenger(this, this), NULL, 0, false, NULL);
+			_fp = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0, false, NULL);
 			_fp->Show();
 			
 			break;
@@ -820,129 +549,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 		}
 	
 		case JAB_CLOSE_CHAT: {
-			PostMessage(B_QUIT_REQUESTED);
-			break;
-		}
-
-		case JAB_RIV: {
-			string jabber_org = "http://www.osdrawer.net"; 
-			
-			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
-			if (!be_roster->IsRunning("text/html"))
-				be_roster->Launch("text/html", 1, argv);
-			else {
-				BMessenger messenger("text/html");
-				BMessage msg(B_NETPOSITIVE_OPEN_URL);
-				msg.AddString("be:url", jabber_org.c_str());
-				messenger.SendMessage(&msg);
-			}
-	
-			break;
-		}
-				
-		case JAB_JABBER_ORG: {
-			string jabber_org = "http://www.jabber.org"; 
-			
-			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
-			if (!be_roster->IsRunning("text/html"))
-				be_roster->Launch("text/html", 1, argv);
-			else {
-				BMessenger messenger("text/html");
-				BMessage msg(B_NETPOSITIVE_OPEN_URL);
-				msg.AddString("be:url", jabber_org.c_str());
-				messenger.SendMessage(&msg);
-			}
-	
-			break;
-		}
-
-		case JAB_JABBER_CENTRAL_ORG: {
-			string jabber_org = "http://www.jabbercentral.org"; 
-			
-			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
-			if (!be_roster->IsRunning("text/html"))
-				be_roster->Launch("text/html", 1, argv);
-			else {
-				BMessenger messenger("text/html");
-				BMessage msg(B_NETPOSITIVE_OPEN_URL);
-				msg.AddString("be:url", jabber_org.c_str());
-				messenger.SendMessage(&msg);
-			}
-	
-			break;
-		}
-
-		case JAB_JABBER_VIEW_COM: {
-			string jabber_org = "http://www.jabberview.com"; 
-			
-			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
-			if (!be_roster->IsRunning("text/html"))
-				be_roster->Launch("text/html", 1, argv);
-			else {
-				BMessenger messenger("text/html");
-				BMessage msg(B_NETPOSITIVE_OPEN_URL);
-				msg.AddString("be:url", jabber_org.c_str());
-				messenger.SendMessage(&msg);
-			}
-	
-			break;
-		}
-
-		case JAB_BE_USERS: {
-			string jabber_org = "http://home.t-online.de/home/sascha.offe/jabber.html"; 
-			
-			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
-			if (!be_roster->IsRunning("text/html"))
-				be_roster->Launch("text/html", 1, argv);
-			else {
-				BMessenger messenger("text/html");
-				BMessage msg(B_NETPOSITIVE_OPEN_URL);
-				msg.AddString("be:url", jabber_org.c_str());
-				messenger.SendMessage(&msg);
-			}
-	
-			break;
-		}
-
-		case JAB_FAQ: {
-			string user_guide = "http://www.users.uswest.net/~jblanco/jabber-faq.html";
-			
-			char *argv[] = {const_cast<char *>(user_guide.c_str()), NULL};
-			if (!be_roster->IsRunning("text/html"))
-				be_roster->Launch("text/html", 1, argv);
-			else {
-				BMessenger messenger("text/html");
-				BMessage msg(B_NETPOSITIVE_OPEN_URL);
-				msg.AddString("be:url", user_guide.c_str());
-				messenger.SendMessage(&msg);
-			}
-	
-			break;
-		}
-
-		case JAB_USER_GUIDE: {
-			string user_guide = AppLocation::Instance()->AbsolutePath("resources/user-guide/user_guide.html");
-			
-			char *argv[] = {const_cast<char *>(user_guide.c_str()), NULL};
-			if (!be_roster->IsRunning("text/html"))
-				be_roster->Launch("text/html", 1, argv);
-			else {
-				BMessenger messenger("text/html");
-				BMessage msg(B_NETPOSITIVE_OPEN_URL);
-				msg.AddString("be:url", user_guide.c_str());
-				messenger.SendMessage(&msg);
-			}
-	
-			break;
-		}
-
-		case JAB_ROTATE_CHAT_FORWARD: {
-			TalkManager::Instance()->RotateToNextWindow(this, TalkManager::ROTATE_FORWARD);
-			break;
-		}
-
-		case JAB_ROTATE_CHAT_BACKWARD: {
-			TalkManager::Instance()->RotateToNextWindow(this, TalkManager::ROTATE_BACKWARD);
+			RemoveSelf();
+			delete this;
 			break;
 		}
 
@@ -953,17 +561,8 @@ void TalkWindow::MessageReceived(BMessage *msg) {
 	}
 }
 
-bool TalkWindow::QuitRequested() {
-	if (IsGroupChat()) {
-		JabberSpeak::Instance()->SendGroupUnvitation(_group_room, _group_username);	
-	}
 
-	TalkManager::Instance()->RemoveWindow(_session->threadID());
-	
-	return true;
-}
-
-string TalkWindow::OurRepresentation() {
+string TalkView::OurRepresentation() {
 	// use friendly name if you have it
 	string user = JabberSpeak::Instance()->CurrentRealName();
 			
@@ -975,7 +574,7 @@ string TalkWindow::OurRepresentation() {
 	return user;
 }
 
-void TalkWindow::AddToTalk(string username, string message, user_type type) {
+void TalkView::AddToTalk(string username, string message, user_type type) {
 	// transform local identity
 	if (IsGroupChat() && type == LOCAL) {
 		username = _group_username;
@@ -1052,7 +651,6 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 			if (_chat->TextLength() > 0) {
 				if (!IsGroupChat() || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
 					SoundSystem::Instance()->PlayMessageSound();
-					NotifyWindowTitle();
 				}
 			}
 			
@@ -1094,7 +692,6 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 			if (comm_type != CommandMessage::NORMAL_ALERT && SoundSystem::Instance()->AlertSound() != "<none>" && _chat->TextLength() > 0) {
 				if (!IsGroupChat() || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
 					SoundSystem::Instance()->PlayMessageSound();
-					NotifyWindowTitle();
 				}
 			}
 
@@ -1174,12 +771,9 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 
 		if (comm_type == CommandMessage::NORMAL_ALERT) {
 			if (!BlabberSettings::Instance()->Tag("suppress-alert")) {
-				Activate();
-
 				// play sound
 				if (type != LOCAL) {
 					SoundSystem::Instance()->PlayAlertSound();
-					NotifyWindowTitle();
 				}
 			}
 		}
@@ -1188,14 +782,14 @@ void TalkWindow::AddToTalk(string username, string message, user_type type) {
 	_chat->ScrollTo(0.0, _chat->Bounds().bottom);
 }
 
-void TalkWindow::Log(const char *buffer) {
+void TalkView::Log(const char *buffer) {
 	if (_am_logging) {
 		fwrite(buffer, sizeof(char), strlen(buffer), _log);
 		fflush(_log);
 	}
 }
 	
-void TalkWindow::NewMessage(string new_message) {
+void TalkView::NewMessage(string new_message) {
 	if (IsGroupChat()) {
 		return; // GCHAT
 	} else {
@@ -1209,27 +803,27 @@ void TalkWindow::NewMessage(string new_message) {
 	}
 }
 
-void TalkWindow::NewMessage(string username, string new_message) {
+void TalkView::NewMessage(string username, string new_message) {
 	AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT);
 }
 	 
-const gloox::JID& TalkWindow::GetUserID() {
+const gloox::JID& TalkView::GetUserID() {
 	return _session->target();
 }
 
-string TalkWindow::GetGroupRoom() {
+string TalkView::GetGroupRoom() {
 	return _group_room;
 }
 
-string TalkWindow::GetGroupUsername() {
+string TalkView::GetGroupUsername() {
 	return _group_username;
 }
 
-bool TalkWindow::NewlinesAllowed() {
+bool TalkView::NewlinesAllowed() {
 	return false;
 }
 
-int TalkWindow::CountHyperlinks(string message) {
+int TalkView::CountHyperlinks(string message) {
 	string::size_type curr_pos = 0, link_start, link_end;
 	string::size_type find1, find2, find3;
 	
@@ -1327,7 +921,7 @@ int TalkWindow::CountHyperlinks(string message) {
 	return link_count;
 }
 
-void TalkWindow::GenerateHyperlinkText(string message, text_run standard, text_run_array **tra) {
+void TalkView::GenerateHyperlinkText(string message, text_run standard, text_run_array **tra) {
 	int link_count = CountHyperlinks(message);
 	string::size_type find1, find2, find3;
 	int link_index = 0;
@@ -1454,7 +1048,7 @@ void TalkWindow::GenerateHyperlinkText(string message, text_run standard, text_r
 	}
 }
 
-void TalkWindow::AddGroupChatter(string user) {
+void TalkView::AddGroupChatter(string user) {
 	int i;
 
 	// create a new entry
@@ -1517,7 +1111,7 @@ void TalkWindow::AddGroupChatter(string user) {
 	}
 }
 
-void TalkWindow::RemoveGroupChatter(string username) {
+void TalkView::RemoveGroupChatter(string username) {
 	// remove user
 	for (int i=0; i < _people->CountItems(); ++i) {
 		if (dynamic_cast<PeopleListItem *>(_people->ItemAt(i))->User() == username) {
@@ -1526,7 +1120,7 @@ void TalkWindow::RemoveGroupChatter(string username) {
 	}
 }
 
-void TalkWindow::RevealPreviousHistory() {
+void TalkView::RevealPreviousHistory() {
 	// boundary
 	if (_chat_index == 49 || _chat_index == ((int)_chat_history.size() - 1)) {
 		return;
@@ -1543,7 +1137,7 @@ void TalkWindow::RevealPreviousHistory() {
 	_message->SetText(_chat_history[_chat_index].c_str());
 }
 
-void TalkWindow::RevealNextHistory() {
+void TalkView::RevealNextHistory() {
 	// boundary
 	if (_chat_index == -1) {
 		return;
@@ -1561,32 +1155,9 @@ void TalkWindow::RevealNextHistory() {
 	}
 }
 
-void
-TalkWindow::WindowActivated(bool active)
-{
-	if(Title() && 
-		active && 
-		memcmp(Title(), NOTIFICATION_CHAR, strlen(NOTIFICATION_CHAR)) == 0)
-	{
-		SetTitle(originalWindowTitle.String());
-	}
-}
-
-
-void
-TalkWindow::NotifyWindowTitle()
-{
-	if(!IsActive())
-	{
-		BString newTitle = originalWindowTitle;
-		newTitle.Prepend(NOTIFICATION_CHAR);
-		SetTitle(newTitle.String());
-	}
-}
-
 
 bool
-TalkWindow::IsGroupChat()
+TalkView::IsGroupChat()
 {
 	return !_group_room.empty();
 }

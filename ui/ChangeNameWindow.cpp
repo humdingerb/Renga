@@ -81,11 +81,8 @@ void ChangeNameWindow::MessageReceived(BMessage *msg) {
 			// re-add to roster
 			JabberSpeak::Instance()->SetFriendlyName(_changing_user, _handle->Text());
 
-			// update window title
-			TalkManager::Instance()->UpdateWindowTitles(_changing_user, _handle->Text());
-
 			PostMessage(B_QUIT_REQUESTED);
-						
+
 			break;
 		}
 

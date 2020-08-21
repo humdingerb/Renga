@@ -21,7 +21,7 @@
 #include "Agent.h"
 #include "AgentList.h"
 #include "BlabberSettings.h"
-#include "TalkWindow.h"
+#include "../ui/TalkView.h"
 #include "UserID.h"
 #include "XMLReader.h"
 

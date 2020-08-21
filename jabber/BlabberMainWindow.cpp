@@ -23,6 +23,7 @@
 #include "RotateChatFilter.h"
 #include "SendTalkWindow.h"
 #include "TalkManager.h"
+#include "../ui/TalkView.h"
 
 #include <Application.h>
 #include <CardLayout.h>
@@ -178,7 +179,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_RIV: {
-			string jabber_org = "http://www.users.uswest.net/~jblanco"; 
+			string jabber_org = "http://github.com/haikuarchives/renga"; 
 			
 			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
 			if (!be_roster->IsRunning("text/html"))
@@ -578,16 +579,6 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 		
-#if 0
-		case PortTalker::COULD_NOT_RESOLVE_HOSTNAME: 
-		{
-			char buffer[1024];
-			
-			sprintf(buffer, "The hostname '%s' couldn't be reached.  Please re-check the name and try again. There could be a networking problem as well.", msg->FindString("hostname"));
-			ModalAlertFactory::Alert(buffer, "Doh!");
-		}
-#endif
-
 		case kResetWindow:
 		{
 			JabberSpeak::Instance()->Reset();
@@ -598,13 +589,23 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_ROTATE_CHAT_FORWARD:
 		{
-			TalkManager::Instance()->RotateToNextWindow(NULL, TalkManager::ROTATE_FORWARD);
+			int currentIndex = fTalkCards->VisibleIndex();
+			int itemCount = fTalkCards->CountItems();
+
+			if (++currentIndex >= itemCount)
+				currentIndex = 0;
+			fTalkCards->SetVisibleItem(currentIndex);
 			break;
 		}
 
 		case JAB_ROTATE_CHAT_BACKWARD:
 		{
-			TalkManager::Instance()->RotateToNextWindow(NULL, TalkManager::ROTATE_BACKWARD);
+			int currentIndex = fTalkCards->VisibleIndex();
+			int itemCount = fTalkCards->CountItems();
+
+			if (--currentIndex < 0)
+				currentIndex = itemCount - 1;
+			fTalkCards->SetVisibleItem(currentIndex);
 			break;
 		}
 
@@ -640,6 +641,25 @@ void BlabberMainWindow::MenusBeginning() {
 		_disconnect_item->SetEnabled(false);
 	}
 
+	// logging
+	bool isGroup = true;
+	bool isLogging = false;
+	TalkView* talk = nullptr;
+
+	BLayoutItem* i = fTalkCards->VisibleItem();
+	if (i) {
+		talk = (TalkView*)i->View();
+		isGroup = talk->IsGroupChat();
+		isLogging = talk->IsLogging();
+	}
+
+	if(_record_item != nullptr) {
+	  _record_item->SetEnabled(!isGroup && !isLogging);
+	  _record_item->SetTarget(talk);
+	}
+	_record_entire_item->SetEnabled(!isGroup && isLogging);
+	_record_entire_item->SetTarget(talk);
+
 	// EDIT menu
 	if (RosterItem *item = _roster->CurrentItemSelection()) {
 		// if a  item is selected
@@ -653,7 +673,7 @@ void BlabberMainWindow::MenusBeginning() {
 
 		_user_info_item->SetEnabled(true);
 		_user_chatlog_item->SetEnabled(BlabberSettings::Instance()->Tag("autoopen-chatlog"));
-	} else {		
+	} else {
 		sprintf(buffer, "Edit Buddy");
 		_change_buddy_item->SetLabel(buffer);
 		_change_buddy_item->SetEnabled(false);
@@ -664,6 +684,96 @@ void BlabberMainWindow::MenusBeginning() {
 
 		_user_info_item->SetEnabled(false);
 		_user_chatlog_item->SetEnabled(false);
+	}
+
+	const char *message_1 = BlabberSettings::Instance()->Data("message-1");
+	const char *message_2 = BlabberSettings::Instance()->Data("message-2");
+	const char *message_3 = BlabberSettings::Instance()->Data("message-3");
+	const char *message_4 = BlabberSettings::Instance()->Data("message-4");
+	const char *message_5 = BlabberSettings::Instance()->Data("message-5");
+	const char *message_6 = BlabberSettings::Instance()->Data("message-6");
+	const char *message_7 = BlabberSettings::Instance()->Data("message-7");
+	const char *message_8 = BlabberSettings::Instance()->Data("message-8");
+	const char *message_9 = BlabberSettings::Instance()->Data("message-9");
+	
+	if (message_1) {
+		_message_1_item->SetLabel(message_1);
+		_message_1_item->SetEnabled(true);
+	} else {
+		_message_1_item->SetLabel("Message 1");
+		_message_1_item->SetEnabled(false);
+	}
+
+	if (message_2) {
+		_message_2_item->SetLabel(message_2);
+		_message_2_item->SetEnabled(true);
+	} else {
+		_message_2_item->SetLabel("Message 2");
+		_message_2_item->SetEnabled(false);
+	}
+
+	if (message_3) {
+		_message_3_item->SetLabel(message_3);
+		_message_3_item->SetEnabled(true);
+	} else {
+		_message_3_item->SetLabel("Message 3");
+		_message_3_item->SetEnabled(false);
+	}
+
+	if (message_4) {
+		_message_4_item->SetLabel(message_4);
+		_message_4_item->SetEnabled(true);
+	} else {
+		_message_4_item->SetLabel("Message 4");
+		_message_4_item->SetEnabled(false);
+	}
+
+	if (message_5) {
+		_message_5_item->SetLabel(message_5);
+		_message_5_item->SetEnabled(true);
+	} else {
+		_message_5_item->SetLabel("Message 5");
+		_message_5_item->SetEnabled(false);
+	}
+
+	if (message_6) {
+		_message_6_item->SetLabel(message_6);
+		_message_6_item->SetEnabled(true);
+	} else {
+		_message_6_item->SetLabel("Message 6");
+		_message_6_item->SetEnabled(false);
+	}
+
+	if (message_7) {
+		_message_7_item->SetLabel(message_7);
+		_message_7_item->SetEnabled(true);
+	} else {
+		_message_7_item->SetLabel("Message 7");
+		_message_7_item->SetEnabled(false);
+	}
+
+	if (message_8) {
+		_message_8_item->SetLabel(message_8);
+		_message_8_item->SetEnabled(true);
+	} else {
+		_message_8_item->SetLabel("Message 8");
+		_message_8_item->SetEnabled(false);
+	}
+
+	if (message_9) {
+		_message_9_item->SetLabel(message_9);
+		_message_9_item->SetEnabled(true);
+	} else {
+		_message_9_item->SetLabel("Message 9");
+		_message_9_item->SetEnabled(false);
+	}
+
+	// FIXME do this when swapping talkcards instead
+	if (fTalkCards->VisibleItem()) {
+		_message_menu->SetTargetForItems(fTalkCards->VisibleItem()->View());
+		_message_menu->SetEnabled(true);
+	} else {
+		_message_menu->SetEnabled(false);
 	}
 }
 
@@ -685,10 +795,12 @@ bool BlabberMainWindow::QuitRequested() {
 }
 
 BlabberMainWindow::BlabberMainWindow(BRect frame)
-	: BWindow(frame, "Renga", B_DOCUMENT_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS) {
+	: BWindow(frame, "Renga", B_DOCUMENT_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS)
+	, _record_item(nullptr)
+{
 
 	// editing filter for taksing
-	AddCommonFilter(new RotateChatFilter(NULL));
+	AddCommonFilter(new RotateChatFilter());
 	
 	// add self to message family
 	MessageRepeater::Instance()->AddTarget(this);
@@ -718,10 +830,24 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_quit_item = new BMenuItem("Quit", new BMessage(JAB_QUIT));
 		_quit_item->SetShortcut('Q', 0);
 
+    bool bAutoOpenChatLog = BlabberSettings::Instance()->Tag("autoopen-chatlog");
+	if(bAutoOpenChatLog) {
+		BMessage *msg = new BMessage(JAB_SHOW_CHATLOG);
+		_record_entire_item = new BMenuItem("Show Chat Log", msg);
+		_record_entire_item->SetShortcut('H', 0);
+	} else {
+		_record_item = new BMenuItem("Start Chat Log", new BMessage(JAB_START_RECORD));
+		_record_entire_item = new BMenuItem("Stop Chat Log", new BMessage(JAB_STOP_RECORD));
+	}
+
+	if(_record_item != nullptr) {
+	  file_menu->AddItem(_record_item);
+	}
+	file_menu->AddItem(_record_entire_item);
+	file_menu->AddSeparatorItem();
+
 //	file_menu->AddItem(_connect_item);
 	file_menu->AddItem(_disconnect_item);
-	file_menu->AddSeparatorItem();
-	file_menu->AddItem(_about_item);
 	file_menu->AddSeparatorItem();
 	file_menu->AddItem(_quit_item);
 	file_menu->SetTargetForItems(MessageRepeater::Instance());
@@ -793,11 +919,11 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	// TALK MENU
 	BMenu* talk_menu = new BMenu("Talk");
 
-		_rotate_chat_forward_item = new BMenuItem("Rotate Chat Forward", new BMessage(JAB_ROTATE_CHAT_FORWARD));
-		_rotate_chat_forward_item->SetShortcut('.', 0);
+		BMenuItem* rotate_chat_forward_item = new BMenuItem("Rotate Chat Forward", new BMessage(JAB_ROTATE_CHAT_FORWARD));
+		rotate_chat_forward_item->SetShortcut('.', 0);
 
-		_rotate_chat_backward_item = new BMenuItem("Rotate Chat Backward", new BMessage(JAB_ROTATE_CHAT_BACKWARD));
-		_rotate_chat_backward_item->SetShortcut(',', 0);
+		BMenuItem* rotate_chat_backward_item = new BMenuItem("Rotate Chat Backward", new BMessage(JAB_ROTATE_CHAT_BACKWARD));
+		rotate_chat_backward_item->SetShortcut(',', 0);
 
 		_send_message_item = new BMenuItem("Send Message...", new BMessage(JAB_OPEN_NEW_MESSAGE));
 		_send_message_item->SetShortcut('M', 0);
@@ -808,18 +934,82 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_send_groupchat_item = new BMenuItem("Start Group Chat...", new BMessage(JAB_OPEN_NEW_GROUP_CHAT));
 		_send_groupchat_item->SetShortcut('G', 0);
 
-	talk_menu->AddItem(_rotate_chat_forward_item);
-	talk_menu->AddItem(_rotate_chat_backward_item);
+	talk_menu->AddItem(rotate_chat_forward_item);
+	talk_menu->AddItem(rotate_chat_backward_item);
 	talk_menu->AddSeparatorItem();
 	talk_menu->AddItem(_send_message_item);
 	talk_menu->AddItem(_send_chat_item);
 	talk_menu->AddItem(_send_groupchat_item);
 	talk_menu->SetTargetForItems(this);
 
+	// MESSAGE MENU
+	_message_menu = new BMenu("Messages");
+
+		_message_1_item = new BMenuItem("Message #1", new BMessage(JAB_MESSAGE_1));
+		_message_1_item->SetShortcut('1', 0);
+		_message_1_item->SetEnabled(false);
+
+		_message_2_item = new BMenuItem("Message #2", new BMessage(JAB_MESSAGE_2));
+		_message_2_item->SetShortcut('2', 0);
+		_message_2_item->SetEnabled(false);
+
+		_message_3_item = new BMenuItem("Message #3", new BMessage(JAB_MESSAGE_3));
+		_message_3_item->SetShortcut('3', 0);
+		_message_3_item->SetEnabled(false);
+
+		_message_4_item = new BMenuItem("Message #4", new BMessage(JAB_MESSAGE_4));
+		_message_4_item->SetShortcut('4', 0);
+		_message_4_item->SetEnabled(false);
+
+		_message_5_item = new BMenuItem("Message #5", new BMessage(JAB_MESSAGE_5));
+		_message_5_item->SetShortcut('5', 0);
+		_message_5_item->SetEnabled(false);
+
+		_message_6_item = new BMenuItem("Message #6", new BMessage(JAB_MESSAGE_6));
+		_message_6_item->SetShortcut('6', 0);
+		_message_6_item->SetEnabled(false);
+
+		_message_7_item = new BMenuItem("Message #7", new BMessage(JAB_MESSAGE_7));
+		_message_7_item->SetShortcut('7', 0);
+		_message_7_item->SetEnabled(false);
+
+		_message_8_item = new BMenuItem("Message #8", new BMessage(JAB_MESSAGE_8));
+		_message_8_item->SetShortcut('8', 0);
+		_message_8_item->SetEnabled(false);
+		
+		_message_9_item = new BMenuItem("Message #9", new BMessage(JAB_MESSAGE_9));
+		_message_9_item->SetShortcut('9', 0);
+		_message_9_item->SetEnabled(false);
+
+	_message_menu->AddItem(_message_1_item);
+	_message_menu->AddItem(_message_2_item);
+	_message_menu->AddItem(_message_3_item);
+	_message_menu->AddItem(_message_4_item);
+	_message_menu->AddItem(_message_5_item);
+	_message_menu->AddItem(_message_6_item);
+	_message_menu->AddItem(_message_7_item);
+	_message_menu->AddItem(_message_8_item);
+	_message_menu->AddItem(_message_9_item);
+
+	// HELP MENU
+	BMenu* help_menu = new BMenu("Help");
+
+	BMenuItem* user_guide_item = new BMenuItem("Renga Manual", new BMessage(JAB_USER_GUIDE));
+	BMenuItem* faq_item = new BMenuItem("Renga FAQ", new BMessage(JAB_FAQ));
+
+	help_menu->AddItem(user_guide_item);
+	help_menu->AddItem(faq_item);
+	help_menu->AddSeparatorItem();
+	help_menu->AddItem(_about_item);
+
+	help_menu->SetTargetForItems(this);
+
 	menubar->AddItem(file_menu);
 	menubar->AddItem(edit_menu);
 	menubar->AddItem(status_menu);
 	menubar->AddItem(talk_menu);
+	menubar->AddItem(_message_menu);
+	menubar->AddItem(help_menu);
 
 	// tabbed view
 	// roster view
@@ -832,8 +1022,15 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	BLayoutBuilder::Group<>(_full_view, B_VERTICAL, 0)
 		.SetInsets(0, 0, 0, 0)
 		.Add(menubar)
-		.Add(roster_scroller)
-		.Add(_status_view)
+		.AddGroup(B_HORIZONTAL, 0)
+			.AddGroup(B_VERTICAL, 0)
+				.Add(roster_scroller)
+				.Add(_status_view)
+			.End()
+			.AddCards()
+				.GetLayout(&fTalkCards)
+			.End()
+		.End()
 	.End();
 	
 	///// NOW DO LOGIN STUFF
@@ -924,7 +1121,11 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	}
 
 	JabberSpeak::Instance()->StartWatchingAll(this);
+
+	// editing filter for taksing
+	AddCommonFilter(new RotateChatFilter());
 }
+
 
 bool BlabberMainWindow::ValidateLogin() {
 	// existance of username
@@ -1012,4 +1213,11 @@ void BlabberMainWindow::SetCustomStatus(string status) {
 
 	_custom_item->SetMarked(true);
 	_custom_item->SetLabel(buffer);
+}
+
+
+void
+BlabberMainWindow::AddTalkView(TalkView* view)
+{
+	fTalkCards->AddView(view);
 }

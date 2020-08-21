@@ -20,6 +20,7 @@
 
 RosterView::RosterView()
 	: BOutlineListView(NULL, B_SINGLE_SELECTION_LIST) {
+	SetExplicitMinSize(BSize(StringWidth("Firstname M. Lastname"), B_SIZE_UNSET));
 }
 
 RosterView::~RosterView() {
