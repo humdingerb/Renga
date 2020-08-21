@@ -18,51 +18,42 @@
 	#include "JabberSpeak.h"
 #endif
 
-PeopleListItem::PeopleListItem(std::string whoami, std::string user)
+PeopleListItem::PeopleListItem(std::string user, gloox::MUCRoomAffiliation affiliation)
 	: BListItem() {
 	_user   = user;
-	_whoami = whoami;
+	fAffiliation = affiliation;
 }
 
 PeopleListItem::~PeopleListItem() {
 }
 
 void PeopleListItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete) {
-	// text characteristics
-	owner->SetFont(be_plain_font);
-	owner->SetFontSize(11.0);
-
 	// clear rectangle
 	if (IsSelected()) {
-		if (User() == _whoami) {
-			owner->SetHighColor(255, 200, 200);
-		} else {
-			owner->SetHighColor(200, 200, 255);
-		}
-
-		owner->SetLowColor(owner->HighColor());
+		owner->SetLowUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
+		owner->SetHighUIColor(B_LIST_SELECTED_ITEM_TEXT_COLOR);
 	} else {
-		owner->SetHighColor(owner->ViewColor());
-		owner->SetLowColor(owner->HighColor());
+		owner->SetLowUIColor(B_LIST_BACKGROUND_COLOR);
+		owner->SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
 	}
 
-	owner->FillRect(frame);
+	owner->FillRect(frame, B_SOLID_LOW);
 
 	// construct text positioning
 	font_height fh;
 	owner->GetFontHeight(&fh);
 
 	float height = fh.ascent + fh.descent;
-
-	// standard text color
-	if (User() == _whoami) {
-		owner->SetHighColor(255, 0, 0);
-	} else {
-		owner->SetHighColor(0, 0, 255);
-	}
+	float vpos = frame.bottom - (frame.Height() - height) / 2 - fh.descent;
 
 	// draw information
-	owner->DrawString(User().c_str(), BPoint(frame.left + 5.0, frame.bottom - ((frame.Height() - height) / 2) - fh.descent));
+	owner->DrawString(User().c_str(), BPoint(frame.left + 5.0, vpos));
+
+	BPoint affiliationPos(frame.right - owner->StringWidth("@") - 5.0, vpos);
+	if (fAffiliation == gloox::AffiliationOwner)
+		owner->DrawString("&", affiliationPos);
+	else if (fAffiliation == gloox::AffiliationAdmin)
+		owner->DrawString("@", affiliationPos);
 }
 
 void PeopleListItem::Update(BView *owner, const BFont *font) {

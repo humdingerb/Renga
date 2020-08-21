@@ -6,18 +6,18 @@
 #ifndef PEOPLE_LIST_ITEM_H
 #define PEOPLE_LIST_ITEM_H
 
-#ifndef __STRING__
-	#include <string>
-#endif
+#include <string>
 
-#ifndef LIST_ITEM_H
-	#include <interface/ListItem.h>
-#endif
+#include <interface/ListItem.h>
 
-class PeopleListItem : public BListItem {
+#include <gloox/gloox.h>
+
+
+class PeopleListItem : public BListItem
+{
 public:
-	              PeopleListItem(std::string whoami, std::string user);
-   	             ~PeopleListItem();
+	              PeopleListItem(std::string user, gloox::MUCRoomAffiliation);
+	             ~PeopleListItem();
 
 	virtual void  DrawItem(BView *owner, BRect rect, bool complete);
 	virtual void  Update(BView *owner, const BFont *font);
@@ -26,7 +26,7 @@ public:
 
 private:
 	std::string   _user;
-	std::string   _whoami;
+	gloox::MUCRoomAffiliation fAffiliation;
 };
 
 #endif

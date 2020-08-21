@@ -275,7 +275,8 @@ void TalkView::MessageReceived(BMessage *msg) {
 				case JAB_GROUP_CHATTER_ONLINE:
 				{
 					if (GetGroupRoom() == msg->FindString("room")) {
-						AddGroupChatter(msg->FindString("username"));
+						AddGroupChatter(msg->FindString("username"),
+							(gloox::MUCRoomAffiliation)msg->FindInt32("affiliation"));
 					}
 					break;
 				}
@@ -1065,11 +1066,11 @@ static int compareStrings(const char* a, const char* b)
 }
 
 
-void TalkView::AddGroupChatter(string user) {
+void TalkView::AddGroupChatter(string user, gloox::MUCRoomAffiliation affiliation) {
 	int i;
 
 	// create a new entry
-	PeopleListItem *people_item = new PeopleListItem(_group_username, user);
+	PeopleListItem *people_item = new PeopleListItem(user, affiliation);
 	
 	// exception
 	if (_people->CountItems() == 0) {
@@ -1088,6 +1089,7 @@ void TalkView::AddGroupChatter(string user) {
 
 		if (compare == 0) {
 			// Update existing user
+			// FIXME affiliation might have changed, refresh it
 			_people->InvalidateItem(i);
 		} else if (compare > 0) {
 			// add the new user in the middle

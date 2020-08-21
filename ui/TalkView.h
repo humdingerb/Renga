@@ -62,7 +62,7 @@ public:
 	int                  CountHyperlinks(std::string message);
 	void                 GenerateHyperlinkText(std::string message, text_run standard, text_run_array **tra);
 
-	void                 AddGroupChatter(std::string username);
+	void                 AddGroupChatter(std::string username, gloox::MUCRoomAffiliation);
 	void                 RemoveGroupChatter(std::string username);
 
 	void                 RevealPreviousHistory();

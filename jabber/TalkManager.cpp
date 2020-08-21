@@ -200,6 +200,7 @@ TalkManager::handleMUCParticipantPresence(gloox::MUCRoom *room,
 	msg.AddString("room", fullRoom);
 	msg.AddString("server", room->service().c_str());
 	msg.AddString("username", participant.nick->resource().c_str());
+	msg.AddInt32("affiliation", participant.affiliation);
 	if (presence.subtype() == gloox::Presence::Available) {
 		msg.what = JAB_GROUP_CHATTER_ONLINE;
 	} else if (presence.subtype() == gloox::Presence::Unavailable) {
