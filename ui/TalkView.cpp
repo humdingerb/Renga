@@ -79,12 +79,12 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 		  chatlog_path += "/" + user->username();
 		} else {
 		  chatlog_path += "/" + group_room;
-		}	
+		}
 		// start file
 		_log = fopen(chatlog_path.c_str(), "a");
 		_am_logging = (0 != _log);
 	}
-	
+
 	// FILE MENU
 	// status bar
 	_status_view = new StatusView();
@@ -99,13 +99,12 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	_chat->MakeEditable(false);
 
 	BGridView* _sending = new BGridView("communicate");
-		
+
 	// message control
-	rgb_color sent = {0, 0, 0, 255};
-	BFont black_11(be_plain_font);
-	black_11.SetSize(11.0);
-	
-	_message          = new BetterTextView("message", &black_11, &sent, B_WILL_DRAW);
+	rgb_color text_color = ui_color(B_PANEL_TEXT_COLOR);
+	BFont text_font(be_plain_font);
+
+	_message          = new BetterTextView("message", &text_font, &text_color, B_WILL_DRAW);
 	_message_scroller = new BScrollView("message_scroller", _message, B_WILL_DRAW, false, false);
 	_message->TargetedByScrollView(_message_scroller);
 	_message->SetWordWrap(true);
@@ -118,19 +117,19 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	_send_message->MakeDefault(true);
 	_send_message->SetFlat(true);
 	_send_message->SetExplicitSize(BSize(_send_message->StringWidth("WWWW"), B_SIZE_UNSET));
-	
+
 	// add alt-enter note
 
 	BLayoutBuilder::Grid<>(_sending)
 		.Add(_message_scroller, 0, 0)
 		.Add(_send_message,     1, 0)
 	.End();
-	
+
 	// handle splits
 	BGroupView* _split_talk = new BGroupView(B_VERTICAL);
 	_split_talk->AddChild(_chat_scroller);
 	_split_talk->AddChild(_sending);
-	
+
 	_people = new BListView(NULL, B_SINGLE_SELECTION_LIST);
 	_people->SetExplicitMinSize(BSize(StringWidth("Firstname M. Lastname"), B_SIZE_UNSET));
 	_scrolled_people_pane = new BScrollView(NULL, _people, 0, false, true, B_PLAIN_BORDER);
@@ -145,8 +144,8 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	if (!IsGroupChat()) {
 		_split_group_people->SetItemCollapsed(1, true);
 		_split_group_people->SetSplitterSize(0);
-	}	
-	
+	}
+
 	// add GUI components to BView
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
@@ -156,22 +155,22 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	AddChild(_status_view);
 
 	_message->MakeFocus(true);
-	
+
 	// generate window title
 	char buffer[1024];
 	string user_representation;
-	
+
 	if (!IsGroupChat()) {
 		// identify the user
 		sprintf(buffer, "your identity is %s", _group_username.c_str());
-		_status_view->SetMessage(buffer); 
+		_status_view->SetMessage(buffer);
 	} else if (!uid || uid->UserType() == UserID::JABBER) {
 		// identify the user
 		sprintf(buffer, "your identity is %s", JabberSpeak::Instance()->CurrentLogin().c_str());
-		_status_view->SetMessage(buffer); 
+		_status_view->SetMessage(buffer);
 	} else {
 		user_representation = uid->FriendlyName();
-		
+
 		if (user_representation.empty()) {
 			user_representation = uid->JabberUsername();
 		}
@@ -182,10 +181,10 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 			// identify the user
 			if (!AgentList::Instance()->GetAgentByService("icq")->Username().empty()) {
 				sprintf(buffer, "your identity is %s", AgentList::Instance()->GetAgentByService("icq")->Username().c_str());
-				_status_view->SetMessage(buffer); 
+				_status_view->SetMessage(buffer);
 			} else {
 				sprintf(buffer, "you are communicating via the ICQ service");
-				_status_view->SetMessage(buffer); 
+				_status_view->SetMessage(buffer);
 			}
 		}
 	}
@@ -224,7 +223,7 @@ TalkView::~TalkView() {
 	}
 
 	if (IsGroupChat()) {
-		JabberSpeak::Instance()->SendGroupUnvitation(_group_room, _group_username);	
+		JabberSpeak::Instance()->SendGroupUnvitation(_group_room, _group_username);
 	}
 
 	TalkManager::Instance()->RemoveWindow(this);
@@ -246,10 +245,10 @@ void TalkView::FrameResized(float width, float height)
 
 	chat_rect.OffsetTo(B_ORIGIN);
 	message_rect.OffsetTo(B_ORIGIN);
-	
+
 	chat_rect.InsetBy(2.0, 2.0);
 	message_rect.InsetBy(2.0, 2.0);
-	
+
 	_chat->SetTextRect(chat_rect);
 	_message->SetTextRect(message_rect);
 
@@ -293,17 +292,17 @@ void TalkView::MessageReceived(BMessage *msg) {
 			}
 			break;
 		}
-		
+
 		case JAB_START_RECORD: {
 			if (_am_logging) {
 				// we already are
 				break;
 			}
-			
+
 			// just open file panel for now
 			_fp = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0, false, NULL);
 			_fp->Show();
-			
+
 			break;
 		}
 
@@ -326,11 +325,11 @@ void TalkView::MessageReceived(BMessage *msg) {
 
 			// construct path (sigh)
 			BDirectory dir_object(&dir);
-			
+
 			strcpy(abs_path, BPath(&dir_object, filename.c_str()).Path());
-			
+
 			_am_logging = true;
-			
+
 			// start file
 			_log = fopen(abs_path, "w");
 
@@ -349,10 +348,10 @@ void TalkView::MessageReceived(BMessage *msg) {
 			// dirty work
 			_am_logging = false;
 			fclose(_log);
-			
+
 			break;
 		}
-		
+
 		case BLAB_UPDATE_ROSTER: {
 			// doesn't apply to groupchat
 			if (!IsGroupChat()) {
@@ -384,23 +383,23 @@ void TalkView::MessageReceived(BMessage *msg) {
 			_current_status = new_status;
 
 			JRoster::Instance()->Unlock();
-		
+
 			break;
 		}
-		
+
 		case JAB_MESSAGE_1: {
 			string message = BlabberSettings::Instance()->Data("message-1");
-			
+
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-1")) {
 				// network part
 				_session->send(message);
-				
+
 				// client part
 				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
 				_message->Insert(message.c_str());
 			}
-			
+
 			break;
 		}
 
@@ -410,7 +409,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-2")) {
 				// network part
 				_session->send(message);
-				
+
 				// client part
 				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
@@ -426,7 +425,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-3")) {
 				// network part
 				_session->send(message);
-				
+
 				// client part
 				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
@@ -442,7 +441,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-4")) {
 				// network part
 				_session->send(message);
-				
+
 				// client part
 				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
@@ -458,7 +457,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-5")) {
 				// network part
 				_session->send(message);
-				
+
 				// client part
 				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
@@ -474,7 +473,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-6")) {
 				// network part
 				_session->send(message);
-				
+
 				// client part
 				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
@@ -490,7 +489,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-7")) {
 				// network part
 				_session->send(message);
-				
+
 				// client part
 				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
@@ -506,7 +505,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-8")) {
 				// network part
 				_session->send(message);
-				
+
 				// client part
 				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
@@ -521,7 +520,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 
 			if (!message.empty() && BlabberSettings::Instance()->Tag("fire-9")) {
 				_session->send(message);
-				
+
 				// client part
 				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
 			} else {
@@ -533,7 +532,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 
 		case JAB_CHAT_SENT: {
 			string message = _message->Text();
-			
+
 			// eliminate empty messages
 			if (message.empty()) {
 				break;
@@ -560,7 +559,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 
 			break;
 		}
-	
+
 		case JAB_CLOSE_CHAT: {
 			RemoveSelf();
 			delete this;
@@ -584,7 +583,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 string TalkView::OurRepresentation() {
 	// use friendly name if you have it
 	string user = JabberSpeak::Instance()->CurrentRealName();
-			
+
 	// and if not :)
 	if (user.empty()) {
 		user = JabberSpeak::Instance()->CurrentLogin();
@@ -603,10 +602,10 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	if (type == LOCAL) {
 		// reset chat history index
 		_chat_index = -1;
-		
+
 		// add latest
 		_chat_history.push_front(message);
-		
+
 		// prune end
 		if (_chat_history.size() > 50) {
 			_chat_history.pop_back();
@@ -617,7 +616,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	if (IsGroupChat() && type == MAIN_RECIPIENT && username == _group_username) {
 		return;
 	}
-	
+
 	// ignore empty messages
 	if (message.empty()) {
 		return;
@@ -634,12 +633,12 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 
 	thin.SetSize(11.0);
 	thick.SetSize(11.0);
-			
+
 	// some colors to play with
 	rgb_color blue   = {0, 0, 255, 255};
 	rgb_color red    = {255, 0, 0, 255};
 	rgb_color black  = {0, 0, 0, 255};
-	
+
 	// some runs to play with
 	text_run tr_thick_blue  = {0, thick, blue};
 	text_run tr_thick_red   = {0, thick, red};
@@ -647,10 +646,10 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	text_run tr_thin_black  = {0, thin, black};
 
 	// some run array to play with (simple)
-	text_run_array tra_thick_blue  = {1, {tr_thick_blue}}; 
-	text_run_array tra_thick_red   = {1, {tr_thick_red}}; 
-	text_run_array tra_thick_black = {1, {tr_thick_black}}; 
-	text_run_array tra_thin_black  = {1, {tr_thin_black}}; 
+	text_run_array tra_thick_blue  = {1, {tr_thick_blue}};
+	text_run_array tra_thick_red   = {1, {tr_thick_red}};
+	text_run_array tra_thick_black = {1, {tr_thick_black}};
+	text_run_array tra_thin_black  = {1, {tr_thin_black}};
 
 	// add to end of conversation
 	bool                         is_command = CommandMessage::IsCommand(message);
@@ -660,11 +659,11 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	char timestamp[64];
 	time_t now = time(NULL);
 	struct tm *time_struct = localtime(&now);
-	
+
 	strftime(timestamp, 63, "[%R:%S] ", time_struct);
 
 	string time_stamp = timestamp;
-	
+
 	if (comm_type == CommandMessage::NORMAL) {
 		if (type == MAIN_RECIPIENT) {
 			if (_chat->TextLength() > 0) {
@@ -672,7 +671,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 					SoundSystem::Instance()->PlayMessageSound();
 				}
 			}
-			
+
 			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_blue);
 		} else if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
 			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_red);
@@ -689,7 +688,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 
 			// print usage (most likely)
 			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_black);
-	
+
 			// log?
 			Log(message.c_str());
 		}
@@ -720,7 +719,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 				// log?
 				Log(time_stamp.c_str());
 			}
-			
+
 			_chat->Insert(_chat->TextLength(), username.c_str(), username.size(), &tra_thick_blue);
 
 			// log?
@@ -797,7 +796,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 			}
 		}
 	}
-			
+
 	_chat->ScrollTo(0.0, _chat->Bounds().bottom);
 }
 
@@ -807,7 +806,7 @@ void TalkView::Log(const char *buffer) {
 		fflush(_log);
 	}
 }
-	
+
 void TalkView::NewMessage(string new_message) {
 	if (IsGroupChat()) {
 		return; // GCHAT
@@ -825,7 +824,7 @@ void TalkView::NewMessage(string new_message) {
 void TalkView::NewMessage(string username, string new_message) {
 	AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT);
 }
-	 
+
 const gloox::JID& TalkView::GetUserID() {
 	if (_session == NULL)
 		debugger("Getting user ID not possible for group chat");
@@ -848,10 +847,10 @@ bool TalkView::NewlinesAllowed() {
 int TalkView::CountHyperlinks(string message) {
 	string::size_type curr_pos = 0, link_start, link_end;
 	string::size_type find1, find2, find3;
-	
+
 	// keep count
 	int link_count = 0;
-	
+
 	// find next link
 	link_start = message.find("http://", curr_pos);
 
@@ -900,13 +899,13 @@ int TalkView::CountHyperlinks(string message) {
 				break;
 			}
 		}
-		
+
 		if (link_start < link_end) {
 			++link_count;
 		}
-		
+
 		curr_pos = link_end + 1;
-		
+
 		// find next link
 		link_start = message.find("http://", curr_pos);
 
@@ -926,7 +925,7 @@ int TalkView::CountHyperlinks(string message) {
 				link_start = find2;
 			}
 		}
-	
+
 		find3 = message.find("ftp.", curr_pos);
 		if (find3 != string::npos && (link_start == string::npos || find3 < link_start)) {
 			// ignore if it's not at the beginning or has no whitespace
@@ -959,10 +958,10 @@ void TalkView::GenerateHyperlinkText(string message, text_run standard, text_run
 
 		return;
 	}
-		
+
 	*tra = (text_run_array *)malloc(sizeof(text_run_array) + (sizeof(text_run) * (link_count * 2 - 1)));
 	(*tra)->count = link_count * 2;
-		
+
 	string::size_type curr_pos = 0, link_start, link_end;
 
 	// find next link
@@ -996,7 +995,7 @@ void TalkView::GenerateHyperlinkText(string message, text_run standard, text_run
 			link_start = find3;
 		}
 	}
-			
+
 	while (link_start != string::npos) {
 		// find whitespace or end
 		link_end = message.find_first_of(" \t\r\n", link_start);
@@ -1013,12 +1012,12 @@ void TalkView::GenerateHyperlinkText(string message, text_run standard, text_run
 				break;
 			}
 		}
-		
+
 		// add hyperlink
 		if (link_start < link_end) {
 			BFont thin(be_plain_font);
 			rgb_color purple = {192, 0, 192, 255};
-			
+
 			(*tra)->runs[link_index].offset = link_start;
 			(*tra)->runs[link_index].font = thin;
 			(*tra)->runs[link_index].color = purple;
@@ -1027,13 +1026,13 @@ void TalkView::GenerateHyperlinkText(string message, text_run standard, text_run
 			(*tra)->runs[link_index + 1].font = standard.font;
 			(*tra)->runs[link_index + 1].color = standard.color;
 		}
-		
+
 		curr_pos = link_end + 1;
 
 		if (curr_pos >= message.size()) {
 			break;
 		}
-		
+
 		// find next link
 		link_start = message.find("http://", curr_pos);
 
@@ -1089,7 +1088,7 @@ void TalkView::AddGroupChatter(string user, gloox::MUCRoomAffiliation affiliatio
 
 	// create a new entry
 	PeopleListItem *people_item = new PeopleListItem(user, affiliation);
-	
+
 	// exception
 	if (_people->CountItems() == 0) {
 		// add the new user
@@ -1145,7 +1144,7 @@ void TalkView::RevealPreviousHistory() {
 
 	// go back
 	++_chat_index;
-	
+
 	// update text
 	_message->SetText(_chat_history[_chat_index].c_str());
 }
