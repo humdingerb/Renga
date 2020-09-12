@@ -631,19 +631,16 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	BFont thin(be_plain_font);
 	BFont thick(be_bold_font);
 
-	thin.SetSize(11.0);
-	thick.SetSize(11.0);
-
 	// some colors to play with
 	rgb_color blue   = {0, 0, 255, 255};
 	rgb_color red    = {255, 0, 0, 255};
-	rgb_color black  = {0, 0, 0, 255};
+	rgb_color message_color  = ui_color(B_PANEL_TEXT_COLOR);
 
 	// some runs to play with
 	text_run tr_thick_blue  = {0, thick, blue};
 	text_run tr_thick_red   = {0, thick, red};
-	text_run tr_thick_black = {0, thick, black};
-	text_run tr_thin_black  = {0, thin, black};
+	text_run tr_thick_black = {0, thick, message_color};
+	text_run tr_thin_black  = {0, thin, message_color};
 
 	// some run array to play with (simple)
 	text_run_array tra_thick_blue  = {1, {tr_thick_blue}};
