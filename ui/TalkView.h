@@ -26,7 +26,6 @@
 #include <interface/Window.h>
 #include <storage/FilePanel.h>
 
-#include "jabber/BetterTextView.h"
 #include "jabber/ChatTextView.h"
 #include "jabber/ChatWidget.h"
 #include "jabber/StatusView.h"
@@ -95,7 +94,7 @@ private:
 	BScrollView        *_chat_scroller;
 	BScrollView        *_message_scroller;
 	ChatTextView       *_chat;
-	BetterTextView     *_message;
+	BTextView          *_message;
 	BButton            *_send_message;
 
 	BListView          *_people;

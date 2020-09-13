@@ -12,7 +12,6 @@ add_executable(Renga
 	 jabber/Agent.cpp
 	 jabber/CommandMessage.cpp
 	 jabber/UserID.cpp
-	 jabber/BetterTextView.cpp
 	 jabber/ChatTextView.cpp
 	 jabber/CustomStatusWindow.cpp
 	 jabber/LoginPreferencesView.cpp

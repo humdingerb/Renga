@@ -104,7 +104,7 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	rgb_color text_color = ui_color(B_PANEL_TEXT_COLOR);
 	BFont text_font(be_plain_font);
 
-	_message          = new BetterTextView("message", &text_font, &text_color, B_WILL_DRAW);
+	_message          = new BTextView("message", &text_font, &text_color, B_WILL_DRAW);
 	_message_scroller = new BScrollView("message_scroller", _message, B_WILL_DRAW, false, false);
 	_message->TargetedByScrollView(_message_scroller);
 	_message->SetWordWrap(true);
