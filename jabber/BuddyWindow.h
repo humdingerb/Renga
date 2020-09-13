@@ -38,6 +38,8 @@
 	#include <interface/Window.h>
 #endif
 
+#include "StringView.h"
+
 class BuddyWindow : public BWindow {
 public:
 	static BuddyWindow  *Instance();
@@ -47,25 +49,25 @@ public:
 	bool                 QuitRequested();
 
 	void                 AddNewUser();
-	
+
 protected:
 	                     BuddyWindow(BRect frame);
-				
+
 private:
 	static BuddyWindow *_instance;
-	
+
 	BBox               *_surrounding;
-	
+
 	BView              *_full_view;
 	BTextControl       *_realname;
 	BMenuField         *_chat_services;
 	BPopUpMenu         *_chat_services_selection;
 	BTextControl       *_handle;
-	BTextView          *_enter_note;
-	
+	BStringView          *_enter_note;
+
 	BButton            *_cancel;
 	BButton            *_ok;
-	
+
 };
 
 #endif
