@@ -205,7 +205,7 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 		.End()
 	.End();
 
-	fLayout->SetVisibleItem(0l);
+	fLayout->SetVisibleItem((int32)0);
 }
 
 
