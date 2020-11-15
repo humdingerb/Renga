@@ -333,7 +333,7 @@ RegisterAccountWindow::MessageReceived(BMessage* message)
 				case kTLSConnect:
 				{
 					// TODO confirm TLS certificate, when gloox handler supports that
-					fWaitingMessage->SetText("Getting registration from from server…");
+					fWaitingMessage->SetText("Getting registration form from server…");
 					break;
 				}
 				case kDisconnect:
