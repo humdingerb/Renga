@@ -651,10 +651,10 @@ JabberSpeak::onDisconnect(gloox::ConnectionError e)
 }
 
 bool
-JabberSpeak::onTLSConnect(__attribute__((unused)) const gloox::CertInfo& info)
+JabberSpeak::onTLSConnect(const gloox::CertInfo& info)
 {
 	// Certificate is verified as valid by gloox already
-	return true;
+	return info.status == gloox::CertOk;
 }
 
 bool

@@ -44,28 +44,16 @@ struct ServerInfo {
 };
 
 static const ServerInfo kServerInfos[] = {
-	// TODO confirm all of them are working as expected, once we have SRV records
-	{ "blah.im", "AT" },
-	{ "chinwag.im", "AU" },
+	// TODO find more servers that work, try to cover more countries
 	{ "jabber.otr.im", "CA" },
-	{ "swissjabber.ch", "CH" },
 	{ "jabber.cz", "CZ" },
 	{ "jabber.de", "DE" },
 	{ "jabberes.org", "ES" },
-	{ "jabber.fr", "FR" }, // OK
-	{ "jabbim.hu", "HU" },
-	{ "jabin.org", "ID" },
-	{ "chatme.im", "IT" },
-	{ "xmpp.jp", "JP" },
-	{ "jabber.etighichat.com", "NG" },
-	{ "movim.eu", "NL" },
-	{ "jabber.no", "NO" },
-	{ "jabber.co.nz", "NZ" },
-	{ "chrome.pl", "PL" },
-	{ "creep.im", "RU" }, // has a captcha, OK
-	{ "sss.chaoslab.ru", "UA" },
-	{ "comm.unicate.me", "UK" },
-	{ "home.zom.im", "US" },
+	{ "jabber.fr", "FR" },
+	{ "step.im", "JP" },
+	{ "4ept.net", "NL" },
+	{ "creep.im", "RU" },
+	{ "jabber.today", "US" },
 };
 
 
