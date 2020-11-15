@@ -47,7 +47,6 @@ static const ServerInfo kServerInfos[] = {
 	// TODO confirm all of them are working as expected, once we have SRV records
 	{ "blah.im", "AT" },
 	{ "chinwag.im", "AU" },
-	{ "patchcord.be", "BE" }, // has a captcha, OK
 	{ "jabber.otr.im", "CA" },
 	{ "swissjabber.ch", "CH" },
 	{ "jabber.cz", "CZ" },
@@ -63,7 +62,6 @@ static const ServerInfo kServerInfos[] = {
 	{ "jabber.no", "NO" },
 	{ "jabber.co.nz", "NZ" },
 	{ "chrome.pl", "PL" },
-	{ "coderollers.com", "RO" },
 	{ "creep.im", "RU" }, // has a captcha, OK
 	{ "sss.chaoslab.ru", "UA" },
 	{ "comm.unicate.me", "UK" },
@@ -602,6 +600,11 @@ void RegisterAccountWindow::onDisconnect(gloox::ConnectionError error,
 			fWelcome->SetText("Could not connect to the server.\nCheck you are "
 				"online, then try another one.");
 			// Do not disable the selected server, allow to retry when online
+			break;
+		case gloox::ConnTlsFailed:
+			fWelcome->SetText("Failed to setup a secure TLS communication channel. "
+				"Try another server.");
+			fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
 			break;
 		default:
 			BString message;
