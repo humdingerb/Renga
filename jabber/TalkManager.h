@@ -45,6 +45,7 @@ public:
 	void                 Reset();
 	
 	// MUC handlers from gloox
+	// FIXME probably each TalkView could register for these directly?
 	void				handleMUCParticipantPresence(gloox::MUCRoom *room,
 							const gloox::MUCRoomParticipant participant,
 							const gloox::Presence &presence);

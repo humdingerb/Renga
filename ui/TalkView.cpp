@@ -36,6 +36,7 @@
 
 #include "TalkView.h"
 
+#include "gloox/mucroom.h"
 #include "gloox/rostermanager.h"
 
 #define NOTIFICATION_CHAR "√"
@@ -538,8 +539,16 @@ void TalkView::MessageReceived(BMessage *msg) {
 				break;
 			}
 
-			if (!CommandMessage::IsCommand(message) || CommandMessage::IsLegalCommand(message)) {
-				_session->send(_message->Text());
+			if (!CommandMessage::IsCommand(message)
+				|| CommandMessage::IsLegalCommand(message)) {
+				if (_session == NULL) {
+					// FIXME is it ok to do this from window thread? Or should
+					// we go through main app?
+					gloox::MUCRoom* room = (gloox::MUCRoom*)TalkManager::Instance()
+						->IsExistingWindowToGroup(GetGroupRoom());
+					room->send(_message->Text());
+				} else
+					_session->send(_message->Text());
 			}
 
 			// user part

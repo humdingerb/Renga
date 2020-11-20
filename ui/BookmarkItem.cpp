@@ -42,7 +42,6 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 
 	// text characteristics
 	owner->SetFont(be_plain_font);
-	owner->SetFontSize(10.0);
 
 	// clear rectangle
 	if (IsSelected()) {

@@ -92,7 +92,9 @@ TalkView *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
 		}
 	}
 
-	BlabberMainWindow::Instance()->AddTalkView(window);
+	BMessage message(kAddTalkView);
+	message.AddPointer("view", window);
+	BlabberMainWindow::Instance()->PostMessage(&message);
 
 	// return a reference as well
 	return window;

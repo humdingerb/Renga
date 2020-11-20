@@ -633,6 +633,14 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 
+		case kAddTalkView:
+		{
+			TalkView* view;
+			msg->FindPointer("view", (void**)&view);
+			AddTalkView(view);
+			break;
+		}
+
 		case B_OBSERVER_NOTICE_CHANGE:
 		{
 			int32 orig_what = msg->FindInt32("be:observe_change_what");

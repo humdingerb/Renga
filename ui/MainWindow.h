@@ -24,7 +24,8 @@
 class TalkView;
 
 enum {
-	kResetWindow = 'Wrst'
+	kResetWindow = 'Wrst',
+	kAddTalkView = 'Watv'
 };
 
 class BlabberMainWindow : public BWindow {
@@ -40,10 +41,12 @@ public:
 	void                       ShowLogin();
 	void                       SetCustomStatus(std::string status);
 
-	void						AddTalkView(TalkView* view);
 
 protected:
                                 BlabberMainWindow(BRect frame);
+
+private:
+	void						AddTalkView(TalkView* view);
 
 private:
 	// singleton
