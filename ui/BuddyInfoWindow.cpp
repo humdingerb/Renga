@@ -181,6 +181,11 @@ BuddyInfoWindow::MessageReceived(BMessage* message)
 				type_code type;
 				int32 count;
 
+				BResources resources;
+				extern int main();
+				resources.SetToImage((const void*)main);
+				size_t size = 0;
+
 				int32 stringCount = message->CountNames(B_STRING_TYPE);
 				for (int i = 0; i < stringCount; i++) {
 					message->GetInfo(B_STRING_TYPE, i, &name, &type, &count);
@@ -197,11 +202,6 @@ BuddyInfoWindow::MessageReceived(BMessage* message)
 
 								BGroupView* title = new BGroupView(B_HORIZONTAL);
 								BLayoutBuilder::Group<> builder(title);
-
-								BResources resources;
-								extern int main();
-								resources.SetToImage((const void*)main);
-								size_t size = 0;
 
 								const char* values[] = {
 									"preferred",
@@ -225,6 +225,9 @@ BuddyInfoWindow::MessageReceived(BMessage* message)
 								fDetails->AddView(title, 0, line);
 							} else if (strncmp(name, "address:", strlen("address:")) == 0) {
 								int32 flags = message->FindInt32("address:flags", j);
+
+								BGroupView* title = new BGroupView(B_HORIZONTAL);
+								BLayoutBuilder::Group<> builder(title);
 
 								const char* values[] = {
 									"preferred",
