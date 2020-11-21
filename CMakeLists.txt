@@ -84,7 +84,7 @@ if(NOT expat)
 endif()
 
 target_link_libraries(Renga
-	be expat game gloox tracker translation
+	be expat game gloox shared tracker translation
 )
 
 add_custom_command(TARGET Renga POST_BUILD 
@@ -97,6 +97,9 @@ add_custom_command(TARGET Renga POST_BUILD
 		-a PiNG:6:offline      ${CMAKE_SOURCE_DIR}/resources/icons/offline.png
 		-a PiNG:7:unknown      ${CMAKE_SOURCE_DIR}/resources/icons/unknown.png
 		-a PiNG:9:icq          ${CMAKE_SOURCE_DIR}/resources/icons/icq.png
+		-a VICN:10:preferred   ${CMAKE_SOURCE_DIR}/resources/icons/preferred.hvif
+		-a VICN:11:home        ${CMAKE_SOURCE_DIR}/resources/icons/home.hvif
+		-a VICN:12:work        ${CMAKE_SOURCE_DIR}/resources/icons/work.hvif
 	COMMAND mimeset -f ${CMAKE_BINARY_DIR}/Renga
 	DEPENDS jabber/Resource.rdef
 )

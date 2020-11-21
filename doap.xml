@@ -91,7 +91,17 @@
             <xmpp:status>partial</xmpp:status>
             <xmpp:version>1.1</xmpp:version>
             <xmpp:since>1.22.0</xmpp:since>
-			<xmpp:note>no URL bookmarks, no pubsub. use XEP-0402 instead.</xmpp:note>
+            <xmpp:note>no URL bookmarks, no pubsub. use XEP-0402 instead.</xmpp:note>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <!-- vcard-temp -->
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0054.html"/>
+            <xmpp:status>partial</xmpp:status>
+            <xmpp:version>1.2</xmpp:version>
+            <xmpp:since>1.22.0</xmpp:since>
+            <xmpp:note>Read-only, no publishing of vcard.</xmpp:note>
         </xmpp:SupportedXep>
     </implements>
     <implements>

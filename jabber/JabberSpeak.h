@@ -12,6 +12,8 @@
 #include <gloox/presence.h>
 #include <gloox/registration.h>
 #include <gloox/softwareversion.h>
+#include <gloox/vcardhandler.h>
+#include <gloox/vcardmanager.h>
 
 #include "../network/BookmarkManager.h"
 
@@ -26,11 +28,13 @@
 #include "XMLReader.h"
 
 enum {
-	kAuthenticationFailed = 'Aerr'
+	kAuthenticationFailed = 'Aerr',
+	kVCardReceived = 'vcrd'
 };
 
 class JabberSpeak : public BHandler, public XMLReader,
-	public gloox::ConnectionListener, public gloox::IqHandler
+	public gloox::ConnectionListener, public gloox::IqHandler,
+	public gloox::VCardHandler
 {
 public:
 	enum iq_intent {LOGIN, ROSTER, AGENTS, REGISTER, SEND_REGISTER, UNREGISTER, SEND_UNREGISTER, NEW_USER, MESSAGE, CHAT};
@@ -48,8 +52,6 @@ public:
 	void                     JabberSpeakReset();
  
 	// OUTGOING COMMUNICATION
-	char                   **CreateAttributeMemory(int num_items);
-	void                     DestroyAttributeMemory(char **atts, int num_items);
 	void                     SendConnect(string username = "", string password = "", string realname = "", bool suppress_auto_connect = false);
 	void                     SendDisconnect();
 	void                     SendSubscriptionRequest(string username); 
@@ -68,6 +70,8 @@ public:
 	void                     _SendUserRegistration(string username, string password, string resource);
 	void                     RegisterWithAgent(string agent);
 	void	                 UnregisterWithAgent(string agent);
+
+	void					RequestVCard(const gloox::JID& jid);
 	
 	// INCOMING COMMUNICATION
 	void                     OnTag(XMLEntity *entity);
@@ -87,6 +91,11 @@ public:
 	// gloox::IqHandler
 	bool					handleIq(const gloox::IQ&) final;
 	void					handleIqID(const gloox::IQ&, int) final;
+
+	// gloox::VCardHandler
+	void					handleVCard(const gloox::JID& jid, const gloox::VCard* vcard) final;
+	void					handleVCardResult(VCardContext context,
+								const gloox::JID& jid, gloox::StanzaError se) final;
 
 	gloox::Client* 			GlooxClient() { return fClient; }
 
@@ -130,6 +139,7 @@ private:
 
 	gloox::Client*			fClient;
 	gloox::Registration*	fRegistration;
+	gloox::VCardManager*	fVCardManager;
 };
 
 #endif

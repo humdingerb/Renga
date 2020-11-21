@@ -37,6 +37,19 @@ PictureView::~PictureView() {
 	delete _bitmap;
 }
 
+
+void PictureView::SetBitmap(BPositionIO *source)
+{
+	BBitmap* newBitmap = BTranslationUtils::GetBitmap(source);
+	if (newBitmap) {
+		delete _bitmap;
+		_bitmap = newBitmap;
+		_Init();
+		Invalidate();
+	}
+}
+
+
 void PictureView::AttachedToWindow() {
 }
 
@@ -59,8 +72,7 @@ void PictureView::_Init()
 	float width  = 0.0f;
 	float height = 0.0f;
 
-	// transparency
-	SetViewColor(B_TRANSPARENT_COLOR);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	if (_bitmap) {
 		BRect frame(_bitmap->Bounds());

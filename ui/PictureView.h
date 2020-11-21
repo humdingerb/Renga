@@ -17,8 +17,10 @@ public:
 			  PictureView(BPositionIO *source, uint32 flags = B_WILL_DRAW);
    	         ~PictureView();
 
-	void      AttachedToWindow();
-	void      Draw(BRect frame);	
+	void	SetBitmap(BPositionIO *source);
+
+	void      AttachedToWindow() override;
+	void      Draw(BRect frame) override;
 
 	bool      InitCheck();
 	

@@ -62,6 +62,8 @@ JabberSpeak::JabberSpeak()
 
 JabberSpeak::~JabberSpeak() {
 	_instance = NULL;
+
+	delete fVCardManager;
 }
 
 void JabberSpeak::Reset() {
@@ -100,27 +102,6 @@ void JabberSpeak::JabberSpeakReset() {
 //////////////////////////////////////////////////
 // STANDARD METHODS
 //////////////////////////////////////////////////
-
-char **JabberSpeak::CreateAttributeMemory(int num_items) {
-	char **atts;
-
-	atts = (char **)malloc((num_items + 2) * sizeof(char *));
-	for (int i=0; i<num_items; ++i)
-		atts[i] = (char *)malloc(96 * sizeof(char));
-
-	atts[num_items] = NULL;
-	atts[num_items+1] = NULL;
-
-	return atts;
-}
-
-void JabberSpeak::DestroyAttributeMemory(char **atts, int num_items) {
-	for (int i=0; i<(num_items + 2); ++i) {
-		free(atts[i]);
-	}
-
-	free(atts);
-}
 
 const string JabberSpeak::CurrentRealName() const {
 	return _curr_realname;
@@ -382,6 +363,9 @@ void JabberSpeak::_ConnectionThread() {
 	// Register for incoming chat sessions
 	fClient->registerMessageSessionHandler(TalkManager::Instance());
 
+	// Setup for handling VCard
+	fVCardManager = new gloox::VCardManager(fClient);
+
 	// Prepare our answer to version requests for disco
 	_ProcessVersionRequest();
 
@@ -490,10 +474,9 @@ void JabberSpeak::SendGroupUnvitation(string _group_room, string _group_username
 	}
 }
 
-void JabberSpeak::RegisterWithAgent(string agent) {
+void JabberSpeak::RegisterWithAgent(string) {
+#if 0
 	XMLEntity          *entity;
-	char **atts       = CreateAttributeMemory(6);
-	char **atts_query = CreateAttributeMemory(2);
 
 	// assemble attributes;
 	strcpy(atts[0], "type");
@@ -518,10 +501,8 @@ void JabberSpeak::RegisterWithAgent(string agent) {
 	char *str = entity->ToString();
 	free(str);
 
-	DestroyAttributeMemory(atts, 6);
-	DestroyAttributeMemory(atts_query, 2);
-	
 	delete entity;
+#endif
 }
 
 void JabberSpeak::UnregisterWithAgent(string agent) {
@@ -540,6 +521,13 @@ void JabberSpeak::UnregisterWithAgent(string agent) {
 
 	JRoster::Instance()->Unlock();
 }
+
+
+void JabberSpeak::RequestVCard(const gloox::JID& jid)
+{
+	fVCardManager->fetchVCard(jid, this);
+}
+
 
 void JabberSpeak::_ProcessVersionRequest(void) {
 	string strVersion("Haiku");
@@ -667,4 +655,185 @@ JabberSpeak::handleIq(const gloox::IQ&)
 void
 JabberSpeak::handleIqID(const gloox::IQ&, int)
 {
+}
+
+
+//#pragma mark - VCardHandler
+
+
+void
+JabberSpeak::handleVCard(const gloox::JID& jid, const gloox::VCard* vcard)
+{
+	BMessage message;
+	message.AddString("jid", jid.bare().c_str());
+
+	if (!vcard->formattedname().empty())
+		message.AddString("Name", vcard->formattedname().c_str());
+	if (!vcard->nickname().empty())
+		message.AddString("Nickname", vcard->nickname().c_str());
+	if (!vcard->url().empty())
+		message.AddString("url", vcard->url().c_str());
+	if (!vcard->bday().empty())
+		message.AddString("Birhtday", vcard->bday().c_str());
+	if (!vcard->title().empty())
+		message.AddString("Title", vcard->title().c_str());
+	if (!vcard->role().empty())
+		message.AddString("Role", vcard->role().c_str());
+	if (!vcard->note().empty())
+		message.AddString("Note", vcard->note().c_str());
+	if (!vcard->desc().empty())
+		message.AddString("Description", vcard->desc().c_str());
+	if (!vcard->mailer().empty())
+		message.AddString("Mailer", vcard->mailer().c_str());
+	if (!vcard->rev().empty())
+		message.AddString("Revision", vcard->rev().c_str());
+	if (!vcard->uid().empty())
+		message.AddString("User ID", vcard->uid().c_str());
+	if (!vcard->tz().empty())
+		message.AddString("Timezone", vcard->tz().c_str());
+	if (!vcard->sortstring().empty())
+		message.AddString("Sort String", vcard->sortstring().c_str());
+	if (!vcard->org().name.empty())
+		message.AddString("Organization", vcard->org().name.c_str());
+	for (std::string unit: vcard->org().units)
+		message.AddString("Unit", unit.c_str());
+
+	// Things not meant for direct display as strings
+	for (gloox::VCard::Email email: vcard->emailAddresses()) {
+		message.AddString("mail:address", email.userid.c_str());
+		int32 flags = 0;
+		if (email.pref)
+			flags |= 1;
+		if (email.home)
+			flags |= 2;
+		if (email.work)
+			flags |= 4;
+		if (email.internet)
+			flags |= 8;
+		if (email.x400)
+			flags |= 16;
+		message.AddInt32("mail:flags", flags);
+	}
+
+	for (gloox::VCard::Telephone tel: vcard->telephone()) {
+		message.AddString("phone:number", tel.number.c_str());
+		int32 flags = 0;
+		if (tel.pref)
+			flags |= 1;
+		if (tel.home)
+			flags |= 2;
+		if (tel.work)
+			flags |= 4;
+		if (tel.voice)
+			flags |= 8;
+		if (tel.fax)
+			flags |= 16;
+		if (tel.pager)
+			flags |= 32;
+		if (tel.msg)
+			flags |= 64;
+		if (tel.cell)
+			flags |= 128;
+		if (tel.video)
+			flags |= 256;
+		if (tel.bbs)
+			flags |= 512;
+		if (tel.modem)
+			flags |= 1024;
+		if (tel.isdn)
+			flags |= 2048;
+		if (tel.pcs)
+			flags |= 4096;
+		message.AddInt32("phone:flags", flags);
+	}
+
+	for (gloox::VCard::Label label: vcard->labels()) {
+		BString str;
+		for (auto line: label.lines)
+			str << line.c_str() << "\n";
+		message.AddString("label:lines", str);
+
+		int32 flags = 0;
+		if (label.pref)
+			flags |= 1;
+		if (label.home)
+			flags |= 2;
+		if (label.work)
+			flags |= 4;
+		if (label.postal)
+			flags |= 8;
+		if (label.parcel)
+			flags |= 16;
+		if (label.dom)
+			flags |= 32;
+		if (label.intl)
+			flags |= 64;
+		message.AddInt32("label:flags", flags);
+	}
+
+	for (gloox::VCard::Address address: vcard->addresses()) {
+		// Allow empty strings because we don't want to mix different addresses
+		// and all we get to differenciate them is the offset in the BMessage
+		message.AddString("address:pobox", address.pobox.c_str());
+		message.AddString("address:extadd", address.extadd.c_str());
+		message.AddString("address:street", address.street.c_str());
+		message.AddString("address:locality", address.locality.c_str());
+		message.AddString("address:region", address.region.c_str());
+		message.AddString("address:postcode", address.pcode.c_str());
+		message.AddString("address:country", address.ctry.c_str());
+
+		int32 flags = 0;
+		if (address.pref)
+			flags |= 1;
+		if (address.home)
+			flags |= 2;
+		if (address.work)
+			flags |= 4;
+		if (address.postal)
+			flags |= 8;
+		if (address.parcel)
+			flags |= 16;
+		if (address.dom)
+			flags |= 32;
+		if (address.intl)
+			flags |= 64;
+		message.AddInt32("address:flags", flags);
+	}
+
+	if (!vcard->geo().latitude.empty())
+		message.AddString("geo:lat", vcard->geo().latitude.c_str());
+	if (!vcard->geo().longitude.empty())
+		message.AddString("geo:lon", vcard->geo().longitude.c_str());
+	message.AddInt32("classification", vcard->classification());
+
+	if (!vcard->photo().binval.empty()) {
+		message.AddData("photo:binval", B_RAW_TYPE,
+			vcard->photo().binval.c_str(), vcard->photo().binval.length());
+	}
+	if (!vcard->photo().extval.empty())
+		message.AddString("photo:url", vcard->photo().extval.c_str());
+	if (!vcard->photo().type.empty()) {
+		message.AddData("photo:type", B_MIME_TYPE,
+			vcard->photo().type.c_str(), vcard->photo().type.length());
+	}
+	if (!vcard->logo().binval.empty()) {
+		message.AddData("logo:binval", B_RAW_TYPE,
+			vcard->logo().binval.c_str(), vcard->logo().binval.length());
+	}
+	if (!vcard->logo().extval.empty())
+		message.AddString("logo:url", vcard->logo().extval.c_str());
+	if (!vcard->logo().type.empty()) {
+		message.AddData("logo:type", B_MIME_TYPE,
+			vcard->logo().type.c_str(), vcard->logo().type.length());
+	}
+
+	SendNotices(kVCardReceived, &message);
+}
+
+
+void
+JabberSpeak::handleVCardResult(VCardContext,
+	const gloox::JID&, gloox::StanzaError)
+{
+	puts(__func__);
 }

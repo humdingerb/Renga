@@ -10,9 +10,19 @@
 
 #include "../jabber/UserID.h"
 
-class BuddyInfoWindow : public BWindow {
+class BGridLayout;
+class PictureView;
+
+class BuddyInfoWindow : public BWindow
+{
 public:
-	                       BuddyInfoWindow(UserID *querying_user);
-	                      ~BuddyInfoWindow();
+					BuddyInfoWindow(UserID *querying_user);
+					~BuddyInfoWindow();
+	void			MessageReceived(BMessage*) override;
+
+private:
+	BGridLayout*	fDetails;
+	PictureView*	fAvatar;
+	BString fJID;
 };
 

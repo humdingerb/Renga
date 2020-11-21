@@ -6,26 +6,28 @@
 
 #include <Button.h>
 #include <GroupView.h>
+#include <private/shared/IconView.h>
 #include <LayoutBuilder.h>
+#include <Resources.h>
 
 #include "support/AppLocation.h"
 
 #include "ui/PictureView.h"
 
 #include "../jabber/GenericFunctions.h"
+#include "../jabber/JabberSpeak.h"
 #include "../jabber/Messages.h"
 
 BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	: BWindow(BRect(0, 0, 0, 0), "User Information", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+	, fJID(querying_user->Handle().c_str())
 {
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	BGroupView* full_view = new BGroupView(B_VERTICAL);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	BGroupView* full_view = new BGroupView(B_HORIZONTAL);
 	full_view->GroupLayout()->SetInsets(B_USE_WINDOW_SPACING);
 
-	// lightbulb
-	PictureView *picture = new PictureView("bulb-normal");
-	
+	fAvatar = new PictureView("bulb-normal");
 	BGridView* surrounding = new BGridView();
 
 	// USER INFORMATION
@@ -86,27 +88,178 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	ok->SetTarget(this);
 
 	BLayoutBuilder::Group<>(full_view)
-		.AddGroup(B_HORIZONTAL)
-			.Add(picture)
-			.Add(surrounding)
-		.End()
-		.AddGroup(B_HORIZONTAL)
+		.AddGroup(B_VERTICAL)
+			.Add(fAvatar)
 			.AddGlue()
-			.Add(ok)
+		.End()
+		.AddGroup(B_VERTICAL)
+			.Add(surrounding)
+			.AddGlue()
+			.AddGroup(B_HORIZONTAL)
+				.AddGlue()
+				.Add(ok)
+			.End()
 		.End()
 	.End();
 
-	surrounding->GridLayout()->AddView(friendly_label, 0, 0);
-	surrounding->GridLayout()->AddView(friendly_name, 1, 0);
-	surrounding->GridLayout()->AddView(jabberid_label, 0, 3);
-	surrounding->GridLayout()->AddView(jabberid_name, 1, 3);
+	fDetails = surrounding->GridLayout();
+	fDetails->SetVerticalSpacing(B_USE_SMALL_SPACING);
+	fDetails->AddView(friendly_label, 0, 0);
+	fDetails->AddView(friendly_name, 1, 0);
+	fDetails->AddView(jabberid_label, 0, 3);
+	fDetails->AddView(jabberid_name, 1, 3);
 
 	AddChild(full_view);
 
 	CenterOnScreen();
+
+	// Watch for the result
+	JabberSpeak::Instance()->StartWatching(this, kVCardReceived);
+	// Ask the client to fetch the vcard
+	JabberSpeak::Instance()->RequestVCard(querying_user->JID());
 }
 
 
 BuddyInfoWindow::~BuddyInfoWindow()
 {
+}
+
+
+void
+BuddyInfoWindow::MessageReceived(BMessage* message)
+{
+	if (message->what == B_OBSERVER_NOTICE_CHANGE) {
+		int32 what = message->FindInt32("be:observe_change_what");
+
+		switch(what) {
+			case kVCardReceived:
+			{
+				int line = 4;
+
+				// Check if the JID matches, first!
+				BString jid = message->FindString("jid");
+				if (jid != fJID)
+					return;
+
+				// Handle non-string fields
+				int32 classification = message->FindInt32("classification");
+				switch (classification)
+				{
+					case gloox::VCard::ClassPublic:
+						fDetails->AddView(new BStringView(NULL, "Classification:"), 0, line);
+						fDetails->AddView(new BStringView(NULL, "Public"), 1, line);
+						line++;
+						break;
+					case gloox::VCard::ClassPrivate:
+						fDetails->AddView(new BStringView(NULL, "Classification:"), 0, line);
+						fDetails->AddView(new BStringView(NULL, "Private"), 1, line);
+						line++;
+						break;
+					case gloox::VCard::ClassConfidential:
+						fDetails->AddView(new BStringView(NULL, "Classification:"), 0, line);
+						fDetails->AddView(new BStringView(NULL, "Confidential"), 1, line);
+						line++;
+						break;
+					default:
+						break;
+				}
+
+				const void* avatar;
+				ssize_t avatarSize;
+				if (message->FindData("photo:binval", B_RAW_TYPE, &avatar,
+					&avatarSize) == B_OK) {
+					BMemoryIO io(avatar, avatarSize);
+					fAvatar->SetBitmap(&io);
+				} else if (message->FindData("logo:binval", B_RAW_TYPE, &avatar,
+					&avatarSize) == B_OK) {
+					BMemoryIO io(avatar, avatarSize);
+					fAvatar->SetBitmap(&io);
+				}
+
+				// Now iterate over all string keys
+				char* name;
+				type_code type;
+				int32 count;
+
+				int32 stringCount = message->CountNames(B_STRING_TYPE);
+				for (int i = 0; i < stringCount; i++) {
+					message->GetInfo(B_STRING_TYPE, i, &name, &type, &count);
+					if (strcmp(name, "jid") == 0) {
+						// We already display it
+					} else {
+						for (int j = 0; j < count; j++) {
+							BString value = message->FindString(name, j);
+							if (value == "")
+								continue;
+
+							if (strcmp(name, "mail:address") == 0) {
+								int32 flags = message->FindInt32("mail:flags", j);
+
+								BGroupView* title = new BGroupView(B_HORIZONTAL);
+								BLayoutBuilder::Group<> builder(title);
+
+								BResources resources;
+								extern int main();
+								resources.SetToImage((const void*)main);
+								size_t size = 0;
+
+								const char* values[] = {
+									"preferred",
+									"home",
+									"work"
+								};
+
+								for (unsigned int k = 0; k < B_COUNT_OF(values); k++) {
+									if ((values[k] != NULL) && (flags & (1 << k))) {
+										const uint8_t* data = (const uint8_t*)resources.LoadResource('VICN',
+											values[k], &size);
+										IconView* icon = new IconView();
+										icon->SetIcon(data, size);
+										icon->SetExplicitSize(BSize(20, 20));
+										builder.Add(icon);
+									}
+								}
+
+								builder.Add(new BStringView(NULL, "E-Mail"));
+								builder.AddGlue();
+								fDetails->AddView(title, 0, line);
+							} else if (strncmp(name, "address:", strlen("address:")) == 0) {
+								int32 flags = message->FindInt32("address:flags", j);
+
+								const char* values[] = {
+									"preferred",
+									"home",
+									"work"
+								};
+
+								for (unsigned int k = 0; k < B_COUNT_OF(values); k++) {
+									if ((values[k] != NULL) && (flags & (1 << k))) {
+										const uint8_t* data = (const uint8_t*)resources.LoadResource('VICN',
+											values[k], &size);
+										IconView* icon = new IconView();
+										icon->SetIcon(data, size);
+										icon->SetExplicitSize(BSize(20, 20));
+										builder.Add(icon);
+									}
+								}
+
+								builder.Add(new BStringView(NULL, "Address"));
+								builder.AddGlue();
+								fDetails->AddView(title, 0, line);
+							} else {
+								// TODO manage flags for phone, label
+								fDetails->AddView(new BStringView(NULL, name), 0, line);
+							}
+							fDetails->AddView(new BStringView(NULL, value), 1, line);
+							line++;
+						}
+					}
+				}
+
+				return;
+			}
+		}
+	}
+
+	BWindow::MessageReceived(message);
 }
