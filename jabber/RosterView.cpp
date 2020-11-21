@@ -9,7 +9,7 @@
 #include <MenuItem.h>
 
 #include "BlabberSettings.h"
-#include "BuddyInfoWindow.h"
+#include "ui/BuddyInfoWindow.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
 #include "../ui/ModalAlertFactory.h"

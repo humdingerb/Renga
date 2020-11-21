@@ -8,6 +8,7 @@
 
 #include "support/AppLocation.h"
 
+#include "ui/BuddyInfoWindow.h"
 #include "ui/ChangeNameWindow.h"
 #include "ui/ModalAlertFactory.h"
 #include "ui/RegisterAccountWindow.h"
@@ -16,7 +17,6 @@
 
 #include "jabber/BlabberSettings.h"
 #include "jabber/BuddyWindow.h"
-#include "jabber/BuddyInfoWindow.h"
 #include "jabber/CustomStatusWindow.h"
 #include "jabber/GenericFunctions.h"
 #include "jabber/JabberSpeak.h"

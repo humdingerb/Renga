@@ -44,7 +44,6 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 
 	// text characteristics
 	owner->SetFont(be_plain_font);
-	owner->SetFontSize(10.0);
 
 	// clear rectangle
 	if (IsSelected()) {
@@ -168,7 +167,7 @@ void RosterItem::Update(BView *owner, const BFont *font) {
 	BListItem::Update(owner, font);
 
 	// set height to accomodate graphics and text
-	SetHeight(16.0);
+	SetHeight(24.0);
 }
 
 bool RosterItem::StalePointer() const {

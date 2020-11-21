@@ -13,7 +13,6 @@ add_executable(Renga
 	 jabber/CommandMessage.cpp
 	 jabber/UserID.cpp
 	 jabber/BetterTextView.cpp
-	 jabber/BuddyInfoWindow.cpp
 	 jabber/ChatTextView.cpp
 	 jabber/CustomStatusWindow.cpp
 	 jabber/LoginPreferencesView.cpp
@@ -59,6 +58,7 @@ add_executable(Renga
 	# "Modern" UI classes using gloox types and StartWatching/SendNotices
 	ui/AboutWindow.cpp
 	ui/BookmarkItem.cpp
+	ui/BuddyInfoWindow.cpp
 	ui/ChangeNameWindow.cpp
 	ui/EditingFilter.cpp
 	ui/MainWindow.cpp
