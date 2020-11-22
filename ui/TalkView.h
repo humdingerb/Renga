@@ -34,6 +34,10 @@
 
 #include "ui/EditingFilter.h"
 
+enum {
+	kIncomingMessage = 'imsg'
+};
+
 class TalkView : public BGroupView {
 public:
 	enum                 user_type {MAIN_RECIPIENT, LOCAL, OTHER};

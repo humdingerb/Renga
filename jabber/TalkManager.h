@@ -36,7 +36,7 @@ public:
       	                ~TalkManager();
 
 						// TODO split out into CreateTalkSession / CreateGroupSession
-	TalkView*			CreateTalkSession(const gloox::Message::MessageType type,
+	void				CreateTalkSession(const gloox::Message::MessageType type,
 							const gloox::JID* user,
 							std::string group_room, std::string group_username, 
 							gloox::MessageSession* session, bool sound_on_new = false);

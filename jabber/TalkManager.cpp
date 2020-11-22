@@ -57,7 +57,8 @@ TalkManager::~TalkManager() {
 	_instance = NULL;
 }
 
-TalkView *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
+void
+TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
 	const gloox::JID* user, string group_room, string group_username,
 	gloox::MessageSession* session, bool sound_on_new)
 {
@@ -65,20 +66,42 @@ TalkView *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
 
 	// is there a window already?
 	if (type != gloox::Message::Groupchat) {
+		// This code for when we get called from clicking a user in the roster.
+		// There is possibly already a session but the roster doesn't know about it
+		// so we have to search it (in a quite inefficient way).
+		// FIXME remove all this junk and have each TalkWindow be a SessionHandler
+		// for its own session instead of centralizing everything here.
+		gloox::JID fullJID = *user;
+		if (session == NULL) {
+			gloox::RosterManager* rm
+				= JabberSpeak::Instance()->GlooxClient()->rosterManager();
+			gloox::RosterItem* ri = rm->getRosterItem(fullJID);
+			if (ri && !ri->resources().empty()) {
+				std::string res = ri->resources().begin()->first;
+				fullJID.setResource(res);
+			}
+
+			for (TalkMap::iterator i = fTalkMap.begin();
+					i != fTalkMap.end(); ++i) {
+				if ((*i).first->target().bare() == user->bare()) {
+					session = (*i).first;
+					break;
+				}
+			}
+		}
+
 		if (session && fTalkMap.find(session) != fTalkMap.end()) {
 			window = fTalkMap.at(session);
 		} else {
+			// Actually create the session, there isn't one matching.
 			if (session == NULL) {
-				gloox::JID fullJID = *user;
-				gloox::RosterManager* rm = JabberSpeak::Instance()->GlooxClient()->rosterManager();
-				gloox::RosterItem* ri = rm->getRosterItem(fullJID);
-				if (ri && !ri->resources().empty()) {
-					std::string res = ri->resources().begin()->first;
-					fullJID.setResource(res);
-				}
 				session = new gloox::MessageSession(
-					JabberSpeak::Instance()->GlooxClient(), fullJID);
+						JabberSpeak::Instance()->GlooxClient(), fullJID);
+			} else {
+				// It's a freshly created session for an incoming message,
+				// we just need to create the matching window
 			}
+
 			// create a new window
 			window = new TalkView(user, group_room, group_username, session);
 
@@ -115,9 +138,6 @@ TalkView *TalkManager::CreateTalkSession(const gloox::Message::MessageType type,
 	BMessage message(kAddTalkView);
 	message.AddPointer("view", window);
 	BlabberMainWindow::Instance()->PostMessage(&message);
-
-	// return a reference as well
-	return window;
 }
 
 
@@ -136,11 +156,9 @@ void TalkManager::handleMessage(const gloox::Message& msg, gloox::MessageSession
 
 			try {
 				TalkView* window = fTalkMap.at(session);
-				// FIXME use a BMessage instead of thread locking
-				window->LockLooper();
-				window->AddToTalk(window->OurRepresentation().c_str(),
-					message->body(), TalkView::LOCAL);
-				window->UnlockLooper();
+				BMessage notification(kIncomingMessage);
+				notification.AddString("content", message->body().c_str());
+				BMessenger(window).SendMessage(&notification);
 			} catch (const std::out_of_range&) {
 				// In case we get a carbon for a chat we have not joined?
 			}
@@ -165,12 +183,10 @@ void TalkManager::handleMessage(const gloox::Message& msg, gloox::MessageSession
 	try {
 		TalkView* window = fTalkMap.at(session);
 		// submit the chat
-		if (window) {
-			// FIXME use a BMessage and let the view handle it asynchronously
-			window->LockLooper();
-			window->NewMessage(msg.body());
-			window->UnlockLooper();
-		}
+		BMessage notification(kIncomingMessage);
+		notification.AddString("content", msg.body().c_str());
+		BMessenger(window).SendMessage(&notification);
+		printf("notify %p\n", window);
 	} catch(const std::out_of_range&) {
 		printf("%s: no window found for session %p with %s, ignoring message\n",
 			__func__, session, session ? session->target().full().c_str(): "NULL");
@@ -183,7 +199,7 @@ TalkManager::handleMessageSession(gloox::MessageSession* session)
 {
 	// don't create a window for the carbons session, but still register to
 	// get the messages.
-	if (session->threadID().empty()) {
+	if (session->threadID().empty() && session->types() == gloox::Message::Headline) {
 		session->registerMessageHandler(this);
 		return;
 	}

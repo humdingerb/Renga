@@ -571,6 +571,12 @@ void TalkView::MessageReceived(BMessage *msg) {
 	         BlabberMainWindow::Instance()->Activate();
              break;
         }
+
+		case kIncomingMessage:
+		{
+			AddToTalk(OurRepresentation().c_str(), msg->FindString("content"),
+				LOCAL);
+		}
 	}
 }
 
