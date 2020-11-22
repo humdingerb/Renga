@@ -34,10 +34,13 @@ public:
 
 	const UserID    *GetUserID() const;
 	void             SetStalePointer(bool is_stale);	
+
+	void			SetAvatar(BBitmap*);
 	
 private:
 	const UserID   *_userid;
 	bool            _is_stale_pointer;
+	BBitmap*		fAvatar;
 		
 	static BBitmap *_kinda_online_icon;
 	static BBitmap *_online_icon;

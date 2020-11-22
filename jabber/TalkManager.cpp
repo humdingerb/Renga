@@ -2,13 +2,19 @@
 // Blabber [TalkManager.cpp]
 //////////////////////////////////////////////////
 
+#include <gloox/base64.h>
 #include <gloox/carbons.h>
 #include <gloox/instantmucroom.h>
+#include <gloox/pubsubevent.h>
+#include <gloox/pubsubitem.h>
 #include <gloox/rostermanager.h>
 
 #include <cstdio>
 #include <stdexcept>
 
+#include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
 #include <interface/Window.h>
 
 #include "ui/ModalAlertFactory.h"
@@ -30,7 +36,21 @@ TalkManager *TalkManager::Instance() {
 	return _instance;
 }
 
-TalkManager::TalkManager() {
+TalkManager::TalkManager()
+{
+	// Create/open the avatars cache directory
+	BPath path;
+	find_directory(B_USER_CACHE_DIRECTORY, &path);
+	BDirectory cacheRoot(path.Path());
+	if (!cacheRoot.Contains("Renga")) {
+		BDirectory temp;
+		cacheRoot.CreateDirectory("Renga", &temp);
+		if (!temp.Contains("avatars")) {
+			temp.CreateDirectory("avatars", &fAvatarCache);
+		}
+	}
+
+	fAvatarCache.SetTo(&cacheRoot, "Renga/avatars");
 }
 
 TalkManager::~TalkManager() {
@@ -116,8 +136,10 @@ void TalkManager::handleMessage(const gloox::Message& msg, gloox::MessageSession
 
 			try {
 				TalkView* window = fTalkMap.at(session);
+				// FIXME use a BMessage instead of thread locking
 				window->LockLooper();
-				window->AddToTalk(window->OurRepresentation().c_str(), message->body(), TalkView::LOCAL);
+				window->AddToTalk(window->OurRepresentation().c_str(),
+					message->body(), TalkView::LOCAL);
 				window->UnlockLooper();
 			} catch (const std::out_of_range&) {
 				// In case we get a carbon for a chat we have not joined?
@@ -127,12 +149,32 @@ void TalkManager::handleMessage(const gloox::Message& msg, gloox::MessageSession
 		}
 	}
 
-	TalkView* window = fTalkMap.at(session);
+	const gloox::PubSub::Event* event
+		= msg.findExtension<gloox::PubSub::Event>(gloox::ExtPubSubEvent);
+	if (event) {
+		if (event->node() == "urn:xmpp:avatar:metadata") {
+			for (auto item: event->items()) {
+				GetAvatar(msg.from(), item->item);
+				return;
+			}
+		} else {
+			printf("Got unexpected pubsub event node %s\n", event->node().c_str());
+		}
+	}
 
-	// submit the chat FIXME use a BMessage and let the view handle it asynchronously
-	window->LockLooper();
-	window->NewMessage(msg.body());
-	window->UnlockLooper();
+	try {
+		TalkView* window = fTalkMap.at(session);
+		// submit the chat
+		if (window) {
+			// FIXME use a BMessage and let the view handle it asynchronously
+			window->LockLooper();
+			window->NewMessage(msg.body());
+			window->UnlockLooper();
+		}
+	} catch(const std::out_of_range&) {
+		printf("%s: no window found for session %p with %s, ignoring message\n",
+			__func__, session, session ? session->target().full().c_str(): "NULL");
+	}
 }
 
 
@@ -152,6 +194,158 @@ TalkManager::handleMessageSession(gloox::MessageSession* session)
 }
 
 
+//#pragma mark - PubSub ResultHandler
+void TalkManager::handleItem(const gloox::JID&, const std::string&, const gloox::Tag*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleItems(const std::string&, const gloox::JID& jid,
+	const std::string& node, const gloox::PubSub::ItemList& itemList,
+	const gloox::Error*)
+{
+	if (node == "urn:xmpp:avatar:data") {
+		for (auto item: itemList) {
+			// item->id() has the checksum
+			std::string base64 = item->tag()->findChild("data")->cdata();
+
+			// need to remove all newlines from the base64...
+			size_t pos;
+			for (;;) {
+				pos = base64.find('\n');
+				if (pos == std::string::npos)
+					break;
+				base64.erase(pos, 1);
+			}
+
+			const std::string decoded = gloox::Base64::decode64(base64);
+			BMessage message(kAvatarUpdate);
+			message.AddString("jid", jid.full().c_str());
+			message.AddData("avatar", B_RAW_TYPE, decoded.data(), decoded.length());
+			SendNotices(kAvatarUpdate, &message);
+
+			// store it in cache
+			BFile file;
+			fAvatarCache.CreateFile(item->id().c_str(), &file);
+			file.Write(decoded.data(), decoded.length());
+		}
+	} else {
+		printf("unknown pubsub item in %s(%s, %s)\n", __func__,
+			jid.full().c_str(), node.c_str());
+	}
+}
+
+
+void TalkManager::handleItemPublication(const std::string&, const gloox::JID&,
+	const std::string&, const gloox::PubSub::ItemList&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleItemDeletion(const std::string&, const gloox::JID&, const std::string&, const gloox::PubSub::ItemList&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleSubscriptionResult(const std::string&, const gloox::JID&, const std::string&, const std::string&, const gloox::JID&, gloox::PubSub::SubscriptionType, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleUnsubscriptionResult(const std::string&, const gloox::JID&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleSubscriptionOptions(const std::string&, const gloox::JID&, const gloox::JID&, const std::string&, const gloox::DataForm*, const std::string&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleSubscriptionOptionsResult(const std::string&, const gloox::JID&, const gloox::JID&, const std::string&, const std::string&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleSubscribers(const std::string&, const gloox::JID&, const std::string&, const gloox::PubSub::SubscriptionList&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleSubscribersResult(const std::string&, const gloox::JID&, const std::string&, const gloox::PubSub::SubscriberList*, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleAffiliates(const std::string&, const gloox::JID&, const std::string&, const gloox::PubSub::AffiliateList*, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleAffiliatesResult(const std::string&, const gloox::JID&, const std::string&, const gloox::PubSub::AffiliateList*, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleNodeConfig(const std::string&, const gloox::JID&, const std::string&, const gloox::DataForm*, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleNodeConfigResult(const std::string&, const gloox::JID&, const std::string&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleNodeCreation(const std::string&, const gloox::JID&, const std::string&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleNodeDeletion(const std::string&, const gloox::JID&, const std::string&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleNodePurge(const std::string&, const gloox::JID&, const std::string&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleSubscriptions(const std::string&, const gloox::JID&, const gloox::PubSub::SubscriptionMap&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleAffiliations(const std::string&, const gloox::JID&, const gloox::PubSub::AffiliationMap&, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
+void TalkManager::handleDefaultNodeConfig(const std::string&, const gloox::JID&, const gloox::DataForm*, const gloox::Error*)
+{
+	puts(__func__);
+}
+
+
 void* TalkManager::IsExistingWindowToGroup(string group_room) {
 	// check names
 	for (auto i = fGroupMap.begin(); i != fGroupMap.end(); ++i) {
@@ -165,7 +359,9 @@ void* TalkManager::IsExistingWindowToGroup(string group_room) {
 }
 
 
-void TalkManager::RemoveWindow(TalkView* window) {
+void
+TalkManager::RemoveWindow(TalkView* window)
+{
 	for (GroupMap::iterator i = fGroupMap.begin(); i != fGroupMap.end(); ++i) {
 		if ((*i).second == window) {
 			delete (*i).first;
@@ -185,10 +381,35 @@ void TalkManager::RemoveWindow(TalkView* window) {
 }
 
 
-void TalkManager::Reset() {
+void
+TalkManager::Reset()
+{
 	MessageRepeater::Instance()->PostMessage(JAB_CLOSE_TALKS);
 	fTalkMap.clear();
 	fGroupMap.clear();
+}
+
+
+void
+TalkManager::GetAvatar(const gloox::JID& jid, const std::string& hash)
+{
+	// check the cache first in case we already have it
+	BFile file(&fAvatarCache, hash.c_str(), B_READ_ONLY);
+	if (file.InitCheck() == B_OK) {
+		off_t size;
+		file.GetSize(&size);
+		char buffer[size];
+		file.Read(buffer, size);
+
+		BMessage message(kAvatarUpdate);
+		message.AddString("jid", jid.full().c_str());
+		message.AddData("avatar", B_RAW_TYPE, buffer, size);
+		SendNotices(kAvatarUpdate, &message);
+
+	} else {
+		// Get it from PubSub
+		JabberSpeak::Instance()->RequestPubSubItem(jid, "urn:xmpp:avatar:data", hash, this);
+	}
 }
 
 

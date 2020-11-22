@@ -15,7 +15,9 @@ BBitmap *RosterItem::_unknown_icon      = NULL;
 BBitmap *RosterItem::_icq_icon          = NULL;
 
 RosterItem::RosterItem(const UserID *userid)
-	: BStringItem(userid->FriendlyName().c_str()) {
+	: BStringItem(userid->FriendlyName().c_str())
+	, fAvatar(NULL)
+{
 	_userid           = userid;
 	_is_stale_pointer = false;
 
@@ -29,8 +31,19 @@ RosterItem::RosterItem(const UserID *userid)
 	}
 }
 
-RosterItem::~RosterItem() {
+
+RosterItem::~RosterItem()
+{
+	delete fAvatar;
 }
+
+
+void RosterItem::SetAvatar(BBitmap* avatar)
+{
+	delete fAvatar;
+	fAvatar = avatar;
+}
+
 
 void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete) {
 	// protection
@@ -68,11 +81,20 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 		owner->SetHighColor(owner->ViewColor());
 	}
 
-	owner->FillRect(frame);
+	BRect fullFrame(frame);
+	fullFrame.left = 0;
+	owner->FillRect(fullFrame);
 
 	// draw a graphic
 	owner->SetDrawingMode(B_OP_ALPHA);
 	owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+
+	int height = frame.bottom - frame.top;
+	frame.left = height - 4; // have the status badge right over the edge of the avatar
+	if (fAvatar) {
+		owner->DrawBitmapAsync(fAvatar, fAvatar->Bounds(),
+			BRect(0, frame.top, height - 1, frame.bottom - 1), B_FILTER_BITMAP_BILINEAR);
+	}
 
 	if (status == UserID::ONLINE) {
 		if (exact_status == "xa" || exact_status == "away" || exact_status == "dnd") {
@@ -93,8 +115,6 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 			owner->DrawBitmapAsync(_unknown_icon, BPoint(frame.left + 1, frame.top + 4));
 		}
 	}
-
-	float height;
 
 	// construct name
 	std::string name = GetUserID()->FriendlyName();
@@ -137,18 +157,16 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 	font_height fh;
 	owner->GetFontHeight(&fh);
 
-	height = fh.ascent + fh.descent;
-
 	// draw name
-	owner->DrawString(name.c_str(), BPoint(frame.left + 13, frame.bottom - ((frame.Height() - height) / 2) - fh.descent));
+	BPoint textPosition(frame.left + 13, frame.top + fh.ascent + 1);
+	owner->DrawString(name.c_str(), textPosition);
 
 	// draw show
 	if (!GetUserID()->MoreExactOnlineStatus().empty()) {
 		owner->SetHighColor(0, 0, 0, 255);
+		textPosition.y += frame.Height() / 2;
 
-		owner->DrawString(" [");
-		owner->DrawString(GetUserID()->MoreExactOnlineStatus().c_str());
-		owner->DrawString("]");
+		owner->DrawString(GetUserID()->MoreExactOnlineStatus().c_str(), textPosition);
 	}
 
 	// draw external chat icon
@@ -157,17 +175,18 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 			owner->DrawBitmapAsync(_icq_icon, BPoint(owner->PenLocation().x + 2.0, frame.top + 2));
 		}
 	}
-	
-	owner->SetFont(be_plain_font);
-	owner->SetFontSize(10.0);
-
 }
 
 void RosterItem::Update(BView *owner, const BFont *font) {
 	BListItem::Update(owner, font);
 
+	font_height fh;
+	owner->GetFontHeight(&fh);
+
+	float height = fh.ascent + fh.descent;
+
 	// set height to accomodate graphics and text
-	SetHeight(24.0);
+	SetHeight(height * 2 + 3);
 }
 
 bool RosterItem::StalePointer() const {

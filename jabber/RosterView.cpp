@@ -7,6 +7,7 @@
 #include <cstdio>
 
 #include <MenuItem.h>
+#include <TranslationUtils.h>
 
 #include "BlabberSettings.h"
 #include "ui/BuddyInfoWindow.h"
@@ -20,7 +21,7 @@
 
 RosterView::RosterView()
 	: BOutlineListView(NULL, B_SINGLE_SELECTION_LIST) {
-	SetExplicitMinSize(BSize(StringWidth("Firstname M. Lastname"), B_SIZE_UNSET));
+	SetExplicitMinSize(BSize(StringWidth("Firstname M. Lastname") + 26, B_SIZE_UNSET));
 }
 
 RosterView::~RosterView() {
@@ -114,6 +115,7 @@ void RosterView::AttachedToWindow() {
 
 	BookmarkManager::Instance().StartWatching(this, kBookmarks);
 	TalkManager::Instance()->StartWatching(this, kWindowList);
+	TalkManager::Instance()->StartWatching(this, kAvatarUpdate);
 }
 
 RosterItem *RosterView::CurrentItemSelection() {
@@ -217,6 +219,31 @@ void RosterView::MessageReceived(BMessage* message)
 					BRect b = Bounds();
 					b.top = ItemFrame(IndexOf(_bookmarks)).bottom;
 					Invalidate(b);
+					break;
+				}
+				case kAvatarUpdate:
+				{
+					BString name = message->FindString("jid");
+					if (name.IsEmpty()) {
+						// This is for the "self" avatar
+						// TODO display it somewhere?
+						break;
+					}
+					gloox::JID jid(name.String());
+					ssize_t size;
+					const void* data;
+					message->FindData("avatar", B_RAW_TYPE, &data, &size);
+					BMemoryIO io(data, size);
+					BBitmap* bitmap = BTranslationUtils::GetBitmap(&io);
+					if (bitmap) {
+						int32 index = FindUser(jid);
+						if (index > 0) {
+							dynamic_cast<RosterItem*>(FullListItemAt(index))->SetAvatar(bitmap);
+							Invalidate(ItemFrame(index));
+						}
+					} else {
+						printf("decode error for %s avatar\n", name.String());
+					}
 					break;
 				}
 				default:

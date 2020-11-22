@@ -72,6 +72,7 @@
     </implements>
     <implements>
         <xmpp:SupportedXep>
+            <!-- Service Discovery -->
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0030.html"/>
             <xmpp:status>complete</xmpp:status>
             <xmpp:since>1.22.0</xmpp:since>
@@ -107,10 +108,10 @@
     <implements>
         <xmpp:SupportedXep>
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0060.html"/>
-            <xmpp:status>partial</xmpp:status>
+            <xmpp:status>complete</xmpp:status>
             <xmpp:version>1.13.5</xmpp:version>
             <xmpp:since>1.22.0</xmpp:since>
-            <xmpp:note>only user nickname</xmpp:note>
+            <xmpp:note></xmpp:note>
         </xmpp:SupportedXep>
     </implements>
     <implements>
@@ -119,11 +120,22 @@
             <xmpp:status>partial</xmpp:status>
             <xmpp:version>2.4</xmpp:version>
             <xmpp:since>1.22.0</xmpp:since>
-			<xmpp:note>dataforms only, legacy fixed fields not handled</xmpp:note>
+            <xmpp:note>dataforms only, legacy fixed fields not handled</xmpp:note>
         </xmpp:SupportedXep>
     </implements>
     <implements>
         <xmpp:SupportedXep>
+            <!-- User avatars -->
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0084.html"/>
+            <xmpp:status>partial</xmpp:status>
+            <xmpp:version>1.1.4</xmpp:version>
+            <xmpp:since>1.22.0</xmpp:since>
+            <xmpp:note>No support for setting the avatar yet</xmpp:note>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <!-- Software version -->
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0092.html"/>
             <xmpp:status>complete</xmpp:status>
             <xmpp:version>1.1</xmpp:version>
@@ -132,6 +144,7 @@
     </implements>
     <implements>
         <xmpp:SupportedXep>
+            <!-- Entity Capabilities -->
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0115.html"/>
             <xmpp:status>complete</xmpp:status>
             <xmpp:version>1.5.1</xmpp:version>

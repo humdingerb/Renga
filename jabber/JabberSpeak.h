@@ -10,6 +10,7 @@
 #include <gloox/client.h>
 #include <gloox/connectionlistener.h>
 #include <gloox/presence.h>
+#include <gloox/pubsubmanager.h>
 #include <gloox/registration.h>
 #include <gloox/softwareversion.h>
 #include <gloox/vcardhandler.h>
@@ -72,6 +73,9 @@ public:
 	void	                 UnregisterWithAgent(string agent);
 
 	void					RequestVCard(const gloox::JID& jid);
+	void					RequestPubSubItem(const gloox::JID& jid,
+								const std::string& node, const std::string& subid,
+								gloox::PubSub::ResultHandler* handler);
 	
 	// INCOMING COMMUNICATION
 	void                     OnTag(XMLEntity *entity);
@@ -140,6 +144,7 @@ private:
 	gloox::Client*			fClient;
 	gloox::Registration*	fRegistration;
 	gloox::VCardManager*	fVCardManager;
+	gloox::PubSub::Manager*	fPubSubManager;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include <gloox/dataformitem.h>
 #include <gloox/disco.h>
 #include <gloox/forward.h>
+#include <gloox/pubsubevent.h>
 #include <gloox/registration.h>
 #include <gloox/rostermanager.h>
 
@@ -369,6 +370,11 @@ void JabberSpeak::_ConnectionThread() {
 	// Prepare our answer to version requests for disco
 	_ProcessVersionRequest();
 
+	// Set up for getting avatar notifications
+	fClient->disco()->addFeature("urn:xmpp:avatar:metadata+notify");
+	fPubSubManager = new gloox::PubSub::Manager(fClient);
+	fClient->registerStanzaExtension(new gloox::PubSub::Event());
+
 	// And let's go!
 	fClient->connect();
 }
@@ -526,6 +532,14 @@ void JabberSpeak::UnregisterWithAgent(string agent) {
 void JabberSpeak::RequestVCard(const gloox::JID& jid)
 {
 	fVCardManager->fetchVCard(jid, this);
+}
+
+
+void
+JabberSpeak::RequestPubSubItem(const gloox::JID& jid, const std::string& node,
+	const std::string& subid, gloox::PubSub::ResultHandler* handler)
+{
+	fPubSubManager->requestItems(jid, node, subid, 1, handler);
 }
 
 
