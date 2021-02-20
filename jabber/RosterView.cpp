@@ -54,8 +54,8 @@ void RosterView::AttachedToWindow() {
 	// popup menu
 	_popup = new BPopUpMenu(NULL, false, false);
 
-		_chat_item         = new BMenuItem("Chat...", new BMessage(JAB_OPEN_CHAT));
-		_message_item      = new BMenuItem("Send Message...", new BMessage(JAB_OPEN_MESSAGE));
+		_chat_item         = new BMenuItem("Chat" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_CHAT));
+		_message_item      = new BMenuItem("Send Message" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_MESSAGE));
 		_change_user_item  = new BMenuItem("Edit Buddy", new BMessage(JAB_OPEN_EDIT_BUDDY_WINDOW));
 		_remove_user_item  = new BMenuItem("Remove Buddy", new BMessage(JAB_REMOVE_BUDDY));
 		_user_info_item    = new BMenuItem("Get User Info", new BMessage(JAB_USER_INFO));

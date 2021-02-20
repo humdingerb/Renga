@@ -85,7 +85,7 @@ BookmarkManager::SetBookmark(BString jid, BString nick, BString name, bool autoj
 	fConferences.push_back(item);
 
 	if (fBookmarks2) {
-		// Bookmakrs2 is nice and easy, each bookmark is stored independently.
+		// Bookmarks2 is nice and easy, each bookmark is stored independently.
 		fBookmarks2->storeBookmark(item);
 	} else if (fBookmarks) {
 		// We need to re-send the whole list everytime :(

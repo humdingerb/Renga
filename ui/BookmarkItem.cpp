@@ -32,16 +32,14 @@ BookmarkItem::BookmarkItem(const gloox::JID& userid, BString name)
 BookmarkItem::~BookmarkItem() {
 }
 
-void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete) {
+void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete)
+{
 	// get online status
 	UserID::online_status status;
 	if (TalkManager::Instance()->IsExistingWindowToGroup(_userid.full()) != nullptr)
 		status = UserID::TRANSPORT_ONLINE;
 	else
 		status = UserID::UNKNOWN;
-
-	// text characteristics
-	owner->SetFont(be_plain_font);
 
 	// clear rectangle
 	if (IsSelected()) {
@@ -92,12 +90,13 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 	owner->DrawString(name, BPoint(frame.left + 13, frame.bottom - ((frame.Height() - height) / 2) - fh.descent));
 }
 
-void BookmarkItem::Update(BView *owner, const BFont *font) {
+void BookmarkItem::Update(BView *owner, const BFont *font)
+{
 	BListItem::Update(owner, font);
 
 	const gloox::ConferenceListItem* item
 		= BookmarkManager::Instance().GetBookmark(_userid.full().c_str());
-	if (!item->name.empty())
+	if (item != NULL && !item->name.empty())
 		SetText(item->name.c_str());
 
 	// set height to accomodate graphics and text
