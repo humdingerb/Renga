@@ -16,7 +16,7 @@
 
 #include <Button.h>
 #include <Country.h>
-#include <private/shared/Geolocation.h>
+#include <private/netservices/Geolocation.h>
 #include <LayoutBuilder.h>
 #include <Rect.h>
 #include <ScrollView.h>
@@ -26,7 +26,7 @@
 #include <random>
 
 
-using BPrivate::BGeolocation;
+using BPrivate::Network::BGeolocation;
 
 
 enum {
