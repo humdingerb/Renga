@@ -110,7 +110,8 @@
 #define BLAB_SLEEP                      0x17003009
 
 // transports
-#define AGENT_MENU_CHANGED_TO_ICQ       0x18000002
+#define AGENT_MENU_CHANGED_TO_ICQ       0x18000002 // TODO remove?
+#define AGENT_MENU_CHANGED_TO_IRC       0x18000003
 #define AGENT_MENU_CHANGED_TO_JABBER    0x18000004
 #define REGISTER_TRANSPORT              0x18000005
 #define UNREGISTER_TRANSPORT            0x18000006

@@ -4,8 +4,6 @@
 
 #include "BuddyWindow.h"
 
-#include <Application.h>
-
 #include "support/AppLocation.h"
 
 #include "ui/ModalAlertFactory.h"
@@ -18,13 +16,12 @@
 #include "Messages.h"
 #include "JRoster.h"
 
+#include <Application.h>
+#include <LayoutBuilder.h>
+#include <StringView.h>
+
 #include <cstdio>
 #include <string.h>
-
-#include "GridView.h"
-#include "GroupLayout.h"
-#include "GroupLayoutBuilder.h"
-#include "StringView.h"
 
 BuddyWindow *BuddyWindow::_instance = NULL;
 
@@ -49,14 +46,30 @@ BuddyWindow::~BuddyWindow() {
 }
 
 
-BuddyWindow::BuddyWindow(BRect frame)
-	: BWindow(frame, "Add Contact", B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE) {
+static const char* sXMPPHelpText = "Please enter a JID of the form username@server (e.g., beoslover@jabber.org).";
 
+
+BuddyWindow::BuddyWindow(BRect frame)
+	: BWindow(frame, "Add Contact", B_TITLED_WINDOW,
+		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
+{
 	_realname = new BTextControl("realname", "Nickname:", "", NULL);
 
-	_handle = new BTextControl("handle", "XMPP ID:", "", NULL);
+	// FIXME use a BOptionPopUp instead
+	_chat_services_selection = new BPopUpMenu("Jabber");
+	_chat_services = new BMenuField("chat_services", "Online Service: ",
+		_chat_services_selection);
+	_chat_services_selection->AddItem(new BMenuItem("IRC",
+		new BMessage(AGENT_MENU_CHANGED_TO_IRC)));
+	_chat_services_selection->AddItem(new BMenuItem("XMPP",
+		new BMessage(AGENT_MENU_CHANGED_TO_JABBER)));
+	_chat_services_selection->FindItem("XMPP")->SetMarked(true);
 
-	_enter_note = new BStringView("enter", "Please enter a XMPP ID of the form username@server.tld", B_WILL_DRAW);
+	_handle = new BTextControl("handle", "Jabber ID:", "", NULL);
+
+	_enter_note = new BStringView("enter", sXMPPHelpText);
+	_enter_note->SetExplicitMinSize(BSize(_enter_note->StringWidth(sXMPPHelpText) + 24,
+		B_SIZE_UNSET));
 
 	_cancel = new BButton("Cancel", new BMessage(JAB_CANCEL));
 	_cancel->SetTarget(this);
@@ -68,15 +81,20 @@ BuddyWindow::BuddyWindow(BRect frame)
 	_ok->SetLabel("Add Contact");
 
 	// add GUI components to BView
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 4)
-		.Add(_realname)
-		.Add(_handle)
-		.Add(_enter_note)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 2)
+	SetLayout(new BGridLayout());
+	BLayoutBuilder::Grid<>(this)
+		.SetInsets(B_USE_WINDOW_SPACING)
+		.AddTextControl(_realname, 0, 0)
+		.AddMenuField(_chat_services, 0, 1)
+		.AddTextControl(_handle, 0, 2)
+		.Add(_enter_note, 0, 3, 2, 1)
+		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING, 0, 4, 2, 1)
+			.AddGlue()
+			.Add(_cancel)
 			.Add(_ok)
-			.Add(_cancel))
-		);
+		.End()
+	.End();
+
 	_realname->MakeFocus(true);
 }
 
@@ -90,6 +108,20 @@ void BuddyWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_CANCEL: {
 			PostMessage(B_QUIT_REQUESTED);
+			break;
+		}
+
+		case AGENT_MENU_CHANGED_TO_JABBER:
+		{
+			_enter_note->SetText(sXMPPHelpText);
+			_handle->SetLabel("Jabber ID:");
+			break;
+		}
+
+		case AGENT_MENU_CHANGED_TO_IRC:
+		{
+			_enter_note->SetText("Please enter the user's IRC nickname and server (e.g., haikulover%irc.oftc.net).");
+			_handle->SetLabel("IRC handle:");
 			break;
 		}
 	}
