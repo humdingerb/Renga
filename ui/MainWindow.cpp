@@ -56,7 +56,7 @@ BlabberMainWindow *BlabberMainWindow::_instance = NULL;
 
 BlabberMainWindow *BlabberMainWindow::Instance() {
 	BlabberSettings *settings = BlabberSettings::Instance();
-	
+
 	if (_instance == NULL && !settings->Data("no-window-on-startup")) {
 		float main_window_width, main_window_height;
 
@@ -67,9 +67,9 @@ BlabberMainWindow *BlabberMainWindow::Instance() {
 		} else {
 			// default
 			main_window_width  = 210;
-			main_window_height = 332; 
+			main_window_height = 332;
 		}
-		
+
 		// create window frame position
 		BRect frame(GenericFunctions::CenteredFrame(main_window_width, main_window_height));
 
@@ -81,7 +81,7 @@ BlabberMainWindow *BlabberMainWindow::Instance() {
 		// create window singleton
 		_instance = new BlabberMainWindow(frame);
 	}
-	
+
 	return _instance;
 }
 
@@ -91,7 +91,7 @@ BlabberMainWindow::~BlabberMainWindow() {
 
 	// remove deskbar icon
 //	BDeskbar db;
-//	db.RemoveItem(_deskbar_id);	
+//	db.RemoveItem(_deskbar_id);
 
 	_instance = NULL;
 }
@@ -121,7 +121,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 			break;
 		}
-		
+
 		case B_ABOUT_REQUESTED: {
 			be_app->PostMessage(B_ABOUT_REQUESTED);
 			break;
@@ -165,7 +165,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 			break;
 		}
-		
+
 		case JAB_DISCONNECT: {
 			JabberSpeak::Instance()->SendDisconnect();
 			_status_view->SetMessage("disconnecting");
@@ -181,8 +181,8 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_RIV: {
-			string jabber_org = "http://github.com/haikuarchives/renga"; 
-			
+			string jabber_org = "http://github.com/haikuarchives/renga";
+
 			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
 			if (!be_roster->IsRunning("text/html"))
 				be_roster->Launch("text/html", 1, argv);
@@ -192,13 +192,13 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				msg.AddString("be:url", jabber_org.c_str());
 				messenger.SendMessage(&msg);
 			}
-	
+
 			break;
 		}
 
 		case JAB_BE_USERS: {
-			string jabber_org = "http://home.t-online.de/home/sascha.offe/jabber.html"; 
-			
+			string jabber_org = "http://home.t-online.de/home/sascha.offe/jabber.html";
+
 			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
 			if (!be_roster->IsRunning("text/html"))
 				be_roster->Launch("text/html", 1, argv);
@@ -208,13 +208,13 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				msg.AddString("be:url", jabber_org.c_str());
 				messenger.SendMessage(&msg);
 			}
-	
+
 			break;
 		}
-				
+
 		case JAB_JABBER_ORG: {
-			string jabber_org = "http://www.jabber.org"; 
-			
+			string jabber_org = "http://www.jabber.org";
+
 			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
 			if (!be_roster->IsRunning("text/html"))
 				be_roster->Launch("text/html", 1, argv);
@@ -224,13 +224,13 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				msg.AddString("be:url", jabber_org.c_str());
 				messenger.SendMessage(&msg);
 			}
-	
+
 			break;
 		}
 
 		case JAB_JABBER_CENTRAL_ORG: {
-			string jabber_org = "http://www.jabbercentral.org"; 
-			
+			string jabber_org = "http://www.jabbercentral.org";
+
 			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
 			if (!be_roster->IsRunning("text/html"))
 				be_roster->Launch("text/html", 1, argv);
@@ -240,13 +240,13 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				msg.AddString("be:url", jabber_org.c_str());
 				messenger.SendMessage(&msg);
 			}
-	
+
 			break;
 		}
 
 		case JAB_JABBER_VIEW_COM: {
-			string jabber_org = "http://www.jabberview.com"; 
-			
+			string jabber_org = "http://www.jabberview.com";
+
 			char *argv[] = {const_cast<char *>(jabber_org.c_str()), NULL};
 			if (!be_roster->IsRunning("text/html"))
 				be_roster->Launch("text/html", 1, argv);
@@ -256,13 +256,13 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				msg.AddString("be:url", jabber_org.c_str());
 				messenger.SendMessage(&msg);
 			}
-	
+
 			break;
 		}
 
 		case JAB_FAQ: {
 			string user_guide = "http://www.users.uswest.net/~jblanco/jabber-faq.html";
-			
+
 			char *argv[] = {const_cast<char *>(user_guide.c_str()), NULL};
 			if (!be_roster->IsRunning("text/html"))
 				be_roster->Launch("text/html", 1, argv);
@@ -272,13 +272,13 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				msg.AddString("be:url", user_guide.c_str());
 				messenger.SendMessage(&msg);
 			}
-	
+
 			break;
 		}
 
 		case JAB_USER_GUIDE: {
 			string user_guide = AppLocation::Instance()->AbsolutePath("resources/user-guide/user_guide.html");
-			
+
 			char *argv[] = {const_cast<char *>(user_guide.c_str()), NULL};
 			if (!be_roster->IsRunning("text/html"))
 				be_roster->Launch("text/html", 1, argv);
@@ -288,20 +288,20 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				msg.AddString("be:url", user_guide.c_str());
 				messenger.SendMessage(&msg);
 			}
-	
+
 			break;
 		}
 
 		case BLAB_UPDATE_ROSTER: {
 			// a message that the roster singleton was updated
 			_roster->UpdateRoster();
-	
+
 			break;
 		}
 
 		case JAB_SUBSCRIBE_PRESENCE: {
 			RosterItem *item = _roster->CurrentItemSelection();
-			
+
 			// if there was a user selected (shouldn't be otherwise)
 			if (item) {
 				// don't send subscription request if we have it already
@@ -309,13 +309,13 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 					JabberSpeak::Instance()->SendSubscriptionRequest(item->GetUserID()->JabberHandle());
 				}
 			}
-			
+
 			break;
 		}
 
 		case JAB_UNSUBSCRIBE_PRESENCE: {
 			RosterItem *item = _roster->CurrentItemSelection();
-			
+
 			// if there was a user selected (shouldn't be otherwise)
 			if (item) {
 				// don't send unsubscription request if we don't have it already
@@ -323,7 +323,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 					JabberSpeak::Instance()->SendUnsubscriptionRequest(item->GetUserID()->Handle());
 				}
 			}
-			
+
 			break;
 		}
 
@@ -334,11 +334,11 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			}
 		}
 		__attribute__ ((fallthrough));
-		
+
 		case JAB_OPEN_CHAT: {
 			// if there's a current selection, begin chat with that user
 			RosterItem *item = _roster->CurrentItemSelection();
-			
+
 			if (item != NULL) {
 				const UserID *user = item->GetUserID();
 
@@ -349,7 +349,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 			// if there's a current selection, begin chat with that group
 			BookmarkItem *bookmark = _roster->CurrentBookmarkSelection();
-			
+
 			if (bookmark != NULL) {
 				const gloox::JID& group = bookmark->GetUserID();
 				const gloox::ConferenceListItem* info
@@ -363,7 +363,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 				BookmarkManager::Instance().SetBookmark(group.full().c_str(),
 					info->nick.c_str(), bookmark->Text(), true);
 			}
-			
+
 			break;
 		}
 
@@ -416,7 +416,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 			// open message window
 			TalkManager::Instance()->CreateTalkSession(gloox::Message::Normal, &user->JID(), "", "", NULL);
-			
+
 			break;
 		}
 
@@ -434,7 +434,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		case JAB_OPEN_EDIT_BUDDY_WINDOW: {
 			// pick out user to be edited from RosterView
 			RosterItem *item = _roster->CurrentItemSelection();
-			
+
 			if (item != NULL) {
 				// open edit buddy window
 				(new ChangeNameWindow(item->GetUserID()->JID(), item->GetUserID()->FriendlyName().c_str()))->Show();
@@ -453,7 +453,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		case JAB_USER_INFO: {
 			// pick out user to be analyzed
 			RosterItem *item = _roster->CurrentItemSelection();
-			
+
 			if (item != NULL) {
 				// pick out user
 				UserID *user = const_cast<UserID *>(item->GetUserID());
@@ -468,7 +468,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		case JAB_REMOVE_BUDDY: {
 			// pick out user to be removed from RosterView
 			RosterItem *item = _roster->CurrentItemSelection();
-			
+
 			if (item != NULL) {
 				// pick out user
 				const UserID *user = item->GetUserID();
@@ -510,7 +510,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "away");
 			BlabberSettings::Instance()->WriteToFile();
-			
+
 			break;
 		}
 
@@ -580,12 +580,12 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 			CustomStatusWindow::Instance()->Activate();
 			break;
 		}
-		
+
 		case kResetWindow:
 		{
 			JabberSpeak::Instance()->Reset();
 			ShowLogin();
-			
+
 			break;
 		}
 
@@ -656,7 +656,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 			break;
 		}
-		
+
 		break;
 	}
 }
@@ -727,7 +727,7 @@ void BlabberMainWindow::MenusBeginning() {
 	const char *message_7 = BlabberSettings::Instance()->Data("message-7");
 	const char *message_8 = BlabberSettings::Instance()->Data("message-8");
 	const char *message_9 = BlabberSettings::Instance()->Data("message-9");
-	
+
 	if (message_1) {
 		_message_1_item->SetLabel(message_1);
 		_message_1_item->SetEnabled(true);
@@ -831,9 +831,11 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	, _record_item(nullptr)
 {
 
+	// TODO (nephele) move menu to layout kit
+
 	// editing filter for taksing
 	AddCommonFilter(new RotateChatFilter());
-	
+
 	// add self to message family
 	MessageRepeater::Instance()->AddTarget(this);
 
@@ -844,7 +846,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	// status bar
 	_status_view = new StatusView();
 	_status_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	
+
 	// menubar
 	BMenuBar* menubar = new BMenuBar("menubar");
 
@@ -898,11 +900,12 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 
 		_user_info_item = new BMenuItem("Get User Info", new BMessage(JAB_USER_INFO));
 		_user_info_item->SetShortcut('I', 0);
-		
+
 		_user_chatlog_item = new BMenuItem("Show Chat Log", new BMessage(JAB_SHOW_CHATLOG));
 		_user_chatlog_item->SetShortcut('H', 0);
-		
+
 		_preferences_item = new BMenuItem("Preferences...", new BMessage(JAB_PREFERENCES));
+		_preferences_item->SetShortcut(',', 0);
 
 	edit_menu->AddItem(_add_buddy_item);
 	edit_menu->AddItem(_change_buddy_item);
@@ -917,7 +920,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 
 	// STATUS MENU
 	BMenu* status_menu = new BMenu("Status");
-	
+
 		_chat_item = new BMenuItem("I'm available for chat.", new BMessage(BLAB_AVAILABLE_FOR_CHAT));
 		_away_item = new BMenuItem("I will be away temporarily.", new BMessage(BLAB_AWAY_TEMPORARILY));
 		_dnd_item = new BMenuItem("Do not disturb me.", new BMessage(BLAB_DO_NOT_DISTURB));
@@ -947,24 +950,20 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 
 	status_menu->SetRadioMode(true);
 	_chat_item->SetMarked(true);
-	
+
 	// TALK MENU
 	BMenu* talk_menu = new BMenu("Talk");
 
 		BMenuItem* rotate_chat_forward_item = new BMenuItem("Rotate Chat Forward", new BMessage(JAB_ROTATE_CHAT_FORWARD));
-		rotate_chat_forward_item->SetShortcut('.', 0);
 
 		BMenuItem* rotate_chat_backward_item = new BMenuItem("Rotate Chat Backward", new BMessage(JAB_ROTATE_CHAT_BACKWARD));
-		rotate_chat_backward_item->SetShortcut(',', 0);
 
 		_send_message_item = new BMenuItem("Send Message...", new BMessage(JAB_OPEN_NEW_MESSAGE));
 		_send_message_item->SetShortcut('M', 0);
 
 		_send_chat_item = new BMenuItem("Start Chat...", new BMessage(JAB_OPEN_NEW_CHAT));
-		_send_chat_item->SetShortcut('C', 0);
 
 		_send_groupchat_item = new BMenuItem("Start Group Chat...", new BMessage(JAB_OPEN_NEW_GROUP_CHAT));
-		_send_groupchat_item->SetShortcut('G', 0);
 
 	talk_menu->AddItem(rotate_chat_forward_item);
 	talk_menu->AddItem(rotate_chat_backward_item);
@@ -1008,7 +1007,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_message_8_item = new BMenuItem("Message #8", new BMessage(JAB_MESSAGE_8));
 		_message_8_item->SetShortcut('8', 0);
 		_message_8_item->SetEnabled(false);
-		
+
 		_message_9_item = new BMenuItem("Message #9", new BMessage(JAB_MESSAGE_9));
 		_message_9_item->SetShortcut('9', 0);
 		_message_9_item->SetEnabled(false);
@@ -1064,7 +1063,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 			.End()
 		.End()
 	.End();
-	
+
 	///// NOW DO LOGIN STUFF
 	// encompassing view
 	_login_full_view = new BGroupView("login-full", B_VERTICAL);
@@ -1075,12 +1074,12 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 
 	// username/password controls
 	_login_realname = new BTextControl(NULL, "Nickname: ", NULL, NULL);
-	
+
 	_login_username = new BTextControl(NULL, "Jabber ID: ", NULL, NULL);
-		
+
 	_login_password = new BTextControl(NULL, "Password: ", NULL, NULL);
 	_login_password->TextView()->HideTyping(true);
-	
+
 	BMessage* createAccount = new BMessage(kCreateAccount);
 	_login_new_account = new BButton("create", "Create a new account",
 		createAccount);
@@ -1122,7 +1121,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		.End()
 		.AddGlue()
 	.End();
-	
+
 	// attach all-encompassing main view to window
 	BCardLayout* cl = new BCardLayout();
 	SetLayout(cl);
@@ -1138,13 +1137,13 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	} else {
 		_login_realname->SetText("Me");
 	}
-	
+
 	if (BlabberSettings::Instance()->Data("last-login")) {
 		_login_username->SetText(BlabberSettings::Instance()->Data("last-login"));
 	} else {
 		_login_username->SetText("newuser@jabber.org");
 	}
-	
+
 	_login_password->SetText(BlabberSettings::Instance()->Data("last-password"));
 
 	_login_auto_login->SetValue(BlabberSettings::Instance()->Tag("auto-login"));
@@ -1221,7 +1220,7 @@ void BlabberMainWindow::ShowLogin() {
 	} else {
 		_login_realname->SetText("Me");
 	}
-	
+
 	if (BlabberSettings::Instance()->Data("last-login")) {
 		_login_username->SetText(BlabberSettings::Instance()->Data("last-login"));
 	} else {
@@ -1243,9 +1242,9 @@ void BlabberMainWindow::ShowLogin() {
 
 void BlabberMainWindow::SetCustomStatus(string status) {
 	char buffer[2048];
-	
+
 	// create menued status message
-	sprintf(buffer, "[Custom] %s", status.c_str()); 
+	sprintf(buffer, "[Custom] %s", status.c_str());
 
 	_custom_item->SetMarked(true);
 	_custom_item->SetLabel(buffer);
