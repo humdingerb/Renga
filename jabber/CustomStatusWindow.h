@@ -27,14 +27,14 @@ public:
 public:
 
 
-	                            CustomStatusWindow();
+	                            CustomStatusWindow(BRect frame);
 	                           ~CustomStatusWindow();
 
 	void                        MessageReceived(BMessage *msg);
-	
+
 private:
 	static CustomStatusWindow *_instance;
-	
+
 private:
 	BBox                      *_surrounding;
 	BTextControl              *_handle;
@@ -43,7 +43,7 @@ private:
 	BRadioButton              *_chat;
 	BRadioButton              *_away;
 	BRadioButton              *_xa;
-	BRadioButton              *_dnd;	
+	BRadioButton              *_dnd;
 };
 
 #endif

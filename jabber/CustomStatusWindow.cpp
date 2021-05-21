@@ -6,8 +6,10 @@
 
 #include <cstdio>
 
+#include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <LayoutBuilder.h>
 #include <StringView.h>
 
 #include "support/AppLocation.h"
@@ -24,115 +26,83 @@ CustomStatusWindow *CustomStatusWindow::_instance = NULL;
 
 CustomStatusWindow *CustomStatusWindow::Instance() {
 	if (_instance == NULL) {
-		_instance = new CustomStatusWindow();
+		float main_window_width  = 410;
+		float main_window_height = 100;
+
+		BRect frame(GenericFunctions::CenteredFrame(main_window_width, main_window_height));
+
+		_instance = new CustomStatusWindow(frame);
 	}
-	
+
 	return _instance;
 }
 
 
-CustomStatusWindow::CustomStatusWindow()
-	: BWindow(BRect(0, 0, 0, 0), "Create a Custom Status", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE) {
-	// determine window size
-	BRect rect;
+CustomStatusWindow::CustomStatusWindow(BRect frame)
+	: BWindow(frame, "Create a Custom Status",
+		B_TITLED_WINDOW,
+		B_AUTO_UPDATE_SIZE_LIMITS |
+		B_NOT_ZOOMABLE |
+		B_NOT_RESIZABLE)
+	{
 
-	float login_window_width  = 410;
-	float login_window_height = 100; 
-		
-	// create window frame position
-	rect = GenericFunctions::CenteredFrame(login_window_width, login_window_height);
-	
-	// set it
-	ResizeTo(rect.Width(), rect.Height());
-	MoveTo(rect.LeftTop());
-	
-	// encompassing view
-	rect = Bounds();
-	rect.OffsetTo(B_ORIGIN);
+	_chat = new BRadioButton("status", "Chat", NULL);
 
-	_full_view = new BView(rect, "main-full", B_FOLLOW_ALL, B_WILL_DRAW);
-	_full_view->SetViewColor(216, 216, 216, 255);
+	_away = new BRadioButton("status", "Away", NULL);
 
-	rect = Bounds();
+	_xa = new BRadioButton("status", "Extended Away", NULL);
 
-	// lightbulb
-	PictureView *picture = new PictureView("bulb-normal");
-	
-	// query
-	rect.left = 80.0;
-	rect.InsetBy(5.0, 5.0);
+	_dnd = new BRadioButton("status", "Do Not Disturb", NULL);
 
-	_surrounding = new BBox(rect, NULL);
-	_surrounding->SetLabel("Specify your Status");
-	
-	rect.OffsetTo(B_ORIGIN);
-	rect.InsetBy(6.0, 19.0);
-	rect.bottom = rect.top + 18;
-	rect.right = rect.left + 100.0;
-		
-	_chat = new BRadioButton(rect, "status", "Chat", NULL);	
-	rect.OffsetBy(0.0, 15.0);
 
-	_away = new BRadioButton(rect, "status", "Away", NULL);	
-	rect.OffsetBy(0.0, 15.0);
-
-	_xa = new BRadioButton(rect, "status", "Extended Away", NULL);	
-	rect.OffsetBy(0.0, 15.0);
-
-	_dnd = new BRadioButton(rect, "status", "Do Not Disturb", NULL);	
-
-	rect.OffsetBy(110.0, -48.0);
-	rect.right = rect.left + 200.0;
-	
-	BStringView *query = new BStringView(rect, NULL, "Please provide your detailed status:");
+	BStringView *query = new BStringView(NULL, "Please provide your detailed status:");
 
 	// handle
-	rect.OffsetBy(-2.0, 18.0);
-	_handle = new BTextControl(rect, NULL, NULL, "", NULL);
+	_handle = new BTextControl(NULL, NULL, "", NULL);
 	_handle->SetDivider(0);
-	
+
 	if (BlabberSettings::Instance()->Data("last-custom-more-exact-status")) {
 		_handle->SetText(BlabberSettings::Instance()->Data("last-custom-more-exact-status"));
 	} else {
 		_handle->SetText("I'm at my computer.");
 	}
-	
-	// cancel button
-	rect.OffsetBy(53.0, 24.0);
-	rect.right = rect.left + 65;
 
-	BButton *cancel = new BButton(rect, "cancel", "Nevermind", new BMessage(JAB_CANCEL));
+	BButton *cancel = new BButton("cancel", "Nevermind", new BMessage(JAB_CANCEL));
 	cancel->SetTarget(this);
 
-	// ok button
-	rect.OffsetBy(75.0, 0.0);
-
-	BButton *ok = new BButton(rect, "ok", "OK", new BMessage(JAB_OK));
+	BButton *ok = new BButton("ok", "OK", new BMessage(JAB_OK));
 
 	ok->MakeDefault(true);
 	ok->SetTarget(this);
-		
-	_full_view->AddChild(picture);
-	_surrounding->AddChild(_chat);
-	_surrounding->AddChild(_away);
-	_surrounding->AddChild(_xa);
-	_surrounding->AddChild(_dnd);
-	_surrounding->AddChild(query);
-	_surrounding->AddChild(_handle);
-	_surrounding->AddChild(cancel);
-	_surrounding->AddChild(ok);
-	_full_view->AddChild(_surrounding);
-	
-	AddChild(_full_view);
-	
+
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	BLayoutBuilder::Group<>(this)
+		.SetInsets(B_USE_WINDOW_SPACING)
+		.AddGroup(B_VERTICAL, B_USE_HALF_ITEM_SPACING, 0)
+			.Add(_chat)
+			.Add(_away)
+			.Add(_xa)
+			.Add(_dnd)
+		.End()
+		.AddGroup(B_VERTICAL, B_USE_ITEM_SPACING, 2)
+			.Add(query)
+			.Add(_handle)
+				.AddGroup(B_HORIZONTAL, B_USE_ITEM_SPACING, 0)
+				.AddGlue()
+				.Add(cancel)
+				.Add(ok)
+			.End()
+		.End()
+	.End();
+
 	// set defaults
 	string exact_status;
-	
+
 	if (BlabberSettings::Instance()->Data("last-custom-exact-status")) {
 		// get last status
 		exact_status = BlabberSettings::Instance()->Data("last-custom-exact-status");
 
-		// map to radio buttons		
+		// map to radio buttons
 		if (exact_status == "away") {
 			_away->SetValue(1);
 		} else if (exact_status == "xa") {
@@ -170,17 +140,17 @@ void CustomStatusWindow::MessageReceived(BMessage *msg) {
 			} else if (_dnd->Value()) {
 				JabberSpeak::Instance()->SendPresence(gloox::Presence::DND, _handle->Text());
 				BlabberSettings::Instance()->SetData("last-custom-exact-status", "dnd");
-			}			
-	
+			}
+
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", true);
 			BlabberSettings::Instance()->SetData("last-custom-more-exact-status", _handle->Text());
 			BlabberSettings::Instance()->WriteToFile();
-			
+
 			// update menu
 			BlabberMainWindow::Instance()->SetCustomStatus(_handle->Text());
 
 			PostMessage(B_QUIT_REQUESTED);
-						
+
 			break;
 		}
 
