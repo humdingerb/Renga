@@ -7,19 +7,34 @@
 #endif
 
 #include <ScrollView.h>
+#include <ControlLook.h>
 
 StatusView::StatusView(const char *name)
 	: BView(name, B_WILL_DRAW) {
-	// set font
 	SetFont(be_plain_font);
-	SetFontSize(9.0);
 
-	GetFontHeight(&_fh);
-	_height = _fh.ascent + _fh.descent + 1.0;
-	if (_height <  B_V_SCROLL_BAR_WIDTH)
-		_height = B_V_SCROLL_BAR_WIDTH;
-	SetExplicitSize(BSize(B_SIZE_UNSET, _height));
-	SetExplicitMinSize(BSize(B_SIZE_UNSET, _height));
+	float viewSize = be_control_look->GetScrollBarWidth();
+	float fontSize = 9.0f;
+
+	// calculate a font Size that fits into the alocated space
+	while (fontSize < 48) {
+		SetFontSize(fontSize + 1);
+		GetFontHeight(&_fh);
+		_height = _fh.ascent + _fh.descent + 1.0f;
+		if (_height < viewSize) {
+			fontSize = fontSize +1;
+			continue;
+		}
+		if (_height > viewSize) {
+			SetFontSize(fontSize);
+			break;
+		}
+		if (_height == viewSize)
+			break;
+	}
+
+	SetExplicitSize(BSize(B_SIZE_UNSET, viewSize));
+	SetExplicitMinSize(BSize(B_SIZE_UNSET, viewSize));
 }
 
 StatusView::~StatusView() {
@@ -30,8 +45,8 @@ void StatusView::AttachedToWindow() {
 
 void StatusView::Draw(__attribute__((unused)) BRect rect) {
 	// draw name
-	SetHighColor(0, 0, 0, 255);
-	DrawString(_current_message.c_str(), BPoint(5, _height - 3));
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
+	DrawString(_current_message.c_str(), BPoint(5, _height -(_fh.descent + 1)));
 }
 
 void StatusView::SetMessage(std::string message) {
