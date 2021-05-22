@@ -6,6 +6,8 @@
 
 #include "support/AppLocation.h"
 
+#include <IconUtils.h>
+#include <Resources.h>
 #include <TranslationUtils.h>
 
 BBitmap *RosterItem::_kinda_online_icon = NULL;
@@ -13,6 +15,27 @@ BBitmap *RosterItem::_offline_icon      = NULL;
 BBitmap *RosterItem::_online_icon       = NULL;
 BBitmap *RosterItem::_unknown_icon      = NULL;
 BBitmap *RosterItem::_icq_icon          = NULL;
+
+static BBitmap* LoadIconFromResource(const char* name)
+{
+	BResources resources;
+	resources.SetToImage(name);
+
+	size_t size = 0;
+	const uint8* buffer = (const uint8*)resources.LoadResource('VICN', name, &size);
+
+	if (buffer == NULL)
+		return NULL;
+
+	// FIXME scale this bitmap according to font size
+	BBitmap* result = new BBitmap(BRect(0, 0, 19, 19), B_RGBA32);
+	status_t status = BIconUtils::GetVectorIcon(buffer, size, result);
+	if (status != B_OK) {
+		delete result;
+		return NULL;
+	}
+	return result;
+}
 
 RosterItem::RosterItem(const UserID *userid)
 	: BStringItem(userid->FriendlyName().c_str())
@@ -23,10 +46,10 @@ RosterItem::RosterItem(const UserID *userid)
 
 	// intitialize static members
 	if (_offline_icon == NULL) {
-		_kinda_online_icon = BTranslationUtils::GetBitmap('PiNG', "away-online");
-		_online_icon = BTranslationUtils::GetBitmap('PiNG', "online");
-		_offline_icon = BTranslationUtils::GetBitmap('PiNG', "offline");
-		_unknown_icon = BTranslationUtils::GetBitmap('PiNG', "unknown");
+		_kinda_online_icon = LoadIconFromResource("away-online");
+		_online_icon = LoadIconFromResource("online");
+		_offline_icon = LoadIconFromResource("offline");
+		_unknown_icon = LoadIconFromResource("unknown");
 		_icq_icon = BTranslationUtils::GetBitmap('PiNG', "icq");
 	}
 }
@@ -96,23 +119,24 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 			BRect(0, frame.top, height - 1, frame.bottom - 1), B_FILTER_BITMAP_BILINEAR);
 	}
 
+	BPoint iconPosition(frame.left - 3, frame.top + 1);
 	if (status == UserID::ONLINE) {
 		if (exact_status == "xa" || exact_status == "away" || exact_status == "dnd") {
 			if (_kinda_online_icon) {
-				owner->DrawBitmapAsync(_kinda_online_icon, BPoint(frame.left + 1, frame.top + 4));
+				owner->DrawBitmapAsync(_kinda_online_icon, iconPosition);
 			}
 		} else {
 			if (_online_icon) {
-				owner->DrawBitmapAsync(_online_icon, BPoint(frame.left + 1, frame.top + 4));
+				owner->DrawBitmapAsync(_online_icon, iconPosition);
 			}
 		}
 	} else if (status == UserID::OFFLINE) {
 		if (_offline_icon) {
-			owner->DrawBitmapAsync(_offline_icon, BPoint(frame.left + 1, frame.top + 4));
+			owner->DrawBitmapAsync(_offline_icon, iconPosition);
 		}
 	} else {
 		if (_unknown_icon) {
-			owner->DrawBitmapAsync(_unknown_icon, BPoint(frame.left + 1, frame.top + 4));
+			owner->DrawBitmapAsync(_unknown_icon, iconPosition);
 		}
 	}
 

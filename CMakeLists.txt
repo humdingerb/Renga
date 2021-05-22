@@ -91,10 +91,10 @@ add_custom_command(TARGET Renga POST_BUILD
 	COMMAND xres -o ${CMAKE_BINARY_DIR}/Renga Resource.rsrc
 		-a PiNG:2:bulb-normal  ${CMAKE_SOURCE_DIR}/resources/graphics/bulb-normal.png
 		-a PiNG:3:bulb-big     ${CMAKE_SOURCE_DIR}/resources/graphics/bulb-big.png
-		-a PiNG:4:away-online  ${CMAKE_SOURCE_DIR}/resources/icons/away-online.png
-		-a PiNG:5:online       ${CMAKE_SOURCE_DIR}/resources/icons/online.png
-		-a PiNG:6:offline      ${CMAKE_SOURCE_DIR}/resources/icons/offline.png
-		-a PiNG:7:unknown      ${CMAKE_SOURCE_DIR}/resources/icons/unknown.png
+		-a VICN:4:away-online  ${CMAKE_SOURCE_DIR}/resources/icons/away-online.hvif
+		-a VICN:5:online       ${CMAKE_SOURCE_DIR}/resources/icons/online.hvif
+		-a VICN:6:offline      ${CMAKE_SOURCE_DIR}/resources/icons/offline.hvif
+		-a VICN:7:unknown      ${CMAKE_SOURCE_DIR}/resources/icons/unknown.hvif
 		-a PiNG:9:icq          ${CMAKE_SOURCE_DIR}/resources/icons/icq.png
 		-a VICN:10:preferred   ${CMAKE_SOURCE_DIR}/resources/icons/preferred.hvif
 		-a VICN:11:home        ${CMAKE_SOURCE_DIR}/resources/icons/home.hvif
