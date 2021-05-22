@@ -15,6 +15,8 @@
 #include <String.h>
 #include <TranslationUtils.h>
 
+#include "ui/HVIFUtil.h"
+
 BBitmap *BookmarkItem::_online_icon = NULL;
 BBitmap *BookmarkItem::_unknown_icon = NULL;
 
@@ -24,8 +26,8 @@ BookmarkItem::BookmarkItem(const gloox::JID& userid, BString name)
 {
 	// intitialize static members
 	if (_online_icon == NULL) {
-		_online_icon = BTranslationUtils::GetBitmap('PiNG', "online");
-		_unknown_icon = BTranslationUtils::GetBitmap('PiNG', "unknown");
+		_online_icon = LoadIconFromResource("online");
+		_unknown_icon = LoadIconFromResource("unknown");
 	}
 }
 

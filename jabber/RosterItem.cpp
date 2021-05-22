@@ -6,9 +6,9 @@
 
 #include "support/AppLocation.h"
 
-#include <IconUtils.h>
-#include <Resources.h>
 #include <TranslationUtils.h>
+
+#include "ui/HVIFUtil.h"
 
 BBitmap *RosterItem::_kinda_online_icon = NULL;
 BBitmap *RosterItem::_offline_icon      = NULL;
@@ -16,26 +16,6 @@ BBitmap *RosterItem::_online_icon       = NULL;
 BBitmap *RosterItem::_unknown_icon      = NULL;
 BBitmap *RosterItem::_icq_icon          = NULL;
 
-static BBitmap* LoadIconFromResource(const char* name)
-{
-	BResources resources;
-	resources.SetToImage(name);
-
-	size_t size = 0;
-	const uint8* buffer = (const uint8*)resources.LoadResource('VICN', name, &size);
-
-	if (buffer == NULL)
-		return NULL;
-
-	// FIXME scale this bitmap according to font size
-	BBitmap* result = new BBitmap(BRect(0, 0, 19, 19), B_RGBA32);
-	status_t status = BIconUtils::GetVectorIcon(buffer, size, result);
-	if (status != B_OK) {
-		delete result;
-		return NULL;
-	}
-	return result;
-}
 
 RosterItem::RosterItem(const UserID *userid)
 	: BStringItem(userid->FriendlyName().c_str())
@@ -88,7 +68,7 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 			{
 				owner->SetHighColor(255, 179, 0, 255);
 			}
-			else if(exact_status == "dnd") 
+			else if(exact_status == "dnd")
 			{
 				owner->SetHighColor(213, 158, 158, 255);
 			}
@@ -152,7 +132,7 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 	}
 
 	BFont statusFont;
-			
+
 	// font color is based on online status
 	if (status == UserID::ONLINE) {
 		if (exact_status == "dnd") {
