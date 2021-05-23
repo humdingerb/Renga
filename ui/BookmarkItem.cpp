@@ -26,8 +26,11 @@ BookmarkItem::BookmarkItem(const gloox::JID& userid, BString name)
 {
 	// intitialize static members
 	if (_online_icon == NULL) {
-		_online_icon = LoadIconFromResource("online");
-		_unknown_icon = LoadIconFromResource("unknown");
+		font_height fh;
+		be_plain_font->GetHeight(&fh);
+		float size = fh.ascent + fh.descent;
+		_online_icon = LoadIconFromResource("online", size * (16/11));
+		_unknown_icon = LoadIconFromResource("unknown", size * (16/11));
 	}
 }
 
@@ -60,14 +63,12 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 	owner->SetDrawingMode(B_OP_ALPHA);
 	owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 
-	BPoint iconPosition(frame.left - 2, frame.top);
+	BPoint iconPosition(frame.left + 1, frame.top + 1);
 	if (status == UserID::TRANSPORT_ONLINE) {
 		owner->DrawBitmapAsync(_online_icon, iconPosition);
 	} else if (status == UserID::UNKNOWN) {
 		owner->DrawBitmapAsync(_unknown_icon, iconPosition);
 	}
-
-	float height;
 
 	BString name = Text();
 	if (name.IsEmpty())
@@ -87,10 +88,9 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 	// construct text positioning
 	font_height fh;
 	owner->GetFontHeight(&fh);
+	float height = fh.ascent + fh.descent;
 
-	height = fh.ascent + fh.descent;
-
-	owner->DrawString(name, BPoint(frame.left + 13, frame.bottom - ((frame.Height() - height) / 2) - fh.descent));
+	owner->DrawString(name, BPoint(frame.left + height, frame.bottom - fh.descent));
 }
 
 void BookmarkItem::Update(BView *owner, const BFont *font)
@@ -102,8 +102,10 @@ void BookmarkItem::Update(BView *owner, const BFont *font)
 	if (item != NULL && !item->name.empty())
 		SetText(item->name.c_str());
 
-	// set height to accomodate graphics and text
-	SetHeight(16.0);
+	font_height fh;
+	owner->GetFontHeight(&fh);
+	float height = fh.ascent + fh.descent;
+	SetHeight(height);
 }
 
 const gloox::JID& BookmarkItem::GetUserID() const {

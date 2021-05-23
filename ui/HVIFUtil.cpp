@@ -9,7 +9,7 @@
 
 #include "Bitmap.h"
 
-BBitmap* LoadIconFromResource(const char* name)
+BBitmap* LoadIconFromResource(const char* name, float iconSize)
 {
 	BResources resources;
 	resources.SetToImage(name);
@@ -20,8 +20,7 @@ BBitmap* LoadIconFromResource(const char* name)
 	if (buffer == NULL)
 		return NULL;
 
-	// FIXME scale this bitmap according to font size
-	BBitmap* result = new BBitmap(BRect(0, 0, 19, 19), B_RGBA32);
+	BBitmap* result = new BBitmap(BRect(0, 0, iconSize, iconSize), B_RGBA32);
 	status_t status = BIconUtils::GetVectorIcon(buffer, size, result);
 	if (status != B_OK) {
 		delete result;
@@ -29,4 +28,3 @@ BBitmap* LoadIconFromResource(const char* name)
 	}
 	return result;
 }
-
