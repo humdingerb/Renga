@@ -48,15 +48,10 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 
 	// clear rectangle
 	if (IsSelected()) {
-		if (status == UserID::TRANSPORT_ONLINE) {
-			owner->SetHighColor(200, 255, 200, 255);
-		} else if (status == UserID::UNKNOWN) {
-			owner->SetHighColor(200, 200, 255, 255);
-		}
+			owner->SetHighUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
 	} else {
 		owner->SetHighColor(owner->ViewColor());
 	}
-
 	owner->FillRect(frame);
 
 	// draw a graphic
@@ -74,15 +69,11 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 	if (name.IsEmpty())
 		name = _userid.full().c_str();
 
-	// font color is based on online status
-	if (status == UserID::OFFLINE) {
-		owner->SetHighColor(255, 0, 0, 255);
-	} else if (status == UserID::UNKNOWN) {
-		owner->SetHighColor(0, 0, 255, 255);
-	} else if (status == UserID::TRANSPORT_ONLINE) {
-		owner->SetHighColor(0, 180, 0, 255);
+	// TODO: set font color based on recent activity
+	if (IsSelected()) {
+		owner->SetHighUIColor(B_LIST_SELECTED_ITEM_TEXT_COLOR);
 	} else {
-		owner->SetHighColor(0, 0, 0, 255);
+		owner->SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
 	}
 
 	// construct text positioning
