@@ -60,10 +60,11 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 	owner->SetDrawingMode(B_OP_ALPHA);
 	owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 
+	BPoint iconPosition(frame.left - 2, frame.top);
 	if (status == UserID::TRANSPORT_ONLINE) {
-		owner->DrawBitmapAsync(_online_icon, BPoint(frame.left + 1, frame.top + 4));
+		owner->DrawBitmapAsync(_online_icon, iconPosition);
 	} else if (status == UserID::UNKNOWN) {
-		owner->DrawBitmapAsync(_unknown_icon, BPoint(frame.left + 1, frame.top + 4));
+		owner->DrawBitmapAsync(_unknown_icon, iconPosition);
 	}
 
 	float height;

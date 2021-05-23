@@ -60,6 +60,7 @@ add_executable(Renga
 	ui/BuddyInfoWindow.cpp
 	ui/ChangeNameWindow.cpp
 	ui/EditingFilter.cpp
+	ui/HVIFUtil.cpp
 	ui/MainWindow.cpp
 	ui/ModalAlertFactory.cpp
 	ui/PeopleListItem.cpp
