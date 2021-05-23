@@ -15,8 +15,10 @@ PeopleListItem::PeopleListItem(std::string user, gloox::MUCRoomAffiliation affil
 	fAffiliation = affiliation;
 }
 
+
 PeopleListItem::~PeopleListItem() {
 }
+
 
 void PeopleListItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete) {
 	// clear rectangle
@@ -47,12 +49,17 @@ void PeopleListItem::DrawItem(BView *owner, BRect frame, __attribute__((unused))
 		owner->DrawString("@", affiliationPos);
 }
 
+
 void PeopleListItem::Update(BView *owner, const BFont *font) {
 	BListItem::Update(owner, font);
 
 	// set height to accomodate graphics and text
-	SetHeight(13.0);
+	font_height fh;
+	owner->GetFontHeight(&fh);
+	float height = fh.ascent + fh.descent;
+	SetHeight(height);
 }
+
 
 std::string PeopleListItem::User() const {
 	return _user;
