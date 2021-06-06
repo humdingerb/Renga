@@ -24,14 +24,6 @@ BookmarkItem::BookmarkItem(const gloox::JID& userid, BString name)
 	: BStringItem(name)
 	, _userid(userid)
 {
-	// intitialize static members
-	if (_online_icon == NULL) {
-		font_height fh;
-		be_plain_font->GetHeight(&fh);
-		float size = fh.ascent + fh.descent;
-		_online_icon = LoadIconFromResource("online", size * (16/11));
-		_unknown_icon = LoadIconFromResource("unknown", size * (16/11));
-	}
 }
 
 BookmarkItem::~BookmarkItem() {
@@ -47,18 +39,24 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 		status = UserID::UNKNOWN;
 
 	// clear rectangle
+	BRect selectionFrame = frame;
+	selectionFrame.left = 0;
 	if (IsSelected()) {
 			owner->SetHighUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
 	} else {
 		owner->SetHighColor(owner->ViewColor());
 	}
-	owner->FillRect(frame);
+	owner->FillRect(selectionFrame);
 
 	// draw a graphic
 	owner->SetDrawingMode(B_OP_ALPHA);
 	owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 
-	BPoint iconPosition(frame.left + 1, frame.top + 1);
+	// TODO this is probably not so great at larger font sizes, but at size 10
+	// it gives the proper alignment of the text and icon. Figure out a better
+	// way to make sure they are aligned, probably based on the frame height
+	// and trying to center the icon in it
+	BPoint iconPosition(frame.left - 2, frame.top);
 	if (status == UserID::TRANSPORT_ONLINE) {
 		owner->DrawBitmapAsync(_online_icon, iconPosition);
 	} else if (status == UserID::UNKNOWN) {
@@ -76,7 +74,7 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 		owner->SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
 	}
 
-	// construct text positioning
+	// construct text positioning, keeping space for the icon on the left
 	font_height fh;
 	owner->GetFontHeight(&fh);
 	float height = fh.ascent + fh.descent;
@@ -95,8 +93,18 @@ void BookmarkItem::Update(BView *owner, const BFont *font)
 
 	font_height fh;
 	owner->GetFontHeight(&fh);
-	float height = fh.ascent + fh.descent;
+	float height = floorf(fh.ascent + fh.descent);
 	SetHeight(height);
+
+	if (_online_icon == NULL) {
+		height = height * 16 / 11;
+			// Adjust for the empty space in the icons (they use the same
+			// format as the BToolbar icons and don't fill the whole space for
+			// some reason)
+		printf("size: %f\n", height);
+		_online_icon = LoadIconFromResource("online", height);
+		_unknown_icon = LoadIconFromResource("unknown", height);
+	}
 }
 
 const gloox::JID& BookmarkItem::GetUserID() const {
