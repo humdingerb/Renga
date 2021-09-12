@@ -87,7 +87,7 @@ target_link_libraries(Renga
 	be expat game gloox shared tracker translation
 )
 
-add_custom_command(TARGET Renga POST_BUILD 
+add_custom_command(TARGET Renga POST_BUILD
 	COMMAND rc -o Resource.rsrc ${CMAKE_SOURCE_DIR}/jabber/Resource.rdef
 	COMMAND xres -o ${CMAKE_BINARY_DIR}/Renga Resource.rsrc
 		-a PiNG:2:bulb-normal  ${CMAKE_SOURCE_DIR}/resources/graphics/bulb-normal.png
@@ -96,7 +96,6 @@ add_custom_command(TARGET Renga POST_BUILD
 		-a VICN:5:online       ${CMAKE_SOURCE_DIR}/resources/icons/online.hvif
 		-a VICN:6:offline      ${CMAKE_SOURCE_DIR}/resources/icons/offline.hvif
 		-a VICN:7:unknown      ${CMAKE_SOURCE_DIR}/resources/icons/unknown.hvif
-		-a PiNG:9:icq          ${CMAKE_SOURCE_DIR}/resources/icons/icq.png
 		-a VICN:10:preferred   ${CMAKE_SOURCE_DIR}/resources/icons/preferred.hvif
 		-a VICN:11:home        ${CMAKE_SOURCE_DIR}/resources/icons/home.hvif
 		-a VICN:12:work        ${CMAKE_SOURCE_DIR}/resources/icons/work.hvif

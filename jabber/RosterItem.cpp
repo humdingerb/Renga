@@ -14,7 +14,6 @@ BBitmap *RosterItem::_kinda_online_icon = NULL;
 BBitmap *RosterItem::_offline_icon      = NULL;
 BBitmap *RosterItem::_online_icon       = NULL;
 BBitmap *RosterItem::_unknown_icon      = NULL;
-BBitmap *RosterItem::_icq_icon          = NULL;
 
 
 RosterItem::RosterItem(const UserID *userid)
@@ -30,7 +29,6 @@ RosterItem::RosterItem(const UserID *userid)
 		_online_icon = LoadIconFromResource("online");
 		_offline_icon = LoadIconFromResource("offline");
 		_unknown_icon = LoadIconFromResource("unknown");
-		_icq_icon = BTranslationUtils::GetBitmap('PiNG', "icq");
 	}
 }
 
@@ -171,13 +169,6 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 		textPosition.y += frame.Height() / 2;
 
 		owner->DrawString(GetUserID()->MoreExactOnlineStatus().c_str(), textPosition);
-	}
-
-	// draw external chat icon
-	if (GetUserID()->UserType() == UserID::ICQ) {
-		if (_icq_icon) {
-			owner->DrawBitmapAsync(_icq_icon, BPoint(owner->PenLocation().x + 2.0, frame.top + 2));
-		}
 	}
 }
 

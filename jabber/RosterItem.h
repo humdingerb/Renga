@@ -29,24 +29,23 @@ public:
 
 	void             DrawItem(BView *owner, BRect frame, bool complete = false);
 	virtual void     Update(BView *owner, const BFont *font);
-	
+
 	bool             StalePointer() const;
 
 	const UserID    *GetUserID() const;
-	void             SetStalePointer(bool is_stale);	
+	void             SetStalePointer(bool is_stale);
 
 	void			SetAvatar(BBitmap*);
-	
+
 private:
 	const UserID   *_userid;
 	bool            _is_stale_pointer;
 	BBitmap*		fAvatar;
-		
+
 	static BBitmap *_kinda_online_icon;
 	static BBitmap *_online_icon;
 	static BBitmap *_offline_icon;
 	static BBitmap *_unknown_icon;
-	static BBitmap *_icq_icon;
 };
 
 #endif
