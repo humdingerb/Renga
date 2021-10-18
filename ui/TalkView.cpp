@@ -112,6 +112,7 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	// editing filter for messaging
 	_message->AddFilter(new EditingFilter(_message, this));
 
+
 	// send button
 	_send_message = new BButton("send", "\xe2\x96\xb6", new BMessage(JAB_CHAT_SENT));
 	_send_message->MakeDefault(true);
@@ -171,9 +172,8 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	} else {
 		user_representation = uid->FriendlyName();
 
-		if (user_representation.empty()) {
+		if (user_representation.empty())
 			user_representation = uid->JabberUsername();
-		}
 
 		if (uid->UserType() == UserID::ICQ) {
 			user_representation += " (ICQ)";
@@ -218,13 +218,11 @@ TalkView::~TalkView() {
 	AddToTalk("", message.c_str(), OTHER);
 
 	// close log cleanly if it's open
-	if (_log) {
+	if (_log)
 		fclose(_log);
-	}
 
-	if (IsGroupChat()) {
+	if (IsGroupChat())
 		JabberSpeak::Instance()->SendGroupUnvitation(_group_room, _group_username);
-	}
 
 	TalkManager::Instance()->RemoveWindow(this);
 }
@@ -269,9 +267,8 @@ void TalkView::MessageReceived(BMessage *msg) {
 		case B_OBSERVER_NOTICE_CHANGE:
 		{
 			// only for groupchat
-			if (!IsGroupChat()) {
+			if (!IsGroupChat())
 				break;
-			}
 
 			switch(msg->FindInt32("be:observe_orig_what"))
 			{
@@ -294,10 +291,8 @@ void TalkView::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_START_RECORD: {
-			if (_am_logging) {
-				// we already are
+			if (_am_logging)
 				break;
-			}
 
 			// just open file panel for now
 			_fp = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0, false, NULL);
@@ -340,10 +335,8 @@ void TalkView::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_STOP_RECORD: {
-			if (!_am_logging) {
-				// we're already not :-)
+			if (!_am_logging)
 				break;
-			}
 
 			// dirty work
 			_am_logging = false;
@@ -354,9 +347,8 @@ void TalkView::MessageReceived(BMessage *msg) {
 
 		case BLAB_UPDATE_ROSTER: {
 			// doesn't apply to groupchat
-			if (!IsGroupChat()) {
+			if (!IsGroupChat())
 				break;
-			}
 
 			// get new status
 			JRoster::Instance()->Lock();
@@ -534,9 +526,8 @@ void TalkView::MessageReceived(BMessage *msg) {
 			string message = _message->Text();
 
 			// eliminate empty messages
-			if (message.empty()) {
+			if (message.empty())
 				break;
-			}
 
 			if (!CommandMessage::IsCommand(message)
 				|| CommandMessage::IsLegalCommand(message)) {
@@ -585,18 +576,17 @@ string TalkView::OurRepresentation() {
 	string user = JabberSpeak::Instance()->CurrentRealName();
 
 	// and if not :)
-	if (user.empty()) {
+	if (user.empty())
 		user = JabberSpeak::Instance()->CurrentLogin();
-	}
 
 	return user;
 }
 
+
 void TalkView::AddToTalk(string username, string message, user_type type) {
 	// transform local identity
-	if (IsGroupChat() && type == LOCAL) {
+	if (IsGroupChat() && type == LOCAL)
 		username = _group_username;
-	}
 
 	// history
 	if (type == LOCAL) {
@@ -607,25 +597,21 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 		_chat_history.push_front(message);
 
 		// prune end
-		if (_chat_history.size() > 50) {
+		if (_chat_history.size() > 50)
 			_chat_history.pop_back();
-		}
 	}
 
 	// no duplicates
-	if (IsGroupChat() && type == MAIN_RECIPIENT && username == _group_username) {
+	if (IsGroupChat() && type == MAIN_RECIPIENT && username == _group_username)
 		return;
-	}
 
 	// ignore empty messages
-	if (message.empty()) {
+	if (message.empty())
 		return;
-	}
 
 	// prune trailing whitespace
-	while (!message.empty() && isspace(message[message.size() - 1])) {
+	while (!message.empty() && isspace(message[message.size() - 1]))
 		message.erase(message.size() - 1);
-	}
 
 	// create the thin (plain) and thick (bold) font
 	BFont thin(be_plain_font);
@@ -639,13 +625,11 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 
 	// TODO figure out a goood threshold here, this seems to work for me,
 	// but it may not for others
-	if (abs(blue.Brightness() - bg_color.Brightness()) < 45) {
+	if (abs(blue.Brightness() - bg_color.Brightness()) < 45)
 		blue = { 128, 137, 252, 255 };
-	}
 
-	if (abs(red.Brightness() - bg_color.Brightness()) < 45) {
+	if (abs(red.Brightness() - bg_color.Brightness()) < 45)
 		red = { 249, 84, 87, 255 };
-	}
 
 	// some runs to play with
 	text_run tr_thick_blue  = {0, thick, blue};
@@ -808,6 +792,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	_chat->ScrollTo(0.0, _chat->Bounds().bottom);
 }
 
+
 void TalkView::Log(const char *buffer) {
 	if (_am_logging) {
 		fwrite(buffer, sizeof(char), strlen(buffer), _log);
@@ -815,23 +800,25 @@ void TalkView::Log(const char *buffer) {
 	}
 }
 
+
 void TalkView::NewMessage(string new_message) {
-	if (IsGroupChat()) {
-		return; // GCHAT
+	if (IsGroupChat())
+		return;
+
+	gloox::RosterManager* rm = JabberSpeak::Instance()->GlooxClient()->rosterManager();
+	gloox::RosterItem* item = rm->getRosterItem(_session->target());
+	if (item && !item->name().empty()) {
+		AddToTalk(item->name().c_str(), new_message, MAIN_RECIPIENT);
 	} else {
-		gloox::RosterManager* rm = JabberSpeak::Instance()->GlooxClient()->rosterManager();
-		gloox::RosterItem* item = rm->getRosterItem(_session->target());
-		if (item && !item->name().empty()) {
-			AddToTalk(item->name().c_str(), new_message, MAIN_RECIPIENT);
-		} else {
-			AddToTalk(_session->target().bare().c_str(), new_message, MAIN_RECIPIENT);
-		}
+		AddToTalk(_session->target().bare().c_str(), new_message, MAIN_RECIPIENT);
 	}
 }
+
 
 void TalkView::NewMessage(string username, string new_message) {
 	AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT);
 }
+
 
 const gloox::JID& TalkView::GetUserID() {
 	if (_session == NULL)
@@ -840,17 +827,21 @@ const gloox::JID& TalkView::GetUserID() {
 	return _session->target();
 }
 
+
 string TalkView::GetGroupRoom() {
 	return _group_room;
 }
+
 
 string TalkView::GetGroupUsername() {
 	return _group_username;
 }
 
+
 bool TalkView::NewlinesAllowed() {
 	return false;
 }
+
 
 int TalkView::CountHyperlinks(string message) {
 	string::size_type curr_pos = 0, link_start, link_end;
@@ -895,9 +886,8 @@ int TalkView::CountHyperlinks(string message) {
 		// find whitespace or end
 		link_end = message.find_first_of(" \t\r\n", link_start);
 
-		if (link_end == string::npos) {
+		if (link_end == string::npos)
 			link_end = message.size() - 1;
-		}
 
 		// prune punctuation
 		while (link_start < link_end) {
@@ -918,9 +908,8 @@ int TalkView::CountHyperlinks(string message) {
 		link_start = message.find("http://", curr_pos);
 
 		find1 = message.find("ftp://", curr_pos);
-		if (find1 != string::npos && (link_start == string::npos || find1 < link_start)) {
+		if (find1 != string::npos && (link_start == string::npos || find1 < link_start))
 			link_start = find1;
-		}
 
 		find2 = message.find("www.", curr_pos);
 		if (find2 != string::npos && (link_start == string::npos || find2 < link_start)) {
@@ -950,6 +939,7 @@ int TalkView::CountHyperlinks(string message) {
 	return link_count;
 }
 
+
 void TalkView::GenerateHyperlinkText(string message, text_run standard, text_run_array **tra) {
 	int link_count = CountHyperlinks(message);
 	string::size_type find1, find2, find3;
@@ -976,9 +966,8 @@ void TalkView::GenerateHyperlinkText(string message, text_run standard, text_run
 	link_start = message.find("http://", curr_pos);
 
 	find1 = message.find("ftp://", curr_pos);
-	if (find1 != string::npos && (link_start == string::npos || find1 < link_start)) {
+	if (find1 != string::npos && (link_start == string::npos || find1 < link_start))
 		link_start = find1;
-	}
 
 	find2 = message.find("www.", curr_pos);
 	if (find2 != string::npos && (link_start == string::npos || find2 < link_start)) {
@@ -1101,7 +1090,6 @@ void TalkView::AddGroupChatter(string user, gloox::MUCRoomAffiliation affiliatio
 	if (_people->CountItems() == 0) {
 		// add the new user
 		_people->AddItem(people_item);
-
 		return;
 	}
 
@@ -1131,24 +1119,23 @@ void TalkView::AddGroupChatter(string user, gloox::MUCRoomAffiliation affiliatio
 	}
 }
 
+
 void TalkView::RemoveGroupChatter(string username) {
 	// remove user
 	for (int i=0; i < _people->CountItems(); ++i) {
-		if (dynamic_cast<PeopleListItem *>(_people->ItemAt(i))->User() == username) {
+		if (dynamic_cast<PeopleListItem *>(_people->ItemAt(i))->User() == username)
 			_people->RemoveItem(i);
-		}
 	}
 }
 
+
 void TalkView::RevealPreviousHistory() {
 	// boundary
-	if (_chat_index == 49 || _chat_index == ((int)_chat_history.size() - 1)) {
+	if (_chat_index == 49 || _chat_index == ((int)_chat_history.size() - 1))
 		return;
-	}
 
-	if (_chat_index == -1) {
+	if (_chat_index == -1)
 		_chat_buffer = _message->Text();
-	}
 
 	// go back
 	++_chat_index;
@@ -1157,11 +1144,11 @@ void TalkView::RevealPreviousHistory() {
 	_message->SetText(_chat_history[_chat_index].c_str());
 }
 
+
 void TalkView::RevealNextHistory() {
 	// boundary
-	if (_chat_index == -1) {
+	if (_chat_index == -1)
 		return;
-	}
 
 	// go forward
 	--_chat_index;
