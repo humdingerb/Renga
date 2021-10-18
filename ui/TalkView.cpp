@@ -149,18 +149,6 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 		if (user_representation.empty())
 			user_representation = uid->JabberUsername();
 
-		if (uid->UserType() == UserID::ICQ) {
-			user_representation += " (ICQ)";
-
-			// identify the user
-			if (!AgentList::Instance()->GetAgentByService("icq")->Username().empty()) {
-				sprintf(buffer, "your identity is %s", AgentList::Instance()->GetAgentByService("icq")->Username().c_str());
-				_status_view->SetMessage(buffer);
-			} else {
-				sprintf(buffer, "you are communicating via the ICQ service");
-				_status_view->SetMessage(buffer);
-			}
-		}
 	}
 
 	if (!IsGroupChat() && user_representation.empty()) {

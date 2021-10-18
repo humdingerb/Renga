@@ -26,20 +26,20 @@
 SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 	: BWindow(BRect(0, 0, 0, 0), NULL, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE) {
 	_type = type;
-	
+
 	// determine window size
 	BRect rect;
 
 	float login_window_width  = 410;
 	float login_window_height = 100;
-	
+
 	// create window frame position
 	rect = GenericFunctions::CenteredFrame(login_window_width, login_window_height);
-	
+
 	// set it
 	ResizeTo(rect.Width(), rect.Height());
 	MoveTo(rect.LeftTop());
-	
+
 	// encompassing view
 	rect = Bounds();
 	rect.OffsetTo(B_ORIGIN);
@@ -51,7 +51,7 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 
 	// lightbulb
 	PictureView *picture = new PictureView("bulb-normal");
-	
+
 	// query
 	rect.left = 80.0;
 	rect.InsetBy(5.0, 5.0);
@@ -62,16 +62,15 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 	} else {
 		_surrounding->SetLabel("Select a User");
 	}
-	
+
 	rect.OffsetTo(B_ORIGIN);
 	rect.InsetBy(6.0, 12.0);
 	rect.bottom = rect.top + 18;
 
 	// chat service
 	_chat_services_selection = new BPopUpMenu("Jabber");
-	_chat_services = new BMenuField(rect, "chat_services", "Online Service: ", _chat_services_selection);	
+	_chat_services = new BMenuField(rect, "chat_services", "Online Service: ", _chat_services_selection);
 	_chat_services->SetDivider(_chat_services->Divider() - 33);
-	_chat_services_selection->AddItem(new BMenuItem("ICQ", new BMessage(AGENT_MENU_CHANGED_TO_ICQ)));
 	BMenuItem *default_item = new BMenuItem("Jabber", new BMessage(AGENT_MENU_CHANGED_TO_JABBER));
 	_chat_services_selection->AddItem(default_item);
 	default_item->SetMarked(true);
@@ -79,7 +78,7 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 	if (_type == gloox::Message::Groupchat) {
 		rect.OffsetBy(0.0, 1.0);
 	}
-	
+
 	_name = new BTextControl(rect, "name", "Username: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
 
 	rect.OffsetBy(0.0, 24.0);
@@ -118,7 +117,7 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 			_handle->SetText("somebody@jabber.org");
 		}
 	}
-	
+
 	// cancel button
 	rect.OffsetBy(135.0, 24.0);
 	rect.right = rect.left + 65;
@@ -145,7 +144,7 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 
 	ok->MakeDefault(true);
 	ok->SetTarget(this);
-		
+
 	_full_view->AddChild(picture);
 
 	if (_type == gloox::Message::Groupchat) {
@@ -153,12 +152,12 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 	} else {
 		_surrounding->AddChild(_chat_services);
 	}
-	
+
 	_surrounding->AddChild(_handle);
 	_surrounding->AddChild(cancel);
 	_surrounding->AddChild(ok);
 	_full_view->AddChild(_surrounding);
-	
+
 	AddChild(_full_view);
 
 	// focus
@@ -176,19 +175,13 @@ void SendTalkWindow::MessageReceived(BMessage *msg) {
 			break;
 		}
 
-		case AGENT_MENU_CHANGED_TO_ICQ: {
-//			_enter_note->SetText("Please enter the user's ICQ numeric ID (e.g., 99818234).");
-			_handle->SetLabel("ICQ #:");
-			break;
-		}
-
 		//// JAB_OK
 		case JAB_OK: {
 			if (_type == gloox::Message::Groupchat) {
 				if (!ValidateGroupRoom()) {
 					break;
 				}
-				
+
 				BlabberSettings::Instance()->SetData("last-group-joined", _handle->Text());
 				BlabberSettings::Instance()->SetData("last-group-username", _name->Text());
 
@@ -211,8 +204,8 @@ void SendTalkWindow::MessageReceived(BMessage *msg) {
 				}
 
 				PostMessage(B_QUIT_REQUESTED);
-			}			
-				
+			}
+
 			break;
 		}
 
@@ -228,21 +221,21 @@ bool SendTalkWindow::ValidateGroupRoom() {
 	char buffer[4096];
 
 	if (!strcmp(_handle->Text(), "")) {
-		sprintf(buffer, "Please specify the group's roomname."); 
+		sprintf(buffer, "Please specify the group's roomname.");
 		ModalAlertFactory::Alert(buffer, "Oops!");
 		_handle->MakeFocus(true);
 
 		return false;
 	}
-	
+
 	if (!strcmp(_name->Text(), "")) {
-		sprintf(buffer, "Please specify your handle."); 
+		sprintf(buffer, "Please specify your handle.");
 		ModalAlertFactory::Alert(buffer, "Oops!");
 		_handle->MakeFocus(true);
 
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -250,15 +243,14 @@ string SendTalkWindow::ValidateUser() {
 	char buffer[4096];
 
 	if (!strcmp(_handle->Text(), "")) {
-		sprintf(buffer, "Please specify a user's handle."); 
+		sprintf(buffer, "Please specify a user's handle.");
 		ModalAlertFactory::Alert(buffer, "Oops!");
 		_handle->MakeFocus(true);
 
 		return "";
 	}
-	
+
 	// internally replace the username with a proper one if necessary (transports)
-	Agent *agent;
 	string username = _handle->Text();
 
 	// if not Jabber
@@ -266,25 +258,17 @@ string SendTalkWindow::ValidateUser() {
 		username = GenericFunctions::CrushOutWhitespace(username);
 	}
 
-	if (!strcasecmp(_chat_services->Menu()->FindMarked()->Label(), "ICQ")) {
-		agent = AgentList::Instance()->GetAgentByService("icq");
 
-		if (agent) {
-			username += "@";
-			username += agent->JID();
-		}
-	}
-
-	// make a user to validate against	
+	// make a user to validate against
 	std::string validate = UserID::WhyNotValidJabberHandle(username);
-	
+
 	if (!strcasecmp(_handle->Label(), "Jabber ID:") && validate.size()) {
-		sprintf(buffer, "%s is not a valid Jabber ID for the following reason:\n\n%s\n\nPlease correct it.", _handle->Text(), validate.c_str()); 
+		sprintf(buffer, "%s is not a valid Jabber ID for the following reason:\n\n%s\n\nPlease correct it.", _handle->Text(), validate.c_str());
 		ModalAlertFactory::Alert(buffer, "Hmm, better check that...");
 		_handle->MakeFocus(true);
-		
+
 		return "";
 	}
-	
+
 	return username;
 }

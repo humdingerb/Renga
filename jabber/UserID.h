@@ -15,7 +15,7 @@
 class UserID {
 public:
 	enum online_status  {UNKNOWN, UNACCEPTED, OFFLINE, ONLINE, TRANSPORT_ONLINE};
-	enum user_type      {INVALID, JABBER, ICQ, TRANSPORT};
+	enum user_type      {INVALID, JABBER, TRANSPORT};
 
 public:
 	virtual             ~UserID();

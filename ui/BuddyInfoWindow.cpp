@@ -53,7 +53,7 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 
 	if (!querying_user->ExactOnlineStatus().empty()) {
 		realstatus_label = new BStringView(NULL, "Official Status:");
-		
+
 		if (querying_user->ExactOnlineStatus() == "xa") {
 			realstatus_name  = new BStringView(NULL, "Extended Away");
 		} else if (querying_user->ExactOnlineStatus() == "away") {
@@ -72,12 +72,7 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 		jabberid_label = new BStringView(NULL, "Jabber ID:");
 		jabberid_name  = new BStringView(NULL, querying_user->Handle().c_str());
 	} else {
-		if (querying_user->UserType() == UserID::ICQ) {
-			jabberid_label = new BStringView(NULL, "ICQ #:");
-		} else {
-			jabberid_label = new BStringView(NULL, "Jabber ID:");
-		}
-		
+		jabberid_label = new BStringView(NULL, "Jabber ID:");
 		jabberid_name  = new BStringView(NULL, querying_user->JabberUsername().c_str());
 	}
 

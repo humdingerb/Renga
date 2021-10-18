@@ -153,7 +153,6 @@ void BuddyWindow::AddNewUser() {
 	}
 
 	// internally replace the username with a proper one if necessary (transports)
-	Agent *agent;
 	string username = _handle->Text();
 
 	// if not Jabber
@@ -161,14 +160,6 @@ void BuddyWindow::AddNewUser() {
 		username = GenericFunctions::CrushOutWhitespace(username);
 	}
 
-	if (!strcasecmp(_chat_services->Menu()->FindMarked()->Label(), "ICQ")) {
-		agent = AgentList::Instance()->GetAgentByService("icq");
-
-		if (agent) {
-			username += "@";
-			username += agent->JID();
-		}
-	}
 
 	// make a user to validate against
 	std::string validate = UserID::WhyNotValidJabberHandle(username);
