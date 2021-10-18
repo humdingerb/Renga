@@ -682,7 +682,6 @@ void BlabberMainWindow::MenusBeginning() {
 	if (i) {
 		talk = (TalkView*)i->View();
 		isGroup = talk->IsGroupChat();
-		isLogging = talk->IsLogging();
 	}
 
 	if(_record_item != nullptr) {

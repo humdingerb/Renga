@@ -71,7 +71,6 @@ public:
 	void                 RevealPreviousHistory();
 	void                 RevealNextHistory();
 
-	bool				IsLogging() { return _am_logging; }
 	bool				IsGroupChat();
 
 	void				SetStatus(std::string message);
@@ -107,7 +106,5 @@ private:
 	int                 _chat_index;
 
 	BFilePanel         *_fp;
-	bool                _am_logging;
-	FILE               *_log;
 
 };

@@ -46,8 +46,6 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	: BGroupView("<talk window>", B_VERTICAL)
 	, _session(session)
 {
-	_am_logging = false;
-	_log        = NULL;
 	_chat_index = -1;
 
 	UserID* uid = NULL;
@@ -192,10 +190,6 @@ TalkView::~TalkView() {
 	struct tm *time_struct = localtime(&now);
 	strftime(&message[0], message.size()-1, "Session finished %e %b %y [%R:%S]\n---", time_struct);
 	AddToTalk("", message.c_str(), OTHER);
-
-	// close log cleanly if it's open
-	if (_log)
-		fclose(_log);
 
 	if (IsGroupChat())
 		JabberSpeak::Instance()->SendGroupUnvitation(_group_room, _group_username);
