@@ -616,8 +616,10 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	// some colors to play with
 	rgb_color blue   = {0, 0, 255, 255};
 	rgb_color red    = {255, 0, 0, 255};
+	rgb_color orange = {205, 113, 57, 255};
 	rgb_color message_color  = ui_color(B_PANEL_TEXT_COLOR);
 	rgb_color bg_color = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color highlight = mix_color(message_color, orange, 200);
 
 	// TODO figure out a goood threshold here, this seems to work for me,
 	// but it may not for others
@@ -632,6 +634,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	text_run tr_thick_red   = {0, thick, red};
 	text_run tr_thick_black = {0, thick, message_color};
 	text_run tr_thin_black  = {0, thin, message_color};
+	text_run tr_thick_highlight = {0, thick, highlight};
 
 	// some run array to play with (simple)
 	text_run_array tra_thick_blue  = {1, {tr_thick_blue}};
@@ -718,9 +721,17 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 			// log?
 			Log(": ");
 
+			BString bmessage;
+			bmessage.SetTo(message.c_str());
 			text_run_array *this_array;
-			GenerateHyperlinkText(message, tr_thin_black, &this_array);
-			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
+			if (bmessage.IFindFirst(_group_username.c_str()) != B_ERROR) {
+
+				GenerateHyperlinkText(message, tr_thick_highlight, &this_array);
+				_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
+			} else {
+				GenerateHyperlinkText(message, tr_thin_black, &this_array);
+				_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
+			}
 
 			free(this_array);
 
