@@ -61,29 +61,6 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 		_current_status = uid->OnlineStatus();
 	}
 
-    bool bAutoOpenChatLog = BlabberSettings::Instance()->Tag("autoopen-chatlog");
-	string chatlog_path = "";
-	if (BlabberSettings::Instance()->Data("chatlog-path") != NULL) {
-		chatlog_path = BlabberSettings::Instance()->Data("chatlog-path");
-	}
-	if(bAutoOpenChatLog) {
-		if(0 == chatlog_path.size()) {
-			BPath path;
-			find_directory(B_USER_DIRECTORY, &path);
-			chatlog_path = path.Path();
-		}
-		// assure that directory exists...
-		create_directory(chatlog_path.c_str(), 0777);
-		if(user != 0) {
-		  chatlog_path += "/" + user->username();
-		} else {
-		  chatlog_path += "/" + group_room;
-		}
-		// start file
-		_log = fopen(chatlog_path.c_str(), "a");
-		_am_logging = (0 != _log);
-	}
-
 	// FILE MENU
 	// status bar
 	_status_view = new StatusView();
@@ -289,16 +266,6 @@ void TalkView::MessageReceived(BMessage *msg) {
 			break;
 		}
 
-		case JAB_START_RECORD: {
-			if (_am_logging)
-				break;
-
-			// just open file panel for now
-			_fp = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0, false, NULL);
-			_fp->Show();
-
-			break;
-		}
 
 		case JAB_SHOW_CHATLOG: {
 			// just forward to main blabber window...
@@ -307,42 +274,6 @@ void TalkView::MessageReceived(BMessage *msg) {
 			break;
 		}
 
-		case B_SAVE_REQUESTED: {
-			// collect data
-			char abs_path[B_PATH_NAME_LENGTH];
-
-			entry_ref dir;
-			string filename;
-
-			msg->FindRef("directory", &dir);
-			filename = msg->FindString("name");
-
-			// construct path (sigh)
-			BDirectory dir_object(&dir);
-
-			strcpy(abs_path, BPath(&dir_object, filename.c_str()).Path());
-
-			_am_logging = true;
-
-			// start file
-			_log = fopen(abs_path, "w");
-
-			// log existing data
-			Log(_chat->Text());
-
-			break;
-		}
-
-		case JAB_STOP_RECORD: {
-			if (!_am_logging)
-				break;
-
-			// dirty work
-			_am_logging = false;
-			fclose(_log);
-
-			break;
-		}
 
 		case BLAB_UPDATE_ROSTER: {
 			// doesn't apply to groupchat
@@ -690,14 +621,6 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 
 	_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
 	_chat->ScrollTo(0.0, _chat->Bounds().bottom);
-}
-
-
-void TalkView::Log(const char *buffer) {
-	if (_am_logging) {
-		fwrite(buffer, sizeof(char), strlen(buffer), _log);
-		fflush(_log);
-	}
 }
 
 

@@ -51,7 +51,6 @@ public:
 	void                 FrameResized(float width, float height) override;
 	void                 MessageReceived(BMessage *msg) override;
 
-	void                 Log(const char *buffer);
 	std::string          OurRepresentation();
 	void                 AddToTalk(std::string username, std::string message, user_type type);
 	void                 NewMessage(std::string new_message);
