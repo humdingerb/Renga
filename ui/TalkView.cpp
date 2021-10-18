@@ -472,6 +472,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 			NewMessage(message);
 
 			// GUI
+			_message->ScrollToOffset(0);
 			_message->SetText("");
 			_message->MakeFocus(true);
 
