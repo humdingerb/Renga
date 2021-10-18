@@ -387,7 +387,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 				_session->send(message);
 
 				// client part
-				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
+				NewMessage(message);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -403,7 +403,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 				_session->send(message);
 
 				// client part
-				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
+				NewMessage(message);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -419,7 +419,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 				_session->send(message);
 
 				// client part
-				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
+				NewMessage(message);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -435,7 +435,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 				_session->send(message);
 
 				// client part
-				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
+				NewMessage(message);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -451,7 +451,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 				_session->send(message);
 
 				// client part
-				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
+				NewMessage(message);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -467,7 +467,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 				_session->send(message);
 
 				// client part
-				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
+				NewMessage(message);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -483,7 +483,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 				_session->send(message);
 
 				// client part
-				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
+				NewMessage(message);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -499,7 +499,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 				_session->send(message);
 
 				// client part
-				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
+				NewMessage(message);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -514,7 +514,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 				_session->send(message);
 
 				// client part
-				AddToTalk(OurRepresentation().c_str(), message.c_str(), LOCAL);
+				NewMessage(message);
 			} else {
 				_message->Insert(message.c_str());
 			}
@@ -542,7 +542,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 			}
 
 			// user part
-			AddToTalk(OurRepresentation().c_str(), message, LOCAL);
+			NewMessage(message);
 
 			// GUI
 			_message->SetText("");
@@ -600,10 +600,6 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 		if (_chat_history.size() > 50)
 			_chat_history.pop_back();
 	}
-
-	// no duplicates
-	if (IsGroupChat() && type == MAIN_RECIPIENT && username == _group_username)
-		return;
 
 	// ignore empty messages
 	if (message.empty())
@@ -808,15 +804,18 @@ void TalkView::NewMessage(string new_message) {
 	gloox::RosterManager* rm = JabberSpeak::Instance()->GlooxClient()->rosterManager();
 	gloox::RosterItem* item = rm->getRosterItem(_session->target());
 	if (item && !item->name().empty()) {
-		AddToTalk(item->name().c_str(), new_message, MAIN_RECIPIENT);
+		AddToTalk(item->name().c_str(), new_message, LOCAL);
 	} else {
-		AddToTalk(_session->target().bare().c_str(), new_message, MAIN_RECIPIENT);
+		AddToTalk(_session->target().bare().c_str(), new_message, LOCAL);
 	}
 }
 
 
 void TalkView::NewMessage(string username, string new_message) {
-	AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT);
+	if (username == _group_username)
+		AddToTalk(username.c_str(), new_message, LOCAL);
+	else
+		AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT);
 }
 
 
