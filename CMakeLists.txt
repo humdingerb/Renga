@@ -10,7 +10,6 @@ add_compile_options(-fdiagnostics-color=always)
 add_executable(Renga
 	# TODO review all these files for usefulness and relevance
 	 jabber/Agent.cpp
-	 jabber/CommandMessage.cpp
 	 jabber/UserID.cpp
 	 jabber/ChatTextView.cpp
 	 jabber/CustomStatusWindow.cpp

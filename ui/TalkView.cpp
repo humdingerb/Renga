@@ -21,7 +21,6 @@
 #include "support/AppLocation.h"
 
 #include "jabber/BlabberSettings.h"
-#include "jabber/CommandMessage.h"
 #include "jabber/GenericFunctions.h"
 #include "jabber/JabberSpeak.h"
 #include "jabber/MessageRepeater.h"
@@ -529,17 +528,14 @@ void TalkView::MessageReceived(BMessage *msg) {
 			if (message.empty())
 				break;
 
-			if (!CommandMessage::IsCommand(message)
-				|| CommandMessage::IsLegalCommand(message)) {
-				if (_session == NULL) {
-					// FIXME is it ok to do this from window thread? Or should
-					// we go through main app?
-					gloox::MUCRoom* room = (gloox::MUCRoom*)TalkManager::Instance()
-						->IsExistingWindowToGroup(GetGroupRoom());
+			if (_session == NULL) {
+				// FIXME is it ok to do this from window thread? Or should
+				// we go through main app?
+				gloox::MUCRoom* room = (gloox::MUCRoom*)TalkManager::Instance()
+					->IsExistingWindowToGroup(GetGroupRoom());
 					room->send(_message->Text());
-				} else
-					_session->send(_message->Text());
-			}
+			} else
+				_session->send(_message->Text());
 
 			// user part
 			NewMessage(message);
@@ -642,10 +638,6 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	text_run_array tra_thick_black = {1, {tr_thick_black}};
 	text_run_array tra_thin_black  = {1, {tr_thin_black}};
 
-	// add to end of conversation
-	bool                         is_command = CommandMessage::IsCommand(message);
- 	CommandMessage::command_type comm_type  = CommandMessage::ConvertCommandToMessage(message, username);
-
 	// construct timestamp
 	char timestamp[64];
 	time_t now = time(NULL);
@@ -655,145 +647,104 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 
 	string time_stamp = timestamp;
 
-	if (comm_type == CommandMessage::NORMAL) {
-		if (type == MAIN_RECIPIENT) {
-			if (_chat->TextLength() > 0) {
-				if (!IsGroupChat() || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
-					SoundSystem::Instance()->PlayMessageSound();
-				}
-			}
+	BString messageString = BString(message.c_str());
 
-			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_blue);
-		} else if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
-			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_red);
-		} else {
-			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_black);
+	if (messageString.StartsWith("/me ")) {
+		messageString.ReplaceFirst("/me", username.c_str());
+		printf(messageString);
+		if (type == MAIN_RECIPIENT)
+			_chat->Insert(_chat->TextLength(), messageString, messageString.Length(), &tra_thick_blue);
+		else
+			_chat->Insert(_chat->TextLength(), messageString, messageString.Length(), &tra_thick_red);
+		_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
+		_chat->ScrollTo(0.0, _chat->Bounds().bottom);
+		return;
+	}
+
+	if (type == MAIN_RECIPIENT) {
+		if (!IsGroupChat() || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
+			SoundSystem::Instance()->PlayMessageSound();
 		}
+
+		if (BlabberSettings::Instance()->Tag("show-timestamp")) {
+			_chat->Insert(_chat->TextLength(), time_stamp.c_str(), time_stamp.size(), &tra_thin_black);
+
+			// log?
+			Log(time_stamp.c_str());
+		}
+
+		_chat->Insert(_chat->TextLength(), username.c_str(), username.size(), &tra_thick_blue);
+
+		// log?
+		Log(username.c_str());
+
+		_chat->Insert(_chat->TextLength(), ": ", 2, &tra_thin_black);
+
+		// log?
+		Log(": ");
+
+		BString bmessage;
+		bmessage.SetTo(message.c_str());
+		text_run_array *this_array;
+		if (bmessage.IFindFirst(_group_username.c_str()) != B_ERROR) {
+			GenerateHyperlinkText(message, tr_thick_highlight, &this_array);
+			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
+		} else {
+			GenerateHyperlinkText(message, tr_thin_black, &this_array);
+			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
+		}
+
+		free(this_array);
 
 		// log?
 		Log(message.c_str());
-	} else if (comm_type == CommandMessage::BAD_SYNTAX) {
-		if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
-			// this command was illegal and now it belongs to the system
-			type = OTHER;
 
-			// print usage (most likely)
-			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_black);
+		_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
 
-			// log?
-			Log(message.c_str());
-		}
-	} else if (is_command && comm_type == CommandMessage::NOT_A_COMMAND) {
-		if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
-			message = "You specified an illegal command.\n";
-
-			// this command was illegal and now it belongs to the system
-			type = OTHER;
-
-			// print usage (most likely)
-			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_black);
+		// log?
+		Log("\n");
+	} else if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
+		if (BlabberSettings::Instance()->Tag("show-timestamp")) {
+			_chat->Insert(_chat->TextLength(), time_stamp.c_str(), time_stamp.size(), &tra_thin_black);
 
 			// log?
-			Log(message.c_str());
+			Log(time_stamp.c_str());
 		}
+
+		_chat->Insert(_chat->TextLength(), username.c_str(), username.size(), &tra_thick_red);
+
+		// log?
+		Log(username.c_str());
+
+		_chat->Insert(_chat->TextLength(), ": ", 2, &tra_thin_black);
+
+		// log?
+		Log(": ");
+
+		text_run_array *this_array;
+		GenerateHyperlinkText(message, tr_thin_black, &this_array);
+		_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
+
+		free(this_array);
+
+		// log?
+		Log(message.c_str());
+
+		_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
+
+		// log?
+		Log("\n");
 	} else {
-		if (type == MAIN_RECIPIENT) {
-			if (comm_type != CommandMessage::NORMAL_ALERT && SoundSystem::Instance()->AlertSound() != "<none>" && _chat->TextLength() > 0) {
-				if (!IsGroupChat() || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds")) {
-					SoundSystem::Instance()->PlayMessageSound();
-				}
-			}
+		// system message
+		_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_black);
 
-			if (BlabberSettings::Instance()->Tag("show-timestamp")) {
-				_chat->Insert(_chat->TextLength(), time_stamp.c_str(), time_stamp.size(), &tra_thin_black);
+		// log?
+		Log(message.c_str());
 
-				// log?
-				Log(time_stamp.c_str());
-			}
+		_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thick_black);
 
-			_chat->Insert(_chat->TextLength(), username.c_str(), username.size(), &tra_thick_blue);
-
-			// log?
-			Log(username.c_str());
-
-			_chat->Insert(_chat->TextLength(), ": ", 2, &tra_thin_black);
-
-			// log?
-			Log(": ");
-
-			BString bmessage;
-			bmessage.SetTo(message.c_str());
-			text_run_array *this_array;
-			if (bmessage.IFindFirst(_group_username.c_str()) != B_ERROR) {
-
-				GenerateHyperlinkText(message, tr_thick_highlight, &this_array);
-				_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
-			} else {
-				GenerateHyperlinkText(message, tr_thin_black, &this_array);
-				_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
-			}
-
-			free(this_array);
-
-			// log?
-			Log(message.c_str());
-
-			_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
-
-			// log?
-			Log("\n");
-		} else if (type == LOCAL || (IsGroupChat() && GetGroupUsername() == username)) {
-			if (BlabberSettings::Instance()->Tag("show-timestamp")) {
-				_chat->Insert(_chat->TextLength(), time_stamp.c_str(), time_stamp.size(), &tra_thin_black);
-
-				// log?
-				Log(time_stamp.c_str());
-			}
-
-			_chat->Insert(_chat->TextLength(), username.c_str(), username.size(), &tra_thick_red);
-
-			// log?
-			Log(username.c_str());
-
-			_chat->Insert(_chat->TextLength(), ": ", 2, &tra_thin_black);
-
-			// log?
-			Log(": ");
-
-			text_run_array *this_array;
-			GenerateHyperlinkText(message, tr_thin_black, &this_array);
-			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
-
-			free(this_array);
-
-			// log?
-			Log(message.c_str());
-
-			_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
-
-			// log?
-			Log("\n");
-		} else {
-			// system message
-			_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_black);
-
-			// log?
-			Log(message.c_str());
-
-			_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thick_black);
-
-			// log?
-			Log("\n");
-		}
-
-		if (comm_type == CommandMessage::NORMAL_ALERT) {
-			if (!BlabberSettings::Instance()->Tag("suppress-alert")) {
-				// play sound
-				if (type != LOCAL) {
-					SoundSystem::Instance()->PlayAlertSound();
-				}
-			}
-		}
+		// log?
+		Log("\n");
 	}
 
 	_chat->ScrollTo(0.0, _chat->Bounds().bottom);
