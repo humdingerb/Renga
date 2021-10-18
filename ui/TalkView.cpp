@@ -629,13 +629,12 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	text_run tr_thick_blue  = {0, thick, blue};
 	text_run tr_thick_red   = {0, thick, red};
 	text_run tr_thick_black = {0, thick, message_color};
-	text_run tr_thin_black  = {0, thin, message_color};
 	text_run tr_thick_highlight = {0, thick, highlight};
+	text_run tr_thin_black  = {0, thin, message_color};
 
 	// some run array to play with (simple)
 	text_run_array tra_thick_blue  = {1, {tr_thick_blue}};
 	text_run_array tra_thick_red   = {1, {tr_thick_red}};
-	text_run_array tra_thick_black = {1, {tr_thick_black}};
 	text_run_array tra_thin_black  = {1, {tr_thin_black}};
 
 	// construct timestamp
@@ -649,6 +648,9 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 
 	BString messageString = BString(message.c_str());
 
+	if (BlabberSettings::Instance()->Tag("show-timestamp"))
+		_chat->Insert(_chat->TextLength(), time_stamp.c_str(), time_stamp.size(), &tra_thin_black);
+
 	if (messageString.StartsWith("/me ")) {
 		messageString.ReplaceFirst("/me", username.c_str());
 		if (type == MAIN_RECIPIENT)
@@ -661,9 +663,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 		return;
 	}
 
-	if (BlabberSettings::Instance()->Tag("show-timestamp"))
-		_chat->Insert(_chat->TextLength(), time_stamp.c_str(), time_stamp.size(), &tra_thin_black);
-
+	text_run_array *this_array;
 	if (type == MAIN_RECIPIENT) {
 		if (!IsGroupChat() || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds"))
 			SoundSystem::Instance()->PlayMessageSound();
@@ -672,30 +672,22 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 		_chat->Insert(_chat->TextLength(), ": ", 2, &tra_thin_black);
 
 		// Highlight messages when they mention the nickname
-		text_run_array *this_array;
 		if (messageString.IFindFirst(_group_username.c_str()) != B_ERROR) {
 			GenerateHyperlinkText(message, tr_thick_highlight, &this_array);
 		} else {
 			GenerateHyperlinkText(message, tr_thin_black, &this_array);
 		}
-
-		_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
-
-		free(this_array);
 	} else if (type == LOCAL) {
-
 		_chat->Insert(_chat->TextLength(), username.c_str(), username.size(), &tra_thick_red);
 		_chat->Insert(_chat->TextLength(), ": ", 2, &tra_thin_black);
 
-		text_run_array *this_array;
 		GenerateHyperlinkText(message, tr_thin_black, &this_array);
-		_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
-
-		free(this_array);
-	} else {
-		// system message
-		_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), &tra_thick_black);
+	} else { // SYSTEM messages
+		GenerateHyperlinkText(message, tr_thick_black, &this_array);
 	}
+	_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
+	free(this_array);
+
 	_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
 	_chat->ScrollTo(0.0, _chat->Bounds().bottom);
 }
