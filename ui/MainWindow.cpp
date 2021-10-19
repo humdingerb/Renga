@@ -661,30 +661,10 @@ void BlabberMainWindow::MenusBeginning() {
 
 	// FILE menu
 	if (!_full_view->IsHidden()) {
-		_connect_item->SetEnabled(false);
 		_disconnect_item->SetEnabled(true);
 	} else {
-		_connect_item->SetEnabled(true);
 		_disconnect_item->SetEnabled(false);
 	}
-
-	// logging
-	bool isGroup = true;
-	bool isLogging = false;
-	TalkView* talk = nullptr;
-
-	BLayoutItem* i = fTalkCards->VisibleItem();
-	if (i) {
-		talk = (TalkView*)i->View();
-		isGroup = talk->IsGroupChat();
-	}
-
-	if(_record_item != nullptr) {
-	  _record_item->SetEnabled(!isGroup && !isLogging);
-	  _record_item->SetTarget(talk);
-	}
-	_record_entire_item->SetEnabled(!isGroup && isLogging);
-	_record_entire_item->SetTarget(talk);
 
 	// EDIT menu
 	if (RosterItem *item = _roster->CurrentItemSelection()) {
@@ -698,7 +678,6 @@ void BlabberMainWindow::MenusBeginning() {
 		_remove_buddy_item->SetEnabled(true);
 
 		_user_info_item->SetEnabled(true);
-		_user_chatlog_item->SetEnabled(BlabberSettings::Instance()->Tag("autoopen-chatlog"));
 	} else {
 		sprintf(buffer, "Edit Buddy");
 		_change_buddy_item->SetLabel(buffer);
@@ -709,7 +688,6 @@ void BlabberMainWindow::MenusBeginning() {
 		_remove_buddy_item->SetEnabled(false);
 
 		_user_info_item->SetEnabled(false);
-		_user_chatlog_item->SetEnabled(false);
 	}
 }
 
@@ -732,10 +710,7 @@ bool BlabberMainWindow::QuitRequested() {
 
 BlabberMainWindow::BlabberMainWindow(BRect frame)
 	: BWindow(frame, "Renga", B_DOCUMENT_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS)
-	, _record_item(nullptr)
 {
-
-	// TODO (nephele) move menu to layout kit
 
 	// editing filter for taksing
 	AddCommonFilter(new RotateChatFilter());
@@ -755,41 +730,26 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	BMenuBar* menubar = new BMenuBar("menubar");
 
 	// FILE MENU
-	BMenu* file_menu = new BMenu("File");
+	BMenu* file_menu = new BMenu("Window");
 
-		_connect_item    = new BMenuItem("Log On", new BMessage(JAB_CONNECT));
-
-		_disconnect_item = new BMenuItem("Log Off", new BMessage(JAB_DISCONNECT));
+		_disconnect_item = new BMenuItem("Log Out", new BMessage(JAB_DISCONNECT));
 
 		_about_item      = new BMenuItem("About Renga" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED));
 
 		_quit_item = new BMenuItem("Quit", new BMessage(JAB_QUIT));
 		_quit_item->SetShortcut('Q', 0);
+		_preferences_item = new BMenuItem("Preferences" B_UTF8_ELLIPSIS, new BMessage(JAB_PREFERENCES));
+		_preferences_item->SetShortcut(',', 0);
 
-    bool bAutoOpenChatLog = BlabberSettings::Instance()->Tag("autoopen-chatlog");
-	if(bAutoOpenChatLog) {
-		BMessage *msg = new BMessage(JAB_SHOW_CHATLOG);
-		_record_entire_item = new BMenuItem("Show Chat Log", msg);
-		_record_entire_item->SetShortcut('H', 0);
-	} else {
-		_record_item = new BMenuItem("Start Chat Log", new BMessage(JAB_START_RECORD));
-		_record_entire_item = new BMenuItem("Stop Chat Log", new BMessage(JAB_STOP_RECORD));
-	}
-
-	if(_record_item != nullptr) {
-	  file_menu->AddItem(_record_item);
-	}
-	file_menu->AddItem(_record_entire_item);
+	file_menu->AddItem(_preferences_item);
 	file_menu->AddSeparatorItem();
-
-//	file_menu->AddItem(_connect_item);
 	file_menu->AddItem(_disconnect_item);
 	file_menu->AddSeparatorItem();
 	file_menu->AddItem(_quit_item);
 	file_menu->SetTargetForItems(MessageRepeater::Instance());
 
 	// EDIT MENU
-	BMenu* edit_menu = new BMenu("Edit");
+	BMenu* edit_menu = new BMenu("Buddy");
 
 		_add_buddy_item = new BMenuItem("Add New Buddy", new BMessage(JAB_OPEN_ADD_BUDDY_WINDOW));
 		_add_buddy_item->SetShortcut('N', 0);
@@ -800,24 +760,13 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_remove_buddy_item = new BMenuItem("Remove Buddy", new BMessage(JAB_REMOVE_BUDDY));
 		_remove_buddy_item->SetShortcut('T', 0);
 
-		_user_info_item = new BMenuItem("Get User Info", new BMessage(JAB_USER_INFO));
-		_user_info_item->SetShortcut('I', 0);
-
-		_user_chatlog_item = new BMenuItem("Show Chat Log", new BMessage(JAB_SHOW_CHATLOG));
-		_user_chatlog_item->SetShortcut('H', 0);
-
-		_preferences_item = new BMenuItem("Preferences...", new BMessage(JAB_PREFERENCES));
-		_preferences_item->SetShortcut(',', 0);
+		_user_info_item = new BMenuItem("Get Buddy Info", new BMessage(JAB_USER_INFO));
 
 	edit_menu->AddItem(_add_buddy_item);
 	edit_menu->AddItem(_change_buddy_item);
 	edit_menu->AddItem(_remove_buddy_item);
 	edit_menu->AddSeparatorItem();
 	edit_menu->AddItem(_user_info_item);
-	edit_menu->AddSeparatorItem();
-	edit_menu->AddItem(_user_chatlog_item);
-	edit_menu->AddSeparatorItem();
-	edit_menu->AddItem(_preferences_item);
 	edit_menu->SetTargetForItems(this);
 
 	// STATUS MENU
@@ -893,6 +842,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	menubar->AddItem(status_menu);
 	menubar->AddItem(talk_menu);
 	menubar->AddItem(help_menu);
+
 
 	// tabbed view
 	// roster view

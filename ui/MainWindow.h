@@ -65,10 +65,6 @@ private:
 
 	BButton					*_login_login;
 
-	BMenuItem				*_record_item;
-	BMenuItem				*_record_entire_item;
-
-	BMenuItem				*_connect_item;
 	BMenuItem				*_disconnect_item;
 	BMenuItem				*_about_item;
 	BMenuItem				*_quit_item;
@@ -76,7 +72,6 @@ private:
 	BMenuItem				*_change_buddy_item;
 	BMenuItem				*_remove_buddy_item;
 	BMenuItem				*_user_info_item;
-	BMenuItem				*_user_chatlog_item;
 	BMenuItem				*_chat_item;
 	BMenuItem				*_away_item;
 	BMenuItem				*_dnd_item;
