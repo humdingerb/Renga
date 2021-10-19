@@ -15,10 +15,6 @@
 	#include "LoginPreferencesView.h"
 #endif
 
-#ifndef MESSAGES_PREFERENCES_VIEW_H
-	#include "MessagesPreferencesView.h"
-#endif
-
 #ifndef SOUND_PREFERENCES_VIEW_H
 	#include "SoundPreferencesView.h"
 #endif
@@ -42,7 +38,7 @@
 class PreferencesWindow : public BWindow {
 public:
 	static PreferencesWindow  *Instance();
-	
+
 public:
 	                           PreferencesWindow();
 	   	                      ~PreferencesWindow();
@@ -52,19 +48,17 @@ public:
 
 private:
 	static PreferencesWindow *_instance;
-	
+
 private:
 	BView                    *_full_view;
- 
+
 	BTabView                 *_tab_strip;
 
 	BTab                     *_tab_login;
-	BTab                     *_tab_messages;
 	BTab                     *_tab_transport;
 	BTab                     *_tab_sounds;
 
 	LoginPreferencesView     *_login_view;
-	MessagesPreferencesView  *_messages_view;
 	SoundPreferencesView     *_sounds_view;
 	TransportPreferencesView *_transport_view;
 

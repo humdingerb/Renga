@@ -716,96 +716,6 @@ void BlabberMainWindow::MenusBeginning() {
 		_user_info_item->SetEnabled(false);
 		_user_chatlog_item->SetEnabled(false);
 	}
-
-	const char *message_1 = BlabberSettings::Instance()->Data("message-1");
-	const char *message_2 = BlabberSettings::Instance()->Data("message-2");
-	const char *message_3 = BlabberSettings::Instance()->Data("message-3");
-	const char *message_4 = BlabberSettings::Instance()->Data("message-4");
-	const char *message_5 = BlabberSettings::Instance()->Data("message-5");
-	const char *message_6 = BlabberSettings::Instance()->Data("message-6");
-	const char *message_7 = BlabberSettings::Instance()->Data("message-7");
-	const char *message_8 = BlabberSettings::Instance()->Data("message-8");
-	const char *message_9 = BlabberSettings::Instance()->Data("message-9");
-
-	if (message_1) {
-		_message_1_item->SetLabel(message_1);
-		_message_1_item->SetEnabled(true);
-	} else {
-		_message_1_item->SetLabel("Message 1");
-		_message_1_item->SetEnabled(false);
-	}
-
-	if (message_2) {
-		_message_2_item->SetLabel(message_2);
-		_message_2_item->SetEnabled(true);
-	} else {
-		_message_2_item->SetLabel("Message 2");
-		_message_2_item->SetEnabled(false);
-	}
-
-	if (message_3) {
-		_message_3_item->SetLabel(message_3);
-		_message_3_item->SetEnabled(true);
-	} else {
-		_message_3_item->SetLabel("Message 3");
-		_message_3_item->SetEnabled(false);
-	}
-
-	if (message_4) {
-		_message_4_item->SetLabel(message_4);
-		_message_4_item->SetEnabled(true);
-	} else {
-		_message_4_item->SetLabel("Message 4");
-		_message_4_item->SetEnabled(false);
-	}
-
-	if (message_5) {
-		_message_5_item->SetLabel(message_5);
-		_message_5_item->SetEnabled(true);
-	} else {
-		_message_5_item->SetLabel("Message 5");
-		_message_5_item->SetEnabled(false);
-	}
-
-	if (message_6) {
-		_message_6_item->SetLabel(message_6);
-		_message_6_item->SetEnabled(true);
-	} else {
-		_message_6_item->SetLabel("Message 6");
-		_message_6_item->SetEnabled(false);
-	}
-
-	if (message_7) {
-		_message_7_item->SetLabel(message_7);
-		_message_7_item->SetEnabled(true);
-	} else {
-		_message_7_item->SetLabel("Message 7");
-		_message_7_item->SetEnabled(false);
-	}
-
-	if (message_8) {
-		_message_8_item->SetLabel(message_8);
-		_message_8_item->SetEnabled(true);
-	} else {
-		_message_8_item->SetLabel("Message 8");
-		_message_8_item->SetEnabled(false);
-	}
-
-	if (message_9) {
-		_message_9_item->SetLabel(message_9);
-		_message_9_item->SetEnabled(true);
-	} else {
-		_message_9_item->SetLabel("Message 9");
-		_message_9_item->SetEnabled(false);
-	}
-
-	// FIXME do this when swapping talkcards instead
-	if (fTalkCards->VisibleItem()) {
-		_message_menu->SetTargetForItems(fTalkCards->VisibleItem()->View());
-		_message_menu->SetEnabled(true);
-	} else {
-		_message_menu->SetEnabled(false);
-	}
 }
 
 bool BlabberMainWindow::QuitRequested() {
@@ -970,55 +880,6 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	talk_menu->AddItem(_send_groupchat_item);
 	talk_menu->SetTargetForItems(this);
 
-	// MESSAGE MENU
-	_message_menu = new BMenu("Messages");
-
-		_message_1_item = new BMenuItem("Message #1", new BMessage(JAB_MESSAGE_1));
-		_message_1_item->SetShortcut('1', 0);
-		_message_1_item->SetEnabled(false);
-
-		_message_2_item = new BMenuItem("Message #2", new BMessage(JAB_MESSAGE_2));
-		_message_2_item->SetShortcut('2', 0);
-		_message_2_item->SetEnabled(false);
-
-		_message_3_item = new BMenuItem("Message #3", new BMessage(JAB_MESSAGE_3));
-		_message_3_item->SetShortcut('3', 0);
-		_message_3_item->SetEnabled(false);
-
-		_message_4_item = new BMenuItem("Message #4", new BMessage(JAB_MESSAGE_4));
-		_message_4_item->SetShortcut('4', 0);
-		_message_4_item->SetEnabled(false);
-
-		_message_5_item = new BMenuItem("Message #5", new BMessage(JAB_MESSAGE_5));
-		_message_5_item->SetShortcut('5', 0);
-		_message_5_item->SetEnabled(false);
-
-		_message_6_item = new BMenuItem("Message #6", new BMessage(JAB_MESSAGE_6));
-		_message_6_item->SetShortcut('6', 0);
-		_message_6_item->SetEnabled(false);
-
-		_message_7_item = new BMenuItem("Message #7", new BMessage(JAB_MESSAGE_7));
-		_message_7_item->SetShortcut('7', 0);
-		_message_7_item->SetEnabled(false);
-
-		_message_8_item = new BMenuItem("Message #8", new BMessage(JAB_MESSAGE_8));
-		_message_8_item->SetShortcut('8', 0);
-		_message_8_item->SetEnabled(false);
-
-		_message_9_item = new BMenuItem("Message #9", new BMessage(JAB_MESSAGE_9));
-		_message_9_item->SetShortcut('9', 0);
-		_message_9_item->SetEnabled(false);
-
-	_message_menu->AddItem(_message_1_item);
-	_message_menu->AddItem(_message_2_item);
-	_message_menu->AddItem(_message_3_item);
-	_message_menu->AddItem(_message_4_item);
-	_message_menu->AddItem(_message_5_item);
-	_message_menu->AddItem(_message_6_item);
-	_message_menu->AddItem(_message_7_item);
-	_message_menu->AddItem(_message_8_item);
-	_message_menu->AddItem(_message_9_item);
-
 	// HELP MENU
 	BMenu* help_menu = new BMenu("Help");
 
@@ -1036,7 +897,6 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	menubar->AddItem(edit_menu);
 	menubar->AddItem(status_menu);
 	menubar->AddItem(talk_menu);
-	menubar->AddItem(_message_menu);
 	menubar->AddItem(help_menu);
 
 	// tabbed view

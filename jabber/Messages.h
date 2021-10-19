@@ -49,16 +49,6 @@
 #define JAB_GROUP_CHATTER_ONLINE        0x14006000
 #define JAB_GROUP_CHATTER_OFFLINE       0x14006888
 
-#define JAB_MESSAGE_1                   0x14007000
-#define JAB_MESSAGE_2                   0x14007888
-#define JAB_MESSAGE_3                   0x14008000
-#define JAB_MESSAGE_4                   0x14008888
-#define JAB_MESSAGE_5                   0x14009000
-#define JAB_MESSAGE_6                   0x14009888
-#define JAB_MESSAGE_7                   0x1400A888
-#define JAB_MESSAGE_8                   0x1400B000
-#define JAB_MESSAGE_9                   0x1400B888
-
 #define NEWLINE_TOGGLE                  0x1400B999
 
 #define JAB_START_RECORD                0x1400C000
