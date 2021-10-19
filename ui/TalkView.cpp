@@ -574,7 +574,8 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 			_chat->Insert(_chat->TextLength(), messageString, messageString.Length(), &tra_thick_red);
 
 		_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
-		_chat->ScrollTo(0.0, _chat->Bounds().bottom);
+		if (type == LOCAL)
+			_chat->ScrollTo(0.0, _chat->Bounds().bottom);
 		return;
 	}
 
@@ -610,7 +611,8 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	free(this_array);
 
 	_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
-	_chat->ScrollTo(0.0, _chat->Bounds().bottom);
+	if (type == LOCAL)
+		_chat->ScrollTo(0.0, _chat->Bounds().bottom);
 }
 
 
