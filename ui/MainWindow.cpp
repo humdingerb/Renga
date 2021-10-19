@@ -761,6 +761,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 		_remove_buddy_item->SetShortcut('T', 0);
 
 		_user_info_item = new BMenuItem("Get Buddy Info", new BMessage(JAB_USER_INFO));
+		_user_info_item->SetShortcut('G', 0);
 
 	edit_menu->AddItem(_add_buddy_item);
 	edit_menu->AddItem(_change_buddy_item);
@@ -806,8 +807,10 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	BMenu* talk_menu = new BMenu("Talk");
 
 		BMenuItem* rotate_chat_forward_item = new BMenuItem("Rotate Chat Forward", new BMessage(JAB_ROTATE_CHAT_FORWARD));
+		rotate_chat_forward_item->SetShortcut(B_UP_ARROW, B_SHIFT_KEY);
 
 		BMenuItem* rotate_chat_backward_item = new BMenuItem("Rotate Chat Backward", new BMessage(JAB_ROTATE_CHAT_BACKWARD));
+		rotate_chat_backward_item->SetShortcut(B_DOWN_ARROW, B_SHIFT_KEY);
 
 		_send_message_item = new BMenuItem("Send Message...", new BMessage(JAB_OPEN_NEW_MESSAGE));
 		_send_message_item->SetShortcut('M', 0);
