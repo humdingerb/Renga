@@ -101,8 +101,6 @@ private:
 	BMenuItem				*_user_guide_item;
 	BMenuItem				*_faq_item;
 
-	int32					_deskbar_id;
-
 	BView					*_full_view;
 
 	PictureView				*_title;

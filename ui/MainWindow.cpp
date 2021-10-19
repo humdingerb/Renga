@@ -29,7 +29,6 @@
 
 #include <Application.h>
 #include <CardLayout.h>
-#include <Deskbar.h>
 #include <FindDirectory.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
@@ -88,10 +87,6 @@ BlabberMainWindow *BlabberMainWindow::Instance() {
 BlabberMainWindow::~BlabberMainWindow() {
 	// remove self from message family
 	MessageRepeater::Instance()->RemoveTarget(this);
-
-	// remove deskbar icon
-//	BDeskbar db;
-//	db.RemoveItem(_deskbar_id);
 
 	_instance = NULL;
 }
