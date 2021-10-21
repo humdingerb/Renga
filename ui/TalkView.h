@@ -93,7 +93,6 @@ private:
 	BScrollView        *_message_scroller;
 	ChatTextView       *_chat;
 	BTextView          *_message;
-	BButton            *_send_message;
 
 	BListView          *_people;
 

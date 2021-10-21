@@ -18,33 +18,31 @@ EditingFilter::EditingFilter(BTextView *view, TalkView *window)
 
 filter_result EditingFilter::Filter(BMessage *message, __attribute__((unused)) BHandler **target) {
 	int32 modifiers;
-
 	int8 byte;
-	message->FindInt8("byte", &byte);
 
-	// if we have modifiers but none are the Alt key
-	if (message->FindInt32("modifiers", &modifiers)) {
-		return B_DISPATCH_MESSAGE;
-	}
+	message->FindInt8("byte", &byte);
+	message->FindInt32("modifiers", &modifiers);
 
 	// if the Alt key jives with the command_enter status
 	if ((modifiers & B_COMMAND_KEY) != 0 && byte == B_UP_ARROW) {
-			_window->RevealPreviousHistory();
-	} else if ((modifiers & B_COMMAND_KEY) != 0 && byte == B_DOWN_ARROW) {
-			_window->RevealNextHistory();
-	} else if (_window->NewlinesAllowed() && (modifiers & B_COMMAND_KEY) == 0 && byte == B_ENTER) {
-		_view->Insert("\n");
-
-		return B_SKIP_MESSAGE;
-	} else if (!_window->NewlinesAllowed() && (modifiers & B_COMMAND_KEY) != 0 && byte == B_ENTER) {
-		_view->Insert("\n");
-
-		return B_SKIP_MESSAGE;
-	} else if (_window->NewlinesAllowed() && (modifiers & B_COMMAND_KEY) != 0 && byte == B_ENTER) {
-		puts("Go!");
-		BMessenger(_window).SendMessage(JAB_CHAT_SENT);
+		_window->RevealPreviousHistory();
+		return B_DISPATCH_MESSAGE;
 	}
-	
-	return B_DISPATCH_MESSAGE;
+
+	if ((modifiers & B_COMMAND_KEY) != 0 && byte == B_DOWN_ARROW) {
+		_window->RevealNextHistory();
+		return B_DISPATCH_MESSAGE;
+	}
+
+	if (byte != B_ENTER)
+		return B_DISPATCH_MESSAGE;
+
+	if (modifiers & (B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) {
+		_view->Insert("\n");
+		return B_SKIP_MESSAGE;
+	} else {
+		BMessenger(_window).SendMessage(JAB_CHAT_SENT);
+		return B_DISPATCH_MESSAGE;
+	}
 }
 

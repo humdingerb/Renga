@@ -73,38 +73,27 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	_chat->SetStylable(true);
 	_chat->MakeEditable(false);
 
-	BGridView* _sending = new BGridView("communicate");
-
 	// message control
 	rgb_color text_color = ui_color(B_PANEL_TEXT_COLOR);
 	BFont text_font(be_plain_font);
 
 	_message          = new BTextView("message", &text_font, &text_color, B_WILL_DRAW);
 	_message_scroller = new BScrollView("message_scroller", _message, B_WILL_DRAW, false, false);
+
 	_message->TargetedByScrollView(_message_scroller);
 	_message->SetWordWrap(true);
 
 	// editing filter for messaging
 	_message->AddFilter(new EditingFilter(_message, this));
 
-
-	// send button
-	_send_message = new BButton("send", "\xe2\x96\xb6", new BMessage(JAB_CHAT_SENT));
-	_send_message->MakeDefault(true);
-	_send_message->SetFlat(true);
-	_send_message->SetExplicitSize(BSize(_send_message->StringWidth("WWWW"), B_SIZE_UNSET));
-
-	// add alt-enter note
-
-	BLayoutBuilder::Grid<>(_sending)
-		.Add(_message_scroller, 0, 0)
-		.Add(_send_message,     1, 0)
-	.End();
-
 	// handle splits
-	BGroupView* _split_talk = new BGroupView(B_VERTICAL);
+	BSplitView* _split_talk = new BSplitView(B_VERTICAL);
 	_split_talk->AddChild(_chat_scroller);
-	_split_talk->AddChild(_sending);
+	_split_talk->AddChild(_message_scroller);
+	_split_talk->SetItemWeight(0, 12, false);
+	_split_talk->SetItemWeight(1, 1, false);
+	_split_talk->SetSpacing(0);
+	_split_talk->SetCollapsible(false);
 
 	_people = new BListView(NULL, B_SINGLE_SELECTION_LIST);
 	_people->SetExplicitMinSize(BSize(StringWidth("Firstname M. Lastname"), B_SIZE_UNSET));
@@ -189,7 +178,6 @@ TalkView::~TalkView() {
 
 void TalkView::AttachedToWindow()
 {
-	_send_message->SetTarget(this);
 }
 
 
