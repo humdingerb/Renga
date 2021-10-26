@@ -651,8 +651,9 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 			break;
 		}
-
-		break;
+		default:
+			BWindow::MessageReceived(msg);
+			break;
 	}
 }
 
