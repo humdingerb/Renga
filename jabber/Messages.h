@@ -142,5 +142,6 @@
 #define GO_TO_RIV                       0x1B000000
 #define GO_TO_BEBITS                    0x1B000001
 
+#define kOptionChanged					0x1C000001
 
 #endif

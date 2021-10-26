@@ -8,6 +8,7 @@
 
 #include "support/AppLocation.h"
 
+#include "ui/AddBuddyWindow.h"
 #include "ui/BuddyInfoWindow.h"
 #include "ui/ChangeNameWindow.h"
 #include "ui/ModalAlertFactory.h"
@@ -16,7 +17,6 @@
 #include "ui/TalkView.h"
 
 #include "jabber/BlabberSettings.h"
-#include "jabber/BuddyWindow.h"
 #include "jabber/CustomStatusWindow.h"
 #include "jabber/GenericFunctions.h"
 #include "jabber/JabberSpeak.h"
@@ -422,7 +422,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_OPEN_ADD_BUDDY_WINDOW: {
 			// open buddy window
-			BuddyWindow::Instance()->Show();
+			AddBuddyWindow::Instance()->Show();
 			break;
 		}
 

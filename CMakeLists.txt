@@ -26,7 +26,6 @@ add_executable(Renga
 	 jabber/BlabberApp.cpp
 	 jabber/AgentList.cpp
 	 jabber/BlabberSettings.cpp
-	 jabber/BuddyWindow.cpp
 	 jabber/JabberSpeak.cpp
 	 jabber/JRoster.cpp
 	 jabber/SoundSystem.cpp
@@ -54,6 +53,7 @@ add_executable(Renga
 
 	# "Modern" UI classes using gloox types and StartWatching/SendNotices
 	ui/AboutWindow.cpp
+	ui/AddBuddyWindow.cpp
 	ui/BookmarkItem.cpp
 	ui/BuddyInfoWindow.cpp
 	ui/ChangeNameWindow.cpp
