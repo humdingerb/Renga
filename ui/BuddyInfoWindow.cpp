@@ -19,7 +19,7 @@
 #include "../jabber/Messages.h"
 
 BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
-	: BWindow(BRect(0, 0, 0, 0), "User Information", B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 0, 0), "Buddy Information", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 	, fJID(querying_user->Handle().c_str())
 {

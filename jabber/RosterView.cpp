@@ -45,7 +45,7 @@ int RosterView::ListComparison(const void *a, const void *b) {
 }
 
 void RosterView::AttachedToWindow() {
-	// superclass call	
+	// superclass call
 	BOutlineListView::AttachedToWindow();
 
 	// on double-click
@@ -58,11 +58,11 @@ void RosterView::AttachedToWindow() {
 		_message_item      = new BMenuItem("Send Message" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_MESSAGE));
 		_change_user_item  = new BMenuItem("Edit Buddy", new BMessage(JAB_OPEN_EDIT_BUDDY_WINDOW));
 		_remove_user_item  = new BMenuItem("Remove Buddy", new BMessage(JAB_REMOVE_BUDDY));
-		_user_info_item    = new BMenuItem("Get User Info", new BMessage(JAB_USER_INFO));
+		_user_info_item    = new BMenuItem("Get Buddy Info", new BMessage(JAB_USER_INFO));
 		_user_chatlog_item = new BMenuItem("Show Chat Log", new BMessage(JAB_SHOW_CHATLOG));
 
 		_presence          = new BMenu("Presence");
-			
+
 			_subscribe_presence   = new BMenuItem("Subscribe", new BMessage(JAB_SUBSCRIBE_PRESENCE));
 			_unsubscribe_presence = new BMenuItem("Unsubscribe", new BMessage(JAB_UNSUBSCRIBE_PRESENCE));
 
@@ -88,7 +88,7 @@ void RosterView::AttachedToWindow() {
 	AddItem(_offline = new RosterSuperitem("Offline"));
 	AddItem(_transports = new RosterSuperitem("Live Transports"));
 	AddItem(_bookmarks = new RosterSuperitem("Group chats"));
-	
+
 	// make maps (BUGBUG better way to do two-way map?)
 	_item_to_status_map[_offline] = UserID::OFFLINE;
 	_item_to_status_map[_online]  = UserID::ONLINE;
@@ -108,7 +108,7 @@ void RosterView::AttachedToWindow() {
 	_status_to_item_map[UserID::UNKNOWN] = _unknown;
 	_status_to_item_map[UserID::TRANSPORT_ONLINE] = _transports;
 	_status_to_item_map[UserID::UNACCEPTED] = _unaccepted;
-	
+
 	// BUGBUG events
 	_presence->SetTargetForItems(Window());
 	_popup->SetTargetForItems(Window());
@@ -120,7 +120,7 @@ void RosterView::AttachedToWindow() {
 
 RosterItem *RosterView::CurrentItemSelection() {
 	int32 index = CurrentSelection();
-	
+
 	if (index >= 0) {
 		return dynamic_cast<RosterItem *>(ItemAt(index));
 	} else {
@@ -131,7 +131,7 @@ RosterItem *RosterView::CurrentItemSelection() {
 BookmarkItem* RosterView::CurrentBookmarkSelection()
 {
 	int32 index = CurrentSelection();
-	
+
 	if (index >= 0) {
 		return dynamic_cast<BookmarkItem *>(ItemAt(index));
 	} else {
@@ -153,10 +153,10 @@ void RosterView::MouseDown(BPoint point) {
 	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
 		// update menu before presentation
 		UpdatePopUpMenu();
-		
+
 		BPoint screen_point(point);
 		ConvertToScreen(&screen_point);
-		
+
 		BRect r(screen_point.x - 4, screen_point.y - 20, screen_point.x + 24, screen_point.y + 4);
 		_popup->Go(screen_point, true, true, r, false);
 		//_popup->Go(screen_point, true, true, false);
@@ -168,12 +168,12 @@ void RosterView::RemoveSelected() {
 		// numeric and object based selections
 		int32       selected = CurrentSelection();
 		RosterItem *item     = CurrentItemSelection();
-		
+
 		if (item == NULL) {
 			// not a roster item, won't remove
 			return;
 		}
-		
+
 		// remove item from view
 		RemoveItem(CurrentSelection());
 
@@ -285,27 +285,27 @@ void RosterView::LinkBookmark(const gloox::JID& added_bookmark, BString name) {
 void RosterView::UnlinkUser(const gloox::JID& removed_user) {
 	// does user exist
 	int32 index = FindUser(removed_user);
-	
+
 	if (index >= 0) {
-		RemoveItem(index);	
+		RemoveItem(index);
 	}
 }
 
 void RosterView::UnlinkTransport(const gloox::JID& removed_transport) {
 	// does transport exist
 	int32 index = FindTransport(removed_transport);
-	
+
 	if (index >= 0) {
-		RemoveItem(index);	
+		RemoveItem(index);
 	}
 }
 
 void RosterView::UnlinkBookmark(const gloox::JID& removed_bookmark) {
 	// does transport exist
 	int32 index = FindBookmark(removed_bookmark);
-	
+
 	if (index >= 0) {
-		RemoveItem(index);	
+		RemoveItem(index);
 	}
 }
 
@@ -317,7 +317,7 @@ int32 RosterView::FindUser(const gloox::JID& compare_user) {
 		if (item == NULL || item->StalePointer()) {
 			continue;
 		}
-				
+
 		// compare against RosterView
 		if (item->GetUserID()->JID().bare() == compare_user.bare()) {
 			return i;
@@ -336,7 +336,7 @@ int32 RosterView::FindTransport(const gloox::JID& compare_transport) {
 		if (item == NULL) {
 			continue;
 		}
-				
+
 		// compare against RosterView
 		if (item->GetUserID()->JID() == compare_transport) {
 			return i;
@@ -357,7 +357,7 @@ int32 RosterView::FindBookmark(const gloox::JID& compare_jid)
 		if (item == NULL) {
 			continue;
 		}
-				
+
 		// compare against RosterView
 		if (item->GetUserID() == compare_jid) {
 			return i;
@@ -458,7 +458,7 @@ void RosterView::UpdateRoster() {
 	for (int i = 0; i < FullListCountItems(); ++i) {
 		RosterItem *item = dynamic_cast<RosterItem *>(FullListItemAt(i));
 		TransportItem *transport_item = dynamic_cast<TransportItem *>(FullListItemAt(i));
-		
+
 		// skip illegal entries
 		if (item == NULL && transport_item == NULL) {
 			continue;
@@ -472,14 +472,14 @@ void RosterView::UpdateRoster() {
 
 				goto RESET;
 			}
-		
+
 			// change of statuses
 			if (item->GetUserID()->OnlineStatus() != _item_to_status_map[Superitem(item)]) {
 				UserID::online_status old_status = _item_to_status_map[Superitem(item)];
-				
+
 				// remove the item from the current superitem...
 				RemoveItem(i);
-			
+
 				// and add it to the appropriate one
 				AddUnder(item, _status_to_item_map[item->GetUserID()->OnlineStatus()]);
 
@@ -489,9 +489,9 @@ void RosterView::UpdateRoster() {
 				} else if (item->GetUserID()->OnlineStatus() == UserID::OFFLINE && item->GetUserID()->IsUser() && old_status == UserID::ONLINE) {
 					SoundSystem::Instance()->PlayUserOfflineSound();
 				}
-								
+
 				goto RESET;
-			}			
+			}
 
 			// clean it
 			InvalidateItem(i);
@@ -507,7 +507,7 @@ void RosterView::UpdateRoster() {
 			if (transport_item->GetUserID()->OnlineStatus() != _item_to_status_map[Superitem(transport_item)]) {
 				// remove the item from the current superitem...
 				RemoveItem(i);
-			
+
 				// and add it to the appropriate one
 				if (transport_item->GetUserID()->OnlineStatus() == UserID::TRANSPORT_ONLINE) {
 					AddUnder(transport_item, _status_to_item_map[transport_item->GetUserID()->OnlineStatus()]);
@@ -519,9 +519,9 @@ void RosterView::UpdateRoster() {
 				} else if (transport_item->GetUserID()->OnlineStatus() == UserID::OFFLINE) {
 					SoundSystem::Instance()->PlayUserOfflineSound();
 				}
-								
+
 				goto RESET;
-			}			
+			}
 
 			// clean it
 			InvalidateItem(i);

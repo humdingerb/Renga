@@ -19,7 +19,7 @@
 #include "../jabber/TalkManager.h"
 
 ChangeNameWindow::ChangeNameWindow(const gloox::JID& changing_user, BString oldName)
-	: BWindow(BRect(0, 0, 100, 100), "Changing User Name", B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 100, 100), "Change Buddy Name", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	_changing_user(changing_user)
 {
@@ -29,15 +29,15 @@ ChangeNameWindow::ChangeNameWindow(const gloox::JID& changing_user, BString oldN
 	AddChild(full_view);
 
 	BStringView *query = new BStringView(NULL, "Specify the new \"Nickname\" you'd like to use:");
-	
+
 	_handle = new BTextControl(NULL, NULL, "", NULL);
-	
+
 	if (BlabberSettings::Instance()->Data("last-talk-sent-to")) {
 		_handle->SetText(BlabberSettings::Instance()->Data("last-talk-sent-to"));
 	} else {
 		_handle->SetText("somebody@jabber.org");
 	}
-	
+
 	BButton *cancel = new BButton("cancel", "Nevermind", new BMessage(JAB_CANCEL));
 	cancel->SetTarget(this);
 
@@ -77,7 +77,7 @@ void ChangeNameWindow::MessageReceived(BMessage *msg) {
 
 				return;
 			}
-			
+
 			// re-add to roster
 			JabberSpeak::Instance()->SetFriendlyName(_changing_user, _handle->Text());
 
