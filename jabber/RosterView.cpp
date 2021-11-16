@@ -271,16 +271,39 @@ void RosterView::LinkTransport(const UserID *added_transport) {
 	AddUnder(new TransportItem(added_transport), _transports);
 }
 
+
+static int compareStrings(const char* a, const char* b)
+{
+	// FIXME use ICU locale aware comparison instead
+	int icompare = strcasecmp(a, b);
+	if (icompare != 0)
+		return icompare;
+
+	// In case the names are case-insensitive-equal, still sort them in a
+	// predictible way
+	return strcmp(a, b);
+}
+
+
+int32 CompareBookmarks(const BListItem* first, const BListItem* second) {
+	gloox::JID firstBookmark = dynamic_cast<const BookmarkItem*>(first)->GetUserID();
+	gloox::JID secondBookmark = dynamic_cast<const BookmarkItem*>(second)->GetUserID();
+	return compareStrings(firstBookmark.full().c_str(), secondBookmark.full().c_str());
+}
+
+
 void RosterView::LinkBookmark(const gloox::JID& added_bookmark, BString name) {
 	int32 index = FindBookmark(added_bookmark);
-	if (index < 0)
+	if (index < 0) {
 		AddUnder(new BookmarkItem(added_bookmark, name), _bookmarks);
-	else {
+		SortItemsUnder(_bookmarks, true, &CompareBookmarks);
+	} else {
 		BookmarkItem* item = dynamic_cast<BookmarkItem*>(FullListItemAt(index));
 		item->Update(this, be_plain_font);
 		Invalidate(ItemFrame(index));
 	}
 }
+
 
 void RosterView::UnlinkUser(const gloox::JID& removed_user) {
 	// does user exist
