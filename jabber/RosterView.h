@@ -62,7 +62,6 @@ private:
 	BMenuItem         *_change_user_item;
 	BMenuItem         *_remove_user_item;
 	BMenuItem         *_user_info_item;
-	BMenuItem         *_user_chatlog_item;
 
 	BMenu             *_presence;
 	BMenuItem         *_subscribe_presence;

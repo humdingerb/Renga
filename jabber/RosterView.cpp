@@ -59,7 +59,6 @@ void RosterView::AttachedToWindow() {
 		_change_user_item  = new BMenuItem("Edit Buddy", new BMessage(JAB_OPEN_EDIT_BUDDY_WINDOW));
 		_remove_user_item  = new BMenuItem("Remove Buddy", new BMessage(JAB_REMOVE_BUDDY));
 		_user_info_item    = new BMenuItem("Get Buddy Info", new BMessage(JAB_USER_INFO));
-		_user_chatlog_item = new BMenuItem("Show Chat Log", new BMessage(JAB_SHOW_CHATLOG));
 
 		_presence          = new BMenu("Presence");
 
@@ -76,8 +75,6 @@ void RosterView::AttachedToWindow() {
 	_popup->AddItem(_remove_user_item);
 	_popup->AddSeparatorItem();
 	_popup->AddItem(_user_info_item);
-	_popup->AddSeparatorItem();
-	_popup->AddItem(_user_chatlog_item);
 	_popup->AddSeparatorItem();
 	_popup->AddItem(_presence);
 
@@ -413,7 +410,6 @@ void RosterView::UpdatePopUpMenu() {
 		_remove_user_item->SetEnabled(true);
 
 		_user_info_item->SetEnabled(true);
-		_user_chatlog_item->SetEnabled(BlabberSettings::Instance()->Tag("autoopen-chatlog"));
 
 		_presence->SetEnabled(true);
 
@@ -438,7 +434,6 @@ void RosterView::UpdatePopUpMenu() {
 		_remove_user_item->SetEnabled(true);
 
 		_user_info_item->SetEnabled(false);
-		_user_chatlog_item->SetEnabled(false);
 
 		_presence->SetEnabled(false);
 	} else {
@@ -455,7 +450,6 @@ void RosterView::UpdatePopUpMenu() {
 		_remove_user_item->SetEnabled(false);
 
 		_user_info_item->SetEnabled(false);
-		_user_chatlog_item->SetEnabled(false);
 
 		_presence->SetEnabled(false);
 	}
