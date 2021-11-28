@@ -372,24 +372,24 @@ void TalkView::AddToTalk(string username, string message, user_type type, bool h
 	rgb_color blue   = {0, 0, 255, 255};
 	rgb_color red    = {255, 0, 0, 255};
 	rgb_color orange = {205, 113, 57, 255};
-	rgb_color message_color  = ui_color(B_PANEL_TEXT_COLOR);
-	rgb_color bg_color = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color highlight_color = mix_color(message_color, orange, 200);
+	rgb_color messageColor  = ui_color(B_DOCUMENT_TEXT_COLOR);
+	rgb_color backgroundColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	rgb_color highlightColor = mix_color(messageColor, orange, 200);
 
 	// TODO figure out a goood threshold here, this seems to work for me,
 	// but it may not for others
-	if (abs(blue.Brightness() - bg_color.Brightness()) < 45)
+	if (abs(blue.Brightness() - backgroundColor.Brightness()) < 45)
 		blue = { 128, 137, 252, 255 };
 
-	if (abs(red.Brightness() - bg_color.Brightness()) < 45)
+	if (abs(red.Brightness() - backgroundColor.Brightness()) < 45)
 		red = { 249, 84, 87, 255 };
 
 	// some runs to play with
 	text_run tr_thick_blue  = {0, thick, blue};
 	text_run tr_thick_red   = {0, thick, red};
-	text_run tr_thick_black = {0, thick, message_color};
-	text_run tr_thick_highlight = {0, thick, highlight_color};
-	text_run tr_thin_black  = {0, thin, message_color};
+	text_run tr_thick_black = {0, thick, messageColor};
+	text_run tr_thick_highlight = {0, thick, highlightColor};
+	text_run tr_thin_black  = {0, thin, messageColor};
 
 	// some run array to play with (simple)
 	text_run_array tra_thick_blue  = {1, {tr_thick_blue}};
