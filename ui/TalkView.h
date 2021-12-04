@@ -89,10 +89,10 @@ private:
 	// GUI
 	StatusView         *_status_view;
 
-	BScrollView        *_chat_scroller;
-	BScrollView        *_message_scroller;
-	ChatTextView       *_chat;
-	BTextView          *_message;
+	BScrollView        *fTimelineScroller;
+	BScrollView        *fMessageInputScroller;
+	ChatTextView       *fTimeline;
+	BTextView          *fMessageInput;
 
 	BListView          *_people;
 

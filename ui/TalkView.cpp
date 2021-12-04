@@ -64,31 +64,31 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	_status_view = new StatusView();
 	_status_view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	_chat          = new ChatTextView("chat", B_WILL_DRAW | B_FRAME_EVENTS);
-	_chat_scroller = new BScrollView("chat_scroller", _chat, B_WILL_DRAW, false, true);
-	_chat->TargetedByScrollView(_chat_scroller);
-	_chat->SetFontSize(12.0);
-	_chat->SetWordWrap(true);
-	_chat->SetStylable(true);
-	_chat->MakeEditable(false);
+	fTimeline         = new ChatTextView("Timeline", B_WILL_DRAW | B_FRAME_EVENTS);
+	fTimelineScroller = new BScrollView("Timeline Scroller", fTimeline, B_WILL_DRAW, false, true);
+	fTimeline->TargetedByScrollView(fTimelineScroller);
+	fTimeline->SetFontSize(12.0);
+	fTimeline->SetWordWrap(true);
+	fTimeline->SetStylable(true);
+	fTimeline->MakeEditable(false);
 
 	// message control
 	rgb_color text_color = ui_color(B_PANEL_TEXT_COLOR);
 	BFont text_font(be_plain_font);
 
-	_message          = new BTextView("message", &text_font, &text_color, B_WILL_DRAW);
-	_message_scroller = new BScrollView("message_scroller", _message, B_WILL_DRAW, false, false);
+	fMessageInput         = new BTextView("Message Input", &text_font, &text_color, B_WILL_DRAW);
+	fMessageInputScroller = new BScrollView("Message Input Scroller", fMessageInput, B_WILL_DRAW, false, false);
 
-	_message->TargetedByScrollView(_message_scroller);
-	_message->SetWordWrap(true);
+	fMessageInput->TargetedByScrollView(fMessageInputScroller);
+	fMessageInput->SetWordWrap(true);
 
 	// editing filter for messaging
-	_message->AddFilter(new EditingFilter(_message, this));
+	fMessageInput->AddFilter(new EditingFilter(fMessageInput, this));
 
 	// handle splits
 	BSplitView* _split_talk = new BSplitView(B_VERTICAL);
-	_split_talk->AddChild(_chat_scroller);
-	_split_talk->AddChild(_message_scroller);
+	_split_talk->AddChild(fTimelineScroller);
+	_split_talk->AddChild(fMessageInputScroller);
 	_split_talk->SetItemWeight(0, 12, false);
 	_split_talk->SetItemWeight(1, 1, false);
 	_split_talk->SetSpacing(0);
@@ -118,7 +118,7 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	AddChild(_split_group_people);
 	AddChild(_status_view);
 
-	_message->MakeFocus(true);
+	fMessageInput->MakeFocus(true);
 
 	// generate window title
 	char buffer[1024];
@@ -184,8 +184,8 @@ void TalkView::FrameResized(float width, float height)
 {
 	BView::FrameResized(width, height);
 
-	BRect chat_rect    = _chat->Frame();
-	BRect message_rect = _message->Frame();
+	BRect chat_rect    = fTimeline->Frame();
+	BRect message_rect = fMessageInput->Frame();
 
 	chat_rect.OffsetTo(B_ORIGIN);
 	message_rect.OffsetTo(B_ORIGIN);
@@ -193,11 +193,11 @@ void TalkView::FrameResized(float width, float height)
 	chat_rect.InsetBy(2.0, 2.0);
 	message_rect.InsetBy(2.0, 2.0);
 
-	_chat->SetTextRect(chat_rect);
-	_message->SetTextRect(message_rect);
+	fTimeline->SetTextRect(chat_rect);
+	fMessageInput->SetTextRect(message_rect);
 
-	_chat->Invalidate();
-	_chat_scroller->Invalidate();
+	fTimeline->Invalidate();
+	fTimelineScroller->Invalidate();
 }
 
 
@@ -280,7 +280,7 @@ void TalkView::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_CHAT_SENT: {
-			string message = _message->Text();
+			string message = fMessageInput->Text();
 
 			// eliminate empty messages
 			if (message.empty())
@@ -291,17 +291,17 @@ void TalkView::MessageReceived(BMessage *msg) {
 				// we go through main app?
 				gloox::MUCRoom* room = (gloox::MUCRoom*)TalkManager::Instance()
 					->IsExistingWindowToGroup(GetGroupRoom());
-					room->send(_message->Text());
+					room->send(fMessageInput->Text());
 			} else
-				_session->send(_message->Text());
+				_session->send(fMessageInput->Text());
 
 			// user part
 			NewMessage(message);
 
 			// GUI
-			_message->ScrollToOffset(0);
-			_message->SetText("");
-			_message->MakeFocus(true);
+			fMessageInput->ScrollToOffset(0);
+			fMessageInput->SetText("");
+			fMessageInput->MakeFocus(true);
 
 			break;
 		}
@@ -408,18 +408,18 @@ void TalkView::AddToTalk(string username, string message, user_type type, bool h
 	BString messageString = BString(message.c_str());
 
 	if (BlabberSettings::Instance()->Tag("show-timestamp"))
-		_chat->Insert(_chat->TextLength(), time_stamp.c_str(), time_stamp.size(), &tra_thin_black);
+		fTimeline->Insert(fTimeline->TextLength(), time_stamp.c_str(), time_stamp.size(), &tra_thin_black);
 
 	if (messageString.StartsWith("/me ")) {
 		messageString.ReplaceFirst("/me", username.c_str());
 		if (type == MAIN_RECIPIENT)
-			_chat->Insert(_chat->TextLength(), messageString, messageString.Length(), &tra_thick_blue);
+			fTimeline->Insert(fTimeline->TextLength(), messageString, messageString.Length(), &tra_thick_blue);
 		else
-			_chat->Insert(_chat->TextLength(), messageString, messageString.Length(), &tra_thick_red);
+			fTimeline->Insert(fTimeline->TextLength(), messageString, messageString.Length(), &tra_thick_red);
 
-		_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
+		fTimeline->Insert(fTimeline->TextLength(), "\n", 1, &tra_thin_black);
 		if (type == LOCAL)
-			_chat->ScrollTo(0.0, _chat->Bounds().bottom);
+			fTimeline->ScrollTo(0.0, fTimeline->Bounds().bottom);
 		return;
 	}
 
@@ -428,8 +428,8 @@ void TalkView::AddToTalk(string username, string message, user_type type, bool h
 		if (!IsGroupChat() || !BlabberSettings::Instance()->Tag("exclude-groupchat-sounds"))
 			SoundSystem::Instance()->PlayMessageSound();
 
-		_chat->Insert(_chat->TextLength(), username.c_str(), username.size(), &tra_thick_blue);
-		_chat->Insert(_chat->TextLength(), ": ", 2, &tra_thin_black);
+		fTimeline->Insert(fTimeline->TextLength(), username.c_str(), username.size(), &tra_thick_blue);
+		fTimeline->Insert(fTimeline->TextLength(), ": ", 2, &tra_thin_black);
 
 		// Highlight messages when they mention the nickname
 		if (highlight) {
@@ -438,19 +438,19 @@ void TalkView::AddToTalk(string username, string message, user_type type, bool h
 			GenerateHyperlinkText(message, tr_thin_black, &this_array);
 		}
 	} else if (type == LOCAL) {
-		_chat->Insert(_chat->TextLength(), username.c_str(), username.size(), &tra_thick_red);
-		_chat->Insert(_chat->TextLength(), ": ", 2, &tra_thin_black);
+		fTimeline->Insert(fTimeline->TextLength(), username.c_str(), username.size(), &tra_thick_red);
+		fTimeline->Insert(fTimeline->TextLength(), ": ", 2, &tra_thin_black);
 
 		GenerateHyperlinkText(message, tr_thin_black, &this_array);
 	} else { // SYSTEM messages
 		GenerateHyperlinkText(message, tr_thick_black, &this_array);
 	}
-	_chat->Insert(_chat->TextLength(), message.c_str(), message.size(), this_array);
+	fTimeline->Insert(fTimeline->TextLength(), message.c_str(), message.size(), this_array);
 	free(this_array);
 
-	_chat->Insert(_chat->TextLength(), "\n", 1, &tra_thin_black);
+	fTimeline->Insert(fTimeline->TextLength(), "\n", 1, &tra_thin_black);
 	if (type == LOCAL)
-		_chat->ScrollTo(0.0, _chat->Bounds().bottom);
+		fTimeline->ScrollTo(0.0, fTimeline->Bounds().bottom);
 }
 
 
@@ -791,13 +791,13 @@ void TalkView::RevealPreviousHistory() {
 		return;
 
 	if (_chat_index == -1)
-		_chat_buffer = _message->Text();
+		_chat_buffer = fMessageInput->Text();
 
 	// go back
 	++_chat_index;
 
 	// update text
-	_message->SetText(_chat_history[_chat_index].c_str());
+	fMessageInput->SetText(_chat_history[_chat_index].c_str());
 }
 
 
@@ -811,10 +811,10 @@ void TalkView::RevealNextHistory() {
 
 	// last buffer
 	if (_chat_index == -1) {
-		_message->SetText(_chat_buffer.c_str());
+		fMessageInput->SetText(_chat_buffer.c_str());
 	} else {
 		// update text
-		_message->SetText(_chat_history[_chat_index].c_str());
+		fMessageInput->SetText(_chat_history[_chat_index].c_str());
 	}
 }
 
