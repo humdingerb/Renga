@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Adrien Destugues <pulkomandy@pulkomandy.tk>
+ * Copyright 2019-2021 Adrien Destugues <pulkomandy@pulkomandy.tk>
  *
  * Distributed under terms of the MIT license.
  */
@@ -17,17 +17,22 @@
 
 #include "ui/HVIFUtil.h"
 
+
 BBitmap *BookmarkItem::_online_icon = NULL;
 BBitmap *BookmarkItem::_unknown_icon = NULL;
+
 
 BookmarkItem::BookmarkItem(const gloox::JID& userid, BString name)
 	: BStringItem(name)
 	, _userid(userid)
+	, fFlags(0)
 {
 }
 
+
 BookmarkItem::~BookmarkItem() {
 }
+
 
 void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) bool complete)
 {
@@ -42,7 +47,7 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 	BRect selectionFrame = frame;
 	selectionFrame.left = 0;
 	if (IsSelected()) {
-			owner->SetHighUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
+		owner->SetHighUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
 	} else {
 		owner->SetHighColor(owner->ViewColor());
 	}
@@ -67,12 +72,16 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 	if (name.IsEmpty())
 		name = _userid.full().c_str();
 
-	// TODO: set font color based on recent activity
 	if (IsSelected()) {
 		owner->SetHighUIColor(B_LIST_SELECTED_ITEM_TEXT_COLOR);
-	} else {
+		// When the room is active, we can clear the flags
+		fFlags = 0;
+	} else if (fFlags & NICKNAME_HIGHLIGHT)
+		owner->SetHighUIColor(B_FAILURE_COLOR);
+	else if (fFlags & ACTIVITY)
+		owner->SetHighUIColor(B_SUCCESS_COLOR);
+	else
 		owner->SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
-	}
 
 	// construct text positioning, keeping space for the icon on the left
 	font_height fh;
@@ -81,6 +90,7 @@ void BookmarkItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) b
 
 	owner->DrawString(name, BPoint(frame.left + height, frame.bottom - fh.descent));
 }
+
 
 void BookmarkItem::Update(BView *owner, const BFont *font)
 {
@@ -106,6 +116,7 @@ void BookmarkItem::Update(BView *owner, const BFont *font)
 		_unknown_icon = LoadIconFromResource("unknown", height);
 	}
 }
+
 
 const gloox::JID& BookmarkItem::GetUserID() const {
 	return _userid;

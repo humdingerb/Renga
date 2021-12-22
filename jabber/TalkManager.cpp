@@ -14,6 +14,7 @@
 
 #include <File.h>
 #include <FindDirectory.h>
+#include <Notification.h>
 #include <Path.h>
 #include <interface/Window.h>
 
@@ -456,10 +457,7 @@ TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 {
 	TalkView *window = NULL;
 
-	string group_username;
-
-	// clear out text
-	group_username = msg.from().resource();
+	string group_username = msg.from().resource();
 
 	window = fGroupMap.at(room);
 	// submit the chat
@@ -469,6 +467,26 @@ TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 		if (group_username.empty()) {
 			window->AddToTalk("System:", msg.body(), TalkView::OTHER);
 		} else {
+			// Highlight messages when they mention the nickname
+			// TODO also use metadata in the message that may indicate an highlight
+			if (BString(msg.body().c_str()).IFindFirst(room->nick().c_str()) != B_ERROR) {
+				// NOTE: This will erronously pop up for backlog messages aswell, can be improved
+				// once we have MAM
+				BNotification notification(B_INFORMATION_NOTIFICATION);
+				notification.SetGroup(room->name().c_str());
+				notification.SetTitle(group_username.c_str());
+				notification.SetContent(msg.body().c_str());
+				notification.Send();
+
+				BlabberMainWindow::Instance()->FlagBookmarkItem(msg.from().bare(),
+					BookmarkItem::NICKNAME_HIGHLIGHT);
+			} else {
+				BlabberMainWindow::Instance()->FlagBookmarkItem(msg.from().bare(),
+					BookmarkItem::ACTIVITY);
+			}
+
+			// TODO pass the flag to NewMessage too, so it doesn't need to re-detect the nickname
+			// highlight
 			window->NewMessage(group_username, msg.body());
 		}
 		window->UnlockLooper();
@@ -497,7 +515,7 @@ TalkManager::handleMUCSubject(gloox::MUCRoom *room,
 	window->LockLooper();
 	window->SetStatus(subject);
 	if (!nick.empty()) {
-		// Do it only for topic chnages (not for the initial topic setting)
+		// Do it only for topic changes (not for the initial topic setting)
 		window->AddToTalk(nick, topic.String(), TalkView::OTHER);
 	}
 	window->UnlockLooper();

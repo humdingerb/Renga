@@ -1058,6 +1058,26 @@ void BlabberMainWindow::SetCustomStatus(string status) {
 
 
 void
+BlabberMainWindow::FlagBookmarkItem(const gloox::JID& room, uint32 flags)
+{
+	int32 pos = _roster->FindBookmark(room);
+	if (pos < 0)
+		return;
+
+	auto* item = dynamic_cast<BookmarkItem*>(_roster->FullListItemAt(pos));
+	item->SetFlag(flags);
+
+	// Need to redo a FindItem because there is no FullListInvalidateItem, so we need to convert the
+	// FullList index returned by FindBookmark to a BListView index...
+	int32 listIndex = _roster->IndexOf(item);
+	// ... and this can fail if the item is in a collapsed part of the list
+	if (listIndex < 0)
+		return;
+	_roster->InvalidateItem(listIndex);
+}
+
+
+void
 BlabberMainWindow::AddTalkView(TalkView* view)
 {
 	if (view->Window() != this) {

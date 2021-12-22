@@ -15,6 +15,8 @@
 #include <TextControl.h>
 #include <Window.h>
 
+#include <gloox/instantmucroom.h>
+
 #include "ui/PictureView.h"
 
 #include "jabber/RosterView.h"
@@ -41,6 +43,7 @@ public:
 	void						ShowLogin();
 	void						SetCustomStatus(std::string status);
 
+	void						FlagBookmarkItem(const gloox::JID& room, uint32 flags);
 
 protected:
 								BlabberMainWindow(BRect frame);

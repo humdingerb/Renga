@@ -14,7 +14,6 @@
 #include <GroupLayout.h>
 #include <GroupView.h>
 #include <LayoutBuilder.h>
-#include <Notification.h>
 #include <Roster.h>
 #include <storage/Path.h>
 #include <SplitView.h>
@@ -434,12 +433,6 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 
 		// Highlight messages when they mention the nickname
 		if (messageString.IFindFirst(_group_username.c_str()) != B_ERROR) {
-			// NOTE: This will erronously pop up for backlog messages aswell, can be improved once we have MAM
-			BNotification notification(B_INFORMATION_NOTIFICATION);
-			notification.SetGroup(GetGroupRoom().c_str());
-			notification.SetTitle(username.c_str());
-			notification.SetContent(message.c_str());
-			notification.Send();
 			GenerateHyperlinkText(message, tr_thick_highlight, &this_array);
 		} else {
 			GenerateHyperlinkText(message, tr_thin_black, &this_array);
