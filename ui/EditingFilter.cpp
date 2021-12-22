@@ -42,7 +42,7 @@ filter_result EditingFilter::Filter(BMessage *message, __attribute__((unused)) B
 		return B_SKIP_MESSAGE;
 	} else {
 		BMessenger(_window).SendMessage(JAB_CHAT_SENT);
-		return B_DISPATCH_MESSAGE;
+		return B_SKIP_MESSAGE;
 	}
 }
 
