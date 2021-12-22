@@ -52,9 +52,9 @@ public:
 	void                 MessageReceived(BMessage *msg) override;
 
 	std::string          OurRepresentation();
-	void                 AddToTalk(std::string username, std::string message, user_type type);
+	void                 AddToTalk(std::string username, std::string message, user_type type, bool highlight = false);
 	void                 NewMessage(std::string new_message);
-	void                 NewMessage(std::string username, std::string new_message);
+	void                 NewMessage(std::string username, std::string new_message, bool highlight);
 
 	bool                 NewlinesAllowed();
 

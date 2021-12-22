@@ -467,6 +467,7 @@ TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 		if (group_username.empty()) {
 			window->AddToTalk("System:", msg.body(), TalkView::OTHER);
 		} else {
+			bool highlight;
 			// Highlight messages when they mention the nickname
 			// TODO also use metadata in the message that may indicate an highlight
 			if (BString(msg.body().c_str()).IFindFirst(room->nick().c_str()) != B_ERROR) {
@@ -480,14 +481,14 @@ TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 
 				BlabberMainWindow::Instance()->FlagBookmarkItem(msg.from().bare(),
 					BookmarkItem::NICKNAME_HIGHLIGHT);
+				highlight = true;
 			} else {
 				BlabberMainWindow::Instance()->FlagBookmarkItem(msg.from().bare(),
 					BookmarkItem::ACTIVITY);
+				highlight = false;
 			}
 
-			// TODO pass the flag to NewMessage too, so it doesn't need to re-detect the nickname
-			// highlight
-			window->NewMessage(group_username, msg.body());
+			window->NewMessage(group_username, msg.body(), highlight);
 		}
 		window->UnlockLooper();
 	}

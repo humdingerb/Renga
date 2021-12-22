@@ -338,7 +338,7 @@ string TalkView::OurRepresentation() {
 }
 
 
-void TalkView::AddToTalk(string username, string message, user_type type) {
+void TalkView::AddToTalk(string username, string message, user_type type, bool highlight) {
 	// transform local identity
 	if (IsGroupChat() && type == LOCAL)
 		username = _group_username;
@@ -374,7 +374,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	rgb_color orange = {205, 113, 57, 255};
 	rgb_color message_color  = ui_color(B_PANEL_TEXT_COLOR);
 	rgb_color bg_color = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color highlight = mix_color(message_color, orange, 200);
+	rgb_color highlight_color = mix_color(message_color, orange, 200);
 
 	// TODO figure out a goood threshold here, this seems to work for me,
 	// but it may not for others
@@ -388,7 +388,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 	text_run tr_thick_blue  = {0, thick, blue};
 	text_run tr_thick_red   = {0, thick, red};
 	text_run tr_thick_black = {0, thick, message_color};
-	text_run tr_thick_highlight = {0, thick, highlight};
+	text_run tr_thick_highlight = {0, thick, highlight_color};
 	text_run tr_thin_black  = {0, thin, message_color};
 
 	// some run array to play with (simple)
@@ -432,7 +432,7 @@ void TalkView::AddToTalk(string username, string message, user_type type) {
 		_chat->Insert(_chat->TextLength(), ": ", 2, &tra_thin_black);
 
 		// Highlight messages when they mention the nickname
-		if (messageString.IFindFirst(_group_username.c_str()) != B_ERROR) {
+		if (highlight) {
 			GenerateHyperlinkText(message, tr_thick_highlight, &this_array);
 		} else {
 			GenerateHyperlinkText(message, tr_thin_black, &this_array);
@@ -468,11 +468,11 @@ void TalkView::NewMessage(string new_message) {
 }
 
 
-void TalkView::NewMessage(string username, string new_message) {
+void TalkView::NewMessage(string username, string new_message, bool highlight) {
 	if (username == _group_username)
-		AddToTalk(username.c_str(), new_message, LOCAL);
+		AddToTalk(username.c_str(), new_message, LOCAL, highlight);
 	else
-		AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT);
+		AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT, highlight);
 }
 
 
