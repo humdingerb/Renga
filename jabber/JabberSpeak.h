@@ -116,8 +116,6 @@ private:
 
 	// INCOMING COMMUNICATION
 	void                    _ParseAgentList(XMLEntity *iq_agent_entity);
-	void                    _AcceptPresence(string username);
-	void                    _RejectPresence(string username);
 	
 	// pointer to the singleton
 	BlabberSettings        *_blabber_settings;

@@ -10,6 +10,7 @@
 #include "JRoster.h"
 #include "Messages.h"
 #include "MessageRepeater.h"
+#include "ui/ModalAlertFactory.h"
 
 JRoster *JRoster::_instance = NULL;
 
@@ -303,30 +304,27 @@ JRoster::handleSelfPresence(const gloox::RosterItem&, const string& resource, gl
 
 
 bool
-JRoster::handleSubscriptionRequest(const gloox::JID&, const string&)
+JRoster::handleSubscriptionRequest(const gloox::JID& JID, const string& reason)
 {
-	printf("%s\n", __PRETTY_FUNCTION__);
-#if 0
-		sprintf(buffer, "%s would like to subscribe to your presence so they may know if you're online or not.  Would you like to allow it?", asker);
+	char buffer[4096];
+	if (reason.empty())
+		sprintf(buffer, "%s would like to subscribe to your presence so they may know if you're online or not.  Would you like to allow it?", JID.bare().c_str());
+	else
+		sprintf(buffer, "%s would like to subscribe to your presence so they may know if you're online or not.  Would you like to allow it?\n They write:\n%s", JID.bare().c_str(), reason.c_str());
 
-		// query for presence authorization (for users)
-		int32 answer = 0;
-				
-		if (user->IsUser()) {
-			answer = ModalAlertFactory::Alert(buffer, "No, I prefer privacy.", "Yes, grant them my presence!");
-		} else if (user->UserType() == UserID::TRANSPORT) {
-			answer = 1;
-		}
+	gloox::Client* client = JabberSpeak::Instance()->GlooxClient();
+	// query for presence authorization (for users)
+	int32 answer = 0;
+	answer = ModalAlertFactory::Alert(buffer, "No, I prefer privacy.", "Yes, grant them my presence!");
 
-		// send back the response
-		if (answer == 1) {
-			// presence is granted
-			_AcceptPresence(entity->Attribute("from"));
-		} else if (answer == 0) {
-			// presence is denied
-			_RejectPresence(entity->Attribute("from"));
-		}
-#endif
+	// send back the response
+	if (answer == 1) {
+		gloox::Subscription subscription(gloox::Subscription::Subscribed, JID);
+		client->send(subscription);
+		return true;
+	}
+	gloox::Subscription subscription(gloox::Subscription::Unsubscribed, JID);
+	client->send(subscription);
 	return false;
 }
 

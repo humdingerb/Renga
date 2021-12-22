@@ -266,16 +266,6 @@ void JabberSpeak::_ParseAgentList(XMLEntity *iq_agent_entity) {
 	_am_logged_in = true;
 }
 
-void JabberSpeak::_AcceptPresence(string username) {
-	gloox::Subscription subscription(gloox::Subscription::Subscribed, gloox::JID(username));
-	fClient->send(subscription);
-}
-
-void JabberSpeak::_RejectPresence(string username) {
-	gloox::Subscription subscription(gloox::Subscription::Unsubscribed, gloox::JID(username));
-	fClient->send(subscription);
-}
-
 //////////////////////////////////////////////////
 // OUTGOING COMMUNICATION
 //////////////////////////////////////////////////
