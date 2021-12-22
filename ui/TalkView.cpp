@@ -360,6 +360,12 @@ void TalkView::AddToTalk(string username, string message, user_type type, bool h
 	if (message.empty())
 		return;
 
+	// Figure out if the view is scrolled down before modifying it
+	BRect bounds = fTimeline->Bounds();
+	BRect textRect = fTimeline->TextRect();
+	bool scrolledDown = bounds.bottom == -1 ||
+		(bounds.bottom > textRect.bottom && bounds.top < textRect.bottom);
+
 	// prune trailing whitespace
 	while (!message.empty() && isspace(message[message.size() - 1]))
 		message.erase(message.size() - 1);
@@ -418,8 +424,9 @@ void TalkView::AddToTalk(string username, string message, user_type type, bool h
 			fTimeline->Insert(fTimeline->TextLength(), messageString, messageString.Length(), &tra_thick_red);
 
 		fTimeline->Insert(fTimeline->TextLength(), "\n", 1, &tra_thin_black);
-		if (type == LOCAL)
+		if (scrolledDown)
 			fTimeline->ScrollTo(0.0, fTimeline->Bounds().bottom);
+
 		return;
 	}
 
@@ -448,8 +455,9 @@ void TalkView::AddToTalk(string username, string message, user_type type, bool h
 	fTimeline->Insert(fTimeline->TextLength(), message.c_str(), message.size(), this_array);
 	free(this_array);
 
+
 	fTimeline->Insert(fTimeline->TextLength(), "\n", 1, &tra_thin_black);
-	if (type == LOCAL)
+	if (scrolledDown)
 		fTimeline->ScrollTo(0.0, fTimeline->Bounds().bottom);
 }
 
