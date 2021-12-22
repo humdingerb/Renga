@@ -39,36 +39,41 @@ using this client as natural as any other you're used to.
 As such, let's look at Renga!
 
 <a NAME="logging">
-<font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Logging In</h1></u></b></font>
-<center><font SIZE=-2><a HREF="#top">top</a></font></center>
+<h1 ALIGN=CENTER>Logging In</h1>
+<a href="#top">top</a>
 
-<p>When you first run Renga, you will be presented with a window like this:
+<p>When you first run Renga, you will be presented with a window like this:</p>
 
-<p ALIGN=CENTER><img SRC="login-pane.png">
+<div ALIGN=CENTER><img SRC="login-pane.png"></div>
 
 <p>If you've used XMPP in the past then this should look familiar to you.  Just
 enter the login information you've always used.  If you haven't seen the nickname field
 before, this is used as a friendly name only for yourself in chat windows.  Nobody else will see this
-information so it's not critical.  As an expert, you'll probably want to check the Auto-login box as well.
+information so it's not critical.  As an expert, you'll probably want to check the Auto-login box as well.</p>
 
-<p>If you're new to XMPP, this is an important step in getting online.  You'll want
-to decide on your official username!  Here is what all the fields mean:
+<p>If you're new to XMPP, you need to create an account. This is an important step in getting online.
+You'll want to decide on your official username! Here is what all the fields mean:</p>
 
 <ul>
-	<li><b>Nickname:</b> This is a friendly name for yourself.  It'll only be used in your chat windows and no one else will see it, so feel free to change it to fit your mood.
-	<li><b>Username:</b> This is the username you will be officially referred to with. 
-	<li><b>Password:</b> Your password.
-	<li><b>Create This Account:</b> If this is a new account for you, check this box and the account will be created (if possible) before you log in.  In the future, when you login with the same username, you want to keep this box unchecked.
-	<li><b>Auto-login:</b> This is a handy option if you just want Renga to log you in with your last entered username/password automatically.  It's quicker than entering in your information all the time, but also less secure.  If you're on a single-user machine, this is a recommended option.
+	<li><b>Nickname:</b> This is a friendly name for yourself. Other people will see it, and you can change it each time you connect.</li>
+	<li><b>Username:</b> This is the username you will be officially referred to with. You cannot change this once you picked one.</li>
+	<li><b>Password:</b> Your password.</li>
+	<li><b>Auto-login:</b> This is a handy option if you just want Renga to log you in with your
+		last entered username/password automatically.  It's quicker than entering in your
+		information all the time, but also less secure.  If you're on a single-user machine, this
+		is a recommended option.</li>
 </ul>
 
-<p>There are also some rules you should know about how Auto-login works in specific situations.  Here they are:
+<p>To create your account, use the "Create an account" button and follow the instructions. You will
+need to pick a server to host your account, or you can let Renga select one for you.</p>
+
+<p>There are also some rules you should know about how Auto-login works in specific situations.  Here they are:</p>
 
 <ul>
-	<li><b>Normal login:</b> In the "normal" situation, running Renga will cause the login process to initiate for the last username/password you tried logging in with.
-	<li><b>Failed login:</b> If Auto-login fails to log you in because your last username/password is, or is no longer, valid then the login screen will appear and allow you to correct any mistakes.
-	<li><b>Multiple logins:</b> If you already have another instance of Renga running on the machine, Auto-login will not run for that second instance.  The reason is that logging you in with the same name as the one already running will cause the first to disconnect.  Not convenient! 
-	<li><b>Change login:</b> If you use Auto-login, but you want to change your username and log in under another address (stalkers again?), simply logout by selecting "Log Off" from the File menu. 
+	<li><b>Normal login:</b> In the "normal" situation, running Renga will cause the login process to initiate for the last username/password you tried logging in with.</li>
+	<li><b>Failed login:</b> If Auto-login fails to log you in because your last username/password is, or is no longer, valid then the login screen will appear and allow you to correct any mistakes.</li>
+	<li><b>Multiple logins:</b> If you already have another instance of Renga running on the machine, Auto-login will not run for that second instance. Having two copies of the application running for the same account on the same machine would just be confusing.</li>
+	<li><b>Change login:</b> If you use Auto-login, but you want to change your username and log in under another address (stalkers again?), simply logout by selecting "Log Off" from the File menu. </li>
 </ul>
 
 <a NAME="im">
@@ -77,9 +82,9 @@ to decide on your official username!  Here is what all the fields mean:
 
 <p>Congratulations, you're logged in!  Your login window has now transformed and looks like:
 
-<p ALIGN=CENTER><img SRC="logged-in.png" HSPACE=5><img SRC="logged-in-with-friends.png">
+<p ALIGN=CENTER><img SRC="logged-in-with-friends.png"></p>
 
-<p>This is your buddy list, or "roster" as the XMPP group likes to call it.  This is where you'll see your friends and family, their online status and more.  If you just created your account, it will appear empty.  So let's fill it up!
+<p>On the left is your buddy list, or "roster" as the XMPP group likes to call it.  This is where you'll see your friends and family, their online status and more.  If you just created your account, it will appear empty.  So let's fill it up!
 
 <p>There are two basic concepts when dealing with this list: <i>roster</i> and <i>presence</i>.  While many external chat systems
 treat these concepts as one entity, XMPP keeps them separate.  What you need to rememeber is that even if you add a friend to your list (<i>roster</i>), you don't automatically begin seeing their online status (<i>presence</i>). You need to ask for it.
@@ -105,56 +110,17 @@ Next, you want to add a nickname, a casual name that tends to be less cryptic th
 If you've gotten acceptance, you've probably already noticed that the user is now either in the online or offline list and their color is green (dark or light) or red.  Bet you can't guess what this means? ;-)
 Right!  The greens are for online, red is for offline.  The <b><font COLOR=005500>darker shade of green</font></b> means the user is online, but is either away from their computer or does not want to be distrubed. <b><font COLOR=00CC00>The lighter shade of green</font></b> signifies their open for chat. Usually, after being granted presence, the user is online because, well, how else could they have accepted your presence?
 
-<p>Great!  So the user is online.  Now what?  You want to chat is what!  Isn't that why you downloaded this program? :-)  There are two options for chatting:
+<p>Great!  So the user is online.  Now what?  You want to chat is what!  Isn't that why you downloaded this program? :-)</p>
 
-<ul>
-	<li><b>Message-based or ICQ-style chat:</b> ICQ users will be familiar with this, and frankly no one else.  Message-based chat lets you send a single message and then your window will go away.  It's quick, it's easy and it can be annoying for the receiving user. :-)  ICQ users should also note one difference in implementation: XMPP will queue multiple, unanswered messages in the same window alleviating the pain of a billion windows to read through and answer separately! The ICQ-style of messages can be handy for quick messages that require no, or little response.  They can be handy because the window goes away when you respond to one.
-	<li><b>Scrolling chat or AOL-style chat:</b> This is what most users are familiar with as it's used by AOL, and uncommonly ICQ. It's a one-on-one chat, you and one other user, with messages scrolling on the top of the window and an area below to enter your next message.  This is the most pleasant way to communicate long conversations.
-</ul>
+<p>The chatting happens on the right part of the main window. At the bottom is a text input where you can send your messages. Above that is a list of previous messages for the current conversation. To chat with different people, simple select them on the left panel.</p>
 
-<p>While the messaging and chat paradigms are different, the window will look mostly the same:
-
-<p ALIGN=CENTER><img SRC="chat-screen.png">
-
-<p>Make sure you understand that little note on the lower left.  When newlines are allowed, simply hitting <b>Enter</b> inserts a raw newline into your message, otherwise it sends the message. <b>Command-Enter</b> always performs the opposite operation.
+<p>If you want to send a long message with multiple lines, remember to use <b>Command-Enter</b> to insert a newline (since pressing <b>Enter</b> will send the current message to the other user). If you are not happy with that, you can exchange the two in the preferences window.</p>
 
 <a NAME="chatfeatures">
 <font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Chat Features</h1></u></b></font>
 <center><font SIZE=-2><a HREF="#top">top</a></font></center>
 
-
-<p>There are several fun chat features available in Renga.  The first you might notice are <i>Canned Quips</i>.  These are pre-generated messages that you define.  You usually want to type phrases and exclamations you say a lot.  As an example, these are my usual quips:
-
-<ul>
-	<li>For more information about Rapture In Venice, go to http://www.users.uswest.net/~jblanco.
-	<li>Sup.
-	<li>What's that?  You say Renga still hasn't crashed yet?  Not surprising.
-	<li>blue screen of death
-</ul>
-
-<p>I've included four messages, but you can use up to nine.  Each message is associated with a <b>Command-number</b> key, so <i>"Message #4"</i> is triggered with <b>Command-4</b>. So easy. :-)
-You can edit your canned quips in the preferences panel under the <i>"Messaging"</i> tab.
-
-<p>You'll notice that next to each message there is a checkbox as seen below:
-
-<p ALIGN=CENTER><img SRC="preferences-panel.png">
-
-<p>This is the <i>quick-fire</i> option and it affects how messages are included in your chat session:
-
-<ul>
-	<li><b>When checked:</b> This means the message will be <i>"quick-fired."</i>  Basically, when you hit the hotkey the message will be sent with no regard to what you already have in your outgoing message box.  It's great for when you need to send the same message many times but don't want to cut-and-paste your current message to send it.
-	<li><b>When unchecked:</b> This means the message will be pasted in your outgoing message box wherever your cursor currently is.
-</ul>
-
-<p>As an example, I'm always having to tell people where my website is (whether they ask or not...heh heh)!  I've set up my first message for quick-fire. So, if I'm in the middle of a sentence and I see the need to send the information out immediately, Command-1 sends it.  Notice how my current message is unaffected:
-
-<p ALIGN=CENTER><img SRC="quick-fired-message.png"><br><font SIZE=-2>- I've just pressed <b>Command-1</b> -</font>
-
-<p>On the other hand, my fourth quip, "blue screen of death," is not a standalone message.  The problem is I always have to type this phrase when explaining to strangers how much better <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS is than Windows!  Seeing that I've had carpal-tunnel problems in the past typing this exact phrase thousands of times a day, I did't make it a quick-fire and instead include it in messages that are part of larger sentences as shown:
-
-<p ALIGN=CENTER><img SRC="non-quick-fired-message.png"><br><font SIZE=-2>- I've just pressed <b>Command-4</b> -</font>
-
-<p>Renga also supports what's known as <i>"/me syntax"</i>.  This is when you want to type a message but want to make it as part of an action.  It's almost always used for humorous purposes. Here's an example:
+<p>Renga supports what's known as <i>"/me syntax"</i>.  This is when you want to type a message but want to make it as part of an action.  It's almost always used for humorous purposes. Here's an example:
 
 <p ALIGN=CENTER><img SRC="me-syntax.png"><br><font SIZE=-2>- Note how /me makes my message an action -</font>
 
@@ -162,18 +128,9 @@ You can edit your canned quips in the preferences panel under the <i>"Messaging"
 
 	<ul><tt>/me <i>your action</i></tt></ul>
 	
-<p>Here's exactly how I generated the previous example:	
+<p>Here's exactly how I generated the previous example:
 
-	<ul><tt>/me is saddened by your remark. :(</tt></ul>
-
-<p>In addition to <i>"/me syntax"</i>, Renga supports other IRC-like and not so IRC-like <i>"slash"</i> commands:
-
-<ul>
-	<li><b>/me message</b> - As stated above, instead of sending a message you convey an action you are fictionally or non-fictionally performing.
-	<li><b>/alert message</b> - When you have an urgent need to get your recipient's attention, precede your usual message with /alert and the window will be activated on the receiver's side as well as a sound played.
-</ul>
-
-<p>For some, <b>/alert</b> can be annoying as it can easily be abused.  This feature can be turned off in the <i>"Chat Rules"</i> section of the preferences panel.
+	<ul><tt>/me does a barrel roll</tt></ul>
 
 <p>A feature that is new with Jabber for <font COLOR=RED>B</font><font COLOR=BLUE>e</font>OS v1.2 is chat history.  In any chat window, hold down the Command key and use the up and down arrows to scroll through the history of your last 50 messages.  This is handy when your buddy misses a message or you just want to accentuate it! ;-)
 
@@ -215,24 +172,20 @@ You can edit your canned quips in the preferences panel under the <i>"Messaging"
 </ul>
 
 <a NAME="transports">
-<font FACE="Courier New"><b><u><h1 ALIGN=CENTER>XMPP Transports: Gateways to External Chat Systems</h1></u></b></font>
-<center><font SIZE=-2><a HREF="#top">top</a></font></center>
+<h1 ALIGN=CENTER>XMPP Transports: Gateways to External Chat Systems</h1>
+<a HREF="#top">top</a>
 
-<p>If XMPP was just another new chat system, then everyone would just be a little more ill. :-)  But, in fact, XMPP is not.  While it does support it's own network of users who can communicate with each other along with other things like sending files, XMPP allows it's users to talk directly with users of other chat clients!  A little discussion about how it's done is in order.	
+<p>If XMPP was just another new chat system, then everyone would just be a little more ill. :-)
+But, in fact, XMPP is not.  While it does support it's own network of users who can communicate
+with each other along with other things like sending files, XMPP allows it's users to talk directly
+with users of other chat clients!  A little discussion about how it's done is in order.</p>
 
-<p>If you're familiar with other <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS apps such as GimICQ and BeAIM, you know that getting unofficial chat clients for popular chat systems is not a new thing.  Anything on the Internet is hackable, so there's no reason to believe AOL and ICQ have secured their networks better than any hackable e-commerce system.
-Well, these unofficial clients are just that -- clients.  GimICQ only lets you talk to other ICQ users, BeAIM the same with AOL users.  However, XMPP lets you talk to both of these systems and more!
-
-<p>As with GimICQ and BeAIM, the idea is that you have a login to the external system already.  What you do is <i>register</i> your login information with the XMPP transport that's responsible for talking with that system.  Once complete, you can chat with AOL users just as easily as you can with XMPP users themselves.
-
-<p>When you've registered with a transport, Renga has now become just like a login to another chat service.  If you registered as "BeMan" under AOL, then anyone on AOL, or XMPP, who sends a message to your AOL address will reach you on your Renga client.  Basically, you are using one client with one main login (your Jabber ID) and extra virtual logins (your AOL, etc... logins).  Everything is completely transparent from now on.
-
-<p>Lets try it.  Go to your preferences panel and click the <i>"Transports"</i> tab.  Let's pretend you want to register with the AOL transport (Feel free to go ahead and register with whichever transport you'd like to right now).
-Assuming your username and password is <i>"BjorkLover"</i> and <i>"fulloflove"</i>, select the AOL transport and enter the information in as above:
-
-<p ALIGN=CENTER><img SRC="aol-registering.png">
-
-<p>Hit "Register".
+<p>If you're familiar with other <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS apps such as
+GimICQ and BeAIM, you know that getting unofficial chat clients for popular chat systems is not a
+new thing.  Anything on the Internet is hackable, so there's no reason to believe AOL and ICQ have
+secured their networks better than any hackable e-commerce system.
+Well, these unofficial clients are just that -- clients.  GimICQ only lets you talk to other ICQ
+users, BeAIM the same with AOL users.  However, XMPP lets you talk to both of these systems and more!</p>
 
 <p>Here's where I have to give my disclaimers.  You may remember the very public chat wars that went on between AOL Instant Messenger and MSN Messenger a while back.  Basically, Microsoft was trying to hack the AOL chat protocol so that MSN Messenger users could talk to AOL users and vice-versa.  AOL would have none of it and in what was a hilarious coding war, the cycle began:
 
@@ -255,24 +208,22 @@ if a transport doesn't work with Renga, it's probabably not the client's fault. 
 
 <p>Given a happy world where all transports work, you'll also want to add these external users to your roster.  This is done the same as when adding XMPP users, except you want to change the menu to reflect what chat system they're using.  Notice that the instructions on the "Add New Buddy" screen will change as you flip through the systems.
 
+<p>The most common use of these bridging technologies is to access IRC discussion channels. Since
+the IRC protocol does not change a lot, this seems to work better than bridging with other places.</p>
+
+<p>To access an IRC channel, you need to mangle its name a bit. For example to join the #haiku
+channel on irc.oftc.net you would use the address #haiku%irc.oftc.net@irc.jabberfr.org. Once joined,
+this works like any other XMPP group chat.</p>
+
 <a NAME="further">
 <font FACE="Courier New"><b><u><h1 ALIGN=CENTER>Further Exploration</h1></u></b></font>
 <center><font SIZE=-2><a HREF="#top">top</a></font></center>
 
 <p>There are several other features that XMPP offers, as well as many nuances that are specific to Renga.  The big one being changing your own online status.  But I'll leave these all for you to explore! :-)  If it's not easy enough to figure out on your own, then Rapture In Venice has failed you as a developer.  So be confident!
 
-<p>If you're a registered user, feel free to ask me for help.  Rapture In Venice's contact information can be found below, but since this is a chat client the most fun way to get in touch is through XMPP!  As I said before, my Jabber ID is rapture@jabber.org.  I hope this user manual is a friendly springboard to the world of XMPP and Renga.  Have fun!
+<p>If you run into problems (or just want to say hi), you can find the Renga developers on our XMPP chat room renga@chat.jabberfr.org.</p>
 
-<a NAME="cause">
-<font FACE="Courier New"><b><u><h1 ALIGN=CENTER>The Rapture In Venice Cause</h1></u></b></font>
-<center><font SIZE=-2><a HREF="#top">top</a></font></center>
-
-<p>Rapture In Venice was born to help <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS become the #1 desktop OS on the consumer market.  A lofty goal, but Be, Inc. started it. :-)  As such, Rapture In Venice needs your support.  If we're going to be able to create top quality applications that help bolster the existing <font COLOR=BLUE>B</font><font COLOR=RED>e</font>OS library, we need you to support us back.
-Below is how you can get in contact with Rapture In Venice with question, tips, business proposals and whatever else you may need.  As always, thank you for choosing Rapture In Venice.
-
-<ul>
-<p>Rapture In Venice<br>2663 S. Moore Dr. #B<br>Lakewood CO 80227<br>(720) 962-0898<br><a HREF="mailto:jblanco@uswest.net">jblanco@uswest.net</a><br><a HREF="http://www.users.uswest.net/~jblanco">http://www.users.uswest.net/~jblanco</a>
-</ul>
+<p>I hope this user manual is a friendly springboard to the world of XMPP and Renga.  Have fun!
 
 </body>
 
