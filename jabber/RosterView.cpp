@@ -282,7 +282,7 @@ static int compareStrings(const char* a, const char* b)
 }
 
 
-int32 CompareBookmarks(const BListItem* first, const BListItem* second) {
+int CompareBookmarks(const BListItem* first, const BListItem* second) {
 	gloox::JID firstBookmark = dynamic_cast<const BookmarkItem*>(first)->GetUserID();
 	gloox::JID secondBookmark = dynamic_cast<const BookmarkItem*>(second)->GetUserID();
 	return compareStrings(firstBookmark.full().c_str(), secondBookmark.full().c_str());
