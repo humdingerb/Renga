@@ -289,7 +289,7 @@ JRoster::handleRosterPresence(const gloox::RosterItem& item,
 	Unlock();
 
 	// update all RosterViews
-	RefreshRoster();				
+	RefreshRoster();
 }
 
 
@@ -306,16 +306,23 @@ JRoster::handleSelfPresence(const gloox::RosterItem&, const string& resource, gl
 bool
 JRoster::handleSubscriptionRequest(const gloox::JID& JID, const string& reason)
 {
-	char buffer[4096];
+	BString message;
 	if (reason.empty())
-		sprintf(buffer, "%s would like to subscribe to your presence so they may know if you're online or not.  Would you like to allow it?", JID.bare().c_str());
+		message.SetToFormat("%s would like to subscribe to your presence so they may know if "
+			"you're online or not. Would you like to allow it?", JID.bare().c_str());
 	else
-		sprintf(buffer, "%s would like to subscribe to your presence so they may know if you're online or not.  Would you like to allow it?\n They write:\n%s", JID.bare().c_str(), reason.c_str());
+		message.SetToFormat("%s would like to subscribe to your presence so they may know if "
+			"you're online or not. Would you like to allow it?\nThey write:\n%s",
+			JID.bare().c_str(), reason.c_str());
 
 	gloox::Client* client = JabberSpeak::Instance()->GlooxClient();
 	// query for presence authorization (for users)
 	int32 answer = 0;
-	answer = ModalAlertFactory::Alert(buffer, "No, I prefer privacy.", "Yes, grant them my presence!");
+	// TODO this uses a synchrnous alert so the gloox thread will be blocked (no other message can
+	// be sent or received) until the alert is answered by the user. Instead we should use
+	// asynchronous mode
+	answer = ModalAlertFactory::Alert(message.String(), "No, I prefer privacy.",
+		"Yes, grant them my presence!");
 
 	// send back the response
 	if (answer == 1) {

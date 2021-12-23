@@ -45,14 +45,25 @@ struct ServerInfo {
 
 static const ServerInfo kServerInfos[] = {
 	// TODO find more servers that work, try to cover more countries
-	{ "jabber.otr.im", "CA" },
+	// { "jabber.at", "AT" }, Web registration only (also for jabber.zone)
+	// { "chinwag.im", "AU" }, Web registration only (also for jabberzac.org)
+	{ "rows.im", "CA" },
+	{ "stefgo.net", "CH" },
 	{ "jabber.cz", "CZ" },
 	{ "jabber.de", "DE" },
-	{ "jabberes.org", "ES" },
+	// { "jabberes.org", "ES" }, no registrations
+	{ "a3.pm", "FI" },
 	{ "jabber.fr", "FR" },
+	// { "616.pub", "HK" },
 	{ "step.im", "JP" },
+	// { "eigenlab.org", "LV" },
 	{ "4ept.net", "NL" },
-	{ "creep.im", "RU" },
+	// { "jabber.sytes24.pl", "PL" },
+	// { "xmpp.is", "RO" },
+	{ "lsd-25.ru", "RU" },
+	{ "xmpp.international", "SC" },
+	// { "default.rs", "SR" },
+	// { "jix.im", "UK" }, Web registrations only
 	{ "jabber.today", "US" },
 };
 
@@ -68,6 +79,7 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	// a registration.
 
 	// Card 0 - Agree to be geolocalized
+	// TODO remove this, instead pick a server matching the system locale/language settings
 	BGroupView* card0 = new BGroupView(B_VERTICAL);
 	AddChild(card0);
 	BTextView* agree = new BTextView("agree");
