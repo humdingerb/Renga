@@ -476,14 +476,6 @@ void TalkView::NewMessage(string new_message) {
 }
 
 
-void TalkView::NewMessage(string username, string new_message, bool highlight) {
-	if (username == _group_username)
-		AddToTalk(username.c_str(), new_message, LOCAL, highlight);
-	else
-		AddToTalk(username.c_str(), new_message, MAIN_RECIPIENT, highlight);
-}
-
-
 const gloox::JID& TalkView::GetUserID() {
 	if (_session == NULL)
 		debugger("Getting user ID not possible for group chat");

@@ -488,7 +488,11 @@ TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 				highlight = false;
 			}
 
-			window->NewMessage(group_username, msg.body(), highlight);
+			// TODO: compare with JID instead?
+			if (group_username == window->GetGroupUsername())
+				window->AddToTalk(group_username, msg.body(), TalkView::LOCAL, highlight);
+			else
+				window->AddToTalk(group_username, msg.body(), TalkView::MAIN_RECIPIENT, highlight);
 		}
 		window->UnlockLooper();
 	}
