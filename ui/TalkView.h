@@ -53,7 +53,6 @@ public:
 
 	std::string          OurRepresentation();
 	void                 AddToTalk(std::string username, std::string message, user_type type, bool highlight = false);
-	void                 NewMessage(std::string new_message);
 
 	bool                 NewlinesAllowed();
 

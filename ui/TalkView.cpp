@@ -291,14 +291,13 @@ void TalkView::MessageReceived(BMessage *msg) {
 				// we go through main app?
 				gloox::MUCRoom* room = (gloox::MUCRoom*)TalkManager::Instance()
 					->IsExistingWindowToGroup(GetGroupRoom());
-					room->send(fMessageInput->Text());
-			} else
-				_session->send(fMessageInput->Text());
+					room->send(message);
+			} else {
+				_session->send(message);
+				AddToTalk(OurRepresentation(), message, LOCAL);
+			}
 
-			// user part
-			NewMessage(message);
-
-			// GUI
+			// Reset message input box
 			fMessageInput->ScrollToOffset(0);
 			fMessageInput->SetText("");
 			fMessageInput->MakeFocus(true);
@@ -319,8 +318,13 @@ void TalkView::MessageReceived(BMessage *msg) {
 
 		case kIncomingMessage:
 		{
-			AddToTalk(OurRepresentation().c_str(), msg->FindString("content"),
-				LOCAL);
+			gloox::RosterManager* rm = JabberSpeak::Instance()->GlooxClient()->rosterManager();
+			gloox::RosterItem* item = rm->getRosterItem(_session->target());
+			if (item && !item->name().empty()) {
+				AddToTalk(item->name().c_str(), msg->FindString("content"), MAIN_RECIPIENT);
+			} else {
+				AddToTalk(_session->target().bare().c_str(), msg->FindString("content"), MAIN_RECIPIENT);
+			}
 		}
 	}
 }
@@ -459,20 +463,6 @@ void TalkView::AddToTalk(string username, string message, user_type type, bool h
 	fTimeline->Insert(fTimeline->TextLength(), "\n", 1, &tra_thin_black);
 	if (scrolledDown)
 		fTimeline->ScrollTo(0.0, fTimeline->Bounds().bottom);
-}
-
-
-void TalkView::NewMessage(string new_message) {
-	if (IsGroupChat())
-		return;
-
-	gloox::RosterManager* rm = JabberSpeak::Instance()->GlooxClient()->rosterManager();
-	gloox::RosterItem* item = rm->getRosterItem(_session->target());
-	if (item && !item->name().empty()) {
-		AddToTalk(item->name().c_str(), new_message, LOCAL);
-	} else {
-		AddToTalk(_session->target().bare().c_str(), new_message, LOCAL);
-	}
 }
 
 
