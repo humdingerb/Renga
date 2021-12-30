@@ -519,10 +519,7 @@ TalkManager::handleMUCSubject(gloox::MUCRoom *room,
 	// FIXME just send a BMessage to the view and let it handle this
 	window->LockLooper();
 	window->SetStatus(subject);
-	if (!nick.empty()) {
-		// Do it only for topic changes (not for the initial topic setting)
-		window->AddToTalk(nick, topic.String(), TalkView::OTHER);
-	}
+	window->AddToTalk(nick, topic.String(), TalkView::OTHER);
 	window->UnlockLooper();
 }
 
