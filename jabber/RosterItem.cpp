@@ -22,14 +22,6 @@ RosterItem::RosterItem(const UserID *userid)
 {
 	_userid           = userid;
 	_is_stale_pointer = false;
-
-	// intitialize static members
-	if (_offline_icon == NULL) {
-		_kinda_online_icon = LoadIconFromResource("away-online");
-		_online_icon = LoadIconFromResource("online");
-		_offline_icon = LoadIconFromResource("offline");
-		_unknown_icon = LoadIconFromResource("unknown");
-	}
 }
 
 
@@ -50,6 +42,21 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 	// protection
 	if (StalePointer()) {
 		return;
+	}
+
+	font_height fh;
+	owner->GetFontHeight(&fh);
+
+	float iconSize = fh.ascent + fh.descent;
+	iconSize = floorf(fh.ascent + fh.descent);
+
+	// intitialize static members
+	if (_offline_icon == NULL) {
+		iconSize = iconSize * 16 / 11;
+		_kinda_online_icon = LoadIconFromResource("away-online", iconSize);
+		_online_icon = LoadIconFromResource("online", iconSize);
+		_offline_icon = LoadIconFromResource("offline", iconSize);
+		_unknown_icon = LoadIconFromResource("unknown", iconSize);
 	}
 
 	// get online status
@@ -75,7 +82,7 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 	owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 
 	int height = frame.bottom - frame.top;
-	frame.left = height - 4; // have the status badge right over the edge of the avatar
+	frame.left = height - (iconSize / 2); // have the status badge right over the edge of the avatar
 	if (fAvatar) {
 		owner->DrawBitmapAsync(fAvatar, fAvatar->Bounds(),
 			BRect(0, frame.top, height - 1, frame.bottom - 1), B_FILTER_BITMAP_BILINEAR);
@@ -139,17 +146,17 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 		owner->SetHighColor(0, 0, 255, 255); //blue
 	}
 
-	// construct text positioning
-	font_height fh;
-	owner->GetFontHeight(&fh);
-
 	// draw name
-	BPoint textPosition(frame.left + 13, frame.top + fh.ascent + 1);
+	BPoint textPosition(frame.left + iconSize, frame.top + fh.ascent + 1);
 	owner->DrawString(name.c_str(), textPosition);
 
 	// draw show
 	if (!GetUserID()->MoreExactOnlineStatus().empty()) {
-		owner->SetHighColor(0, 0, 0, 255);
+		if (IsSelected()) {
+			owner->SetHighUIColor(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+		} else {
+			owner->SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
+		}
 		textPosition.y += frame.Height() / 2;
 
 		owner->DrawString(GetUserID()->MoreExactOnlineStatus().c_str(), textPosition);
