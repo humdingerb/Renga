@@ -61,23 +61,7 @@ void RosterItem::DrawItem(BView *owner, BRect frame, __attribute__((unused)) boo
 
 	// clear rectangle
 	if (IsSelected()) {
-		if (status == UserID::ONLINE) {
-			if(exact_status == "xa" || exact_status == "away")
-			{
-				owner->SetHighColor(255, 179, 0, 255);
-			}
-			else if(exact_status == "dnd")
-			{
-				owner->SetHighColor(213, 158, 158, 255);
-			}
-			else {
-				owner->SetHighColor(158, 213, 158, 255);
-			}
-		} else if (status == UserID::OFFLINE) {
-			owner->SetHighColor(213, 213, 213, 255);
-		} else {
-			owner->SetHighColor(200, 200, 255, 255);
-		}
+		owner->SetHighUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
 	} else {
 		owner->SetHighColor(owner->ViewColor());
 	}
