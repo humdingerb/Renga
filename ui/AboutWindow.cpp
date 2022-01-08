@@ -27,8 +27,9 @@ AboutWindow::~AboutWindow() {
 }
 	
 void AboutWindow::PopulateCredits() {
-	AddDescription("An XMPP client for Haiku");
+	AddDescription("XMPP instant messaging client");
 	const char * authors[] = {
+		"Pascal Abresch",
 		"Andrea Anzani",
 		"John Blanco",
 		"Adrien Destugues",

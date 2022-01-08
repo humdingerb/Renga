@@ -5,14 +5,14 @@ resource app_flags B_MULTIPLE_LAUNCH;
 
 resource app_version {
 	major  = 1,
-	middle = 2,
-	minor  = 1,
+	middle = 22,
+	minor  = 0,
 
 	variety = B_APPV_DEVELOPMENT,
 	internal = 0,
 
 	short_info = "Renga",
-	long_info = "XMPP Instant Messaging Client for Haiku."
+	long_info = "XMPP Instant Messaging Client"
 };
 
 resource vector_icon {

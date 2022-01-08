@@ -4,7 +4,6 @@
 Delay between logon and getting MUC history? Is it my fault?
 MUC replay don't show messages from me, is it expected?
 Roster list is not properly resizable
-Emojis are not showing
 No "writing" notifications
 Show avatars for MUC rooms in roster, how does that work?
 	Probably we don't want them in the roster, wastes too much space
@@ -13,8 +12,6 @@ Selection message in roster triggers a bit too easily (on right click for popup 
 Make roster headers not selectable
 Show nicknames in Roster (see "modern xmpp" recommendations on how to get them)
 Manage own nickname in MUC properly
-Pressing enter in 1-1 chat does not send the message? have to use the button?
-Check if presence is properly sent
 
 Rename "channel name" and default to nickname
 
@@ -52,9 +49,8 @@ vcard / avatars
 	Support for setting own vcard and/or avatar and showing it somewhere
 	Export/import people files from vcard data
 
-BNotification on all messages (from single user) and mentions (from MUC)
-	XEP for detecting mentions is 0372, but is not in wide use yet :(
-	So scanning the recieved text is also needed.
+BNotification on all messages from single user
+BNotification on XEP-0372 mentions (not in wide use). Also send XEP-0372 mentions whenever the user uses a tab-completed nickname when we implement that
 
 MUC
 ===
@@ -82,9 +78,3 @@ Group MUCs by server in Roster instead of a single "Group Chats" list
 
 - Error handling (entering member only room, ...)
 
-Single window mode
-==================
-
-* Show message activity for each conversation in roster item (bold text? indicate number of unread messages?)
-* When focusing a chat, make sure the text view is scrolled down?
-	To be reviewed when making the new chat view anyway…
