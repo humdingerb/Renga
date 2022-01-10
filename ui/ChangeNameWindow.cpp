@@ -19,7 +19,7 @@
 #include "../jabber/TalkManager.h"
 
 ChangeNameWindow::ChangeNameWindow(const gloox::JID& changing_user, BString oldName)
-	: BWindow(BRect(0, 0, 100, 100), "Change Buddy Name", B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 100, 100), "Change buddy name", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	_changing_user(changing_user)
 {
@@ -38,10 +38,10 @@ ChangeNameWindow::ChangeNameWindow(const gloox::JID& changing_user, BString oldN
 		_handle->SetText("somebody@jabber.org");
 	}
 
-	BButton *cancel = new BButton("cancel", "Nevermind", new BMessage(JAB_CANCEL));
+	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(JAB_CANCEL));
 	cancel->SetTarget(this);
 
-	BButton *ok = new BButton("ok", "Change Name", new BMessage(JAB_OK));
+	BButton *ok = new BButton("ok", "Change nickname", new BMessage(JAB_OK));
 	ok->MakeDefault(true);
 	ok->SetTarget(this);
 
@@ -72,7 +72,7 @@ void ChangeNameWindow::MessageReceived(BMessage *msg) {
 		//// JAB_OK
 		case JAB_OK: {
 			if (!strcmp(_handle->Text(), "")) {
-				ModalAlertFactory::Alert("You cannot erase your buddy's name.  If you're trying to remove this buddy, please use the \"Remove Buddy\" item on the user.", "Oops!");
+				ModalAlertFactory::Alert("You cannot erase your buddy's name.  If you're trying to remove this buddy, please use the \"Remove buddy\" item on the user.", "OK");
 				_handle->MakeFocus(true);
 
 				return;

@@ -55,10 +55,10 @@ void RosterView::AttachedToWindow() {
 	_popup = new BPopUpMenu(NULL, false, false);
 
 		_chat_item         = new BMenuItem("Chat" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_CHAT));
-		_message_item      = new BMenuItem("Send Message" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_MESSAGE));
-		_change_user_item  = new BMenuItem("Edit Buddy", new BMessage(JAB_OPEN_EDIT_BUDDY_WINDOW));
-		_remove_user_item  = new BMenuItem("Remove Buddy", new BMessage(JAB_REMOVE_BUDDY));
-		_user_info_item    = new BMenuItem("Get Buddy Info", new BMessage(JAB_USER_INFO));
+		_message_item      = new BMenuItem("Send message" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_MESSAGE));
+		_change_user_item  = new BMenuItem("Edit buddy", new BMessage(JAB_OPEN_EDIT_BUDDY_WINDOW));
+		_remove_user_item  = new BMenuItem("Remove buddy", new BMessage(JAB_REMOVE_BUDDY));
+		_user_info_item    = new BMenuItem("Get buddy info", new BMessage(JAB_USER_INFO));
 
 		_presence          = new BMenu("Presence");
 
@@ -80,10 +80,10 @@ void RosterView::AttachedToWindow() {
 
 	// create top level lists
 	AddItem(_online  = new RosterSuperitem("Online"));
-	AddItem(_unaccepted = new RosterSuperitem("Pending Presence"));
-	AddItem(_unknown = new RosterSuperitem("No Presence"));
+	AddItem(_unaccepted = new RosterSuperitem("Pending presence"));
+	AddItem(_unknown = new RosterSuperitem("No presence"));
 	AddItem(_offline = new RosterSuperitem("Offline"));
-	AddItem(_transports = new RosterSuperitem("Live Transports"));
+	AddItem(_transports = new RosterSuperitem("Live transports"));
 	AddItem(_bookmarks = new RosterSuperitem("Group chats"));
 
 	// make maps (BUGBUG better way to do two-way map?)
@@ -441,11 +441,11 @@ void RosterView::UpdatePopUpMenu() {
 		_chat_item->SetEnabled(false);
 		_message_item->SetEnabled(false);
 
-		sprintf(buffer, "Edit Buddy");
+		sprintf(buffer, "Edit buddy");
 		_change_user_item->SetLabel(buffer);
 		_change_user_item->SetEnabled(false);
 
-		sprintf(buffer, "Remove Buddy");
+		sprintf(buffer, "Remove buddy");
 		_remove_user_item->SetLabel(buffer);
 		_remove_user_item->SetEnabled(false);
 

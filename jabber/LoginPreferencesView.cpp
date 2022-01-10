@@ -44,13 +44,13 @@ void LoginPreferencesView::AttachedToWindow() {
 	frame.bottom = frame.top + 48.0;
 
 	_surrounding_groupchat = new BBox(frame, NULL, B_FOLLOW_ALL);
-	_surrounding_groupchat->SetLabel("Group Chat Options");
+	_surrounding_groupchat->SetLabel("Group chat options");
 
 	frame.OffsetBy(0.0, frame.Height() + 10.0);
 	frame.bottom = frame.top + 68.0;
 
 	_surrounding_chatlog = new BBox(frame, NULL, B_FOLLOW_ALL);
-	_surrounding_chatlog->SetLabel("Chat Log Options");
+	_surrounding_chatlog->SetLabel("Chat log options");
 
 	frame = _surrounding->Bounds();
 	
@@ -96,7 +96,7 @@ void LoginPreferencesView::AttachedToWindow() {
 	frame.right  = frame.left + 375.0;
 	frame.bottom = frame.top + 18;
 
-	_name = new BTextControl(frame, NULL, "Channel Name:", BlabberSettings::Instance()->Data("channel-name"), NULL);
+	_name = new BTextControl(frame, NULL, "Channel name:", BlabberSettings::Instance()->Data("channel-name"), NULL);
 
 	_surrounding_options->AddChild(_show_timestamp);
 	_surrounding_options->AddChild(_show_all_chat);
@@ -111,7 +111,7 @@ void LoginPreferencesView::AttachedToWindow() {
 	frame.right  = frame.left + 375.0;
 	frame.bottom = frame.top + 18;
 
-	_autoopen_chatlog = new BCheckBox(frame, NULL, "Autoopen of Chat Log.", NULL);	
+	_autoopen_chatlog = new BCheckBox(frame, NULL, "Auto-open chat log", NULL);	
 	_autoopen_chatlog->SetValue(BlabberSettings::Instance()->Tag("autoopen-chatlog"));
 	
 	frame.OffsetBy(0.0, 19.0);

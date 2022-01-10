@@ -39,7 +39,7 @@ CustomStatusWindow *CustomStatusWindow::Instance() {
 
 
 CustomStatusWindow::CustomStatusWindow(BRect frame)
-	: BWindow(frame, "Create a Custom Status",
+	: BWindow(frame, "Create a custom status",
 		B_TITLED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS |
 		B_NOT_ZOOMABLE |
@@ -50,9 +50,9 @@ CustomStatusWindow::CustomStatusWindow(BRect frame)
 
 	_away = new BRadioButton("status", "Away", NULL);
 
-	_xa = new BRadioButton("status", "Extended Away", NULL);
+	_xa = new BRadioButton("status", "Extended away", NULL);
 
-	_dnd = new BRadioButton("status", "Do Not Disturb", NULL);
+	_dnd = new BRadioButton("status", "Do not disturb", NULL);
 
 
 	BStringView *query = new BStringView(NULL, "Please provide your detailed status:");
@@ -67,7 +67,7 @@ CustomStatusWindow::CustomStatusWindow(BRect frame)
 		_handle->SetText("I'm at my computer.");
 	}
 
-	BButton *cancel = new BButton("cancel", "Nevermind", new BMessage(JAB_CANCEL));
+	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(JAB_CANCEL));
 	cancel->SetTarget(this);
 
 	BButton *ok = new BButton("ok", "OK", new BMessage(JAB_OK));

@@ -44,13 +44,13 @@ void SoundPreferencesView::AttachedToWindow() {
 	rect.bottom = rect.top + 211.0;
 
 	_surrounding = new BBox(rect, NULL, B_FOLLOW_ALL);
-	_surrounding->SetLabel("Associated Sound Events");
+	_surrounding->SetLabel("Associated sound events");
 
 	rect.OffsetBy(0.0, rect.Height() + 10.0);
 	rect.bottom = rect.top + 75.0;
 	
 	_surrounding_options = new BBox(rect, NULL, B_FOLLOW_ALL);
-	_surrounding_options->SetLabel("Other Sound Options");
+	_surrounding_options->SetLabel("Other sound options");
 	
 	rect = _surrounding->Bounds();
 	
@@ -77,7 +77,7 @@ void SoundPreferencesView::AttachedToWindow() {
 	
 	_new_chat_selection->AddSeparatorItem();
 	_new_chat_selection->AddItem(new BMenuItem("<none>", new BMessage(JAB_NO_NEW_MESSAGE_SOUND)));
-	_new_chat_selection->AddItem(new BMenuItem("Other...", new BMessage(JAB_PICK_NEW_MESSAGE_SOUND)));
+	_new_chat_selection->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(JAB_PICK_NEW_MESSAGE_SOUND)));
 
 	if (sound->NewMessageSound().empty()) {
 		_new_chat_selection->FindItem("<none>")->SetMarked(true);
@@ -106,7 +106,7 @@ void SoundPreferencesView::AttachedToWindow() {
 	
 	_message_selection->AddSeparatorItem();
 	_message_selection->AddItem(new BMenuItem("<none>", new BMessage(JAB_NO_MESSAGE_SOUND)));
-	_message_selection->AddItem(new BMenuItem("Other...", new BMessage(JAB_PICK_MESSAGE_SOUND)));
+	_message_selection->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(JAB_PICK_MESSAGE_SOUND)));
 
 	if (sound->MessageSound().empty()) {
 		_message_selection->FindItem("<none>")->SetMarked(true);
@@ -135,7 +135,7 @@ void SoundPreferencesView::AttachedToWindow() {
 	
 	_now_online_selection->AddSeparatorItem();
 	_now_online_selection->AddItem(new BMenuItem("<none>", new BMessage(JAB_NO_USER_ONLINE_SOUND)));
-	_now_online_selection->AddItem(new BMenuItem("Other...", new BMessage(JAB_PICK_USER_ONLINE_SOUND)));
+	_now_online_selection->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(JAB_PICK_USER_ONLINE_SOUND)));
 
 	if (sound->UserOnlineSound().empty()) {
 		_now_online_selection->FindItem("<none>")->SetMarked(true);
@@ -164,7 +164,7 @@ void SoundPreferencesView::AttachedToWindow() {
 	
 	_now_offline_selection->AddSeparatorItem();
 	_now_offline_selection->AddItem(new BMenuItem("<none>", new BMessage(JAB_NO_USER_OFFLINE_SOUND)));
-	_now_offline_selection->AddItem(new BMenuItem("Other...", new BMessage(JAB_PICK_USER_OFFLINE_SOUND)));
+	_now_offline_selection->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(JAB_PICK_USER_OFFLINE_SOUND)));
 
 	if (sound->UserOfflineSound().empty()) {
 		_now_offline_selection->FindItem("<none>")->SetMarked(true);
@@ -193,7 +193,7 @@ void SoundPreferencesView::AttachedToWindow() {
 	
 	_alert_selection->AddSeparatorItem();
 	_alert_selection->AddItem(new BMenuItem("<none>", new BMessage(JAB_NO_ALERT_SOUND)));
-	_alert_selection->AddItem(new BMenuItem("Other...", new BMessage(JAB_PICK_ALERT_SOUND)));
+	_alert_selection->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(JAB_PICK_ALERT_SOUND)));
 
 	if (sound->AlertSound().empty()) {
 		_alert_selection->FindItem("<none>")->SetMarked(true);
@@ -214,7 +214,7 @@ void SoundPreferencesView::AttachedToWindow() {
 	rect.bottom = rect.top + 18.0;
 
 	// groupchat message sounds?
-	_groupchat_sounds = new BCheckBox(rect, NULL, "Exclude groupchat from message sound events", NULL);
+	_groupchat_sounds = new BCheckBox(rect, NULL, "Exclude groupchat from message sound events.", NULL);
 	_groupchat_sounds->SetValue(BlabberSettings::Instance()->Tag("exclude-groupchat-sounds"));
 	
 	// children

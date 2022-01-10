@@ -85,10 +85,10 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	BTextView* agree = new BTextView("agree");
 	agree->SetText("In order to find a nearby server, the application will now "
 		"attempt to geolocalize you. A list of wifi networks within reach of "
-		"your computer will be sent to Mozilla Location Services. The "
-		"resulting estimated latitude and longitude will be sent to Geonames "
-		"to deduce the country you are in. If you don't want this to happen, "
-		"you will have to pick a server yourself.");
+		"your computer will be sent to Mozilla Location Services.\n"
+		"The resulting estimated latitude and longitude will be sent to Geonames "
+		"to deduce the country you are in.\n\n"
+		"If you don't want this to happen, you will have to pick a server yourself.");
 	float charSize = agree->StringWidth("W");
 	agree->SetExplicitMinSize(BSize(charSize * 30, charSize * 7));
 	agree->MakeEditable(false);
@@ -96,8 +96,8 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	agree->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	// TODO add hyperlinks to MLS and Geonames
 	
-	BButton* yes = new BButton("yes", "Yes, please", new BMessage(kGeolocalize));
-	BButton* no = new BButton("no", "No thanks!", new BMessage(kShowServerList));
+	BButton* yes = new BButton("yes", "Geolocate", new BMessage(kGeolocalize));
+	BButton* no = new BButton("no", "Set manually", new BMessage(kShowServerList));
 
 	BLayoutBuilder::Group<>(card0)
 		.SetInsets(B_USE_WINDOW_INSETS)
@@ -115,10 +115,10 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	AddChild(card1);
 
 	fWelcome = new BTextView("welcome");
-	fWelcome->SetText("Welcome to the XMPP network! We have chosen a server for "
-		"you, but you can select another one if you prefer to. The server name "
-		"will be part of your XMPP identifier, so you may pick one with a "
-		"short and catchy name.");
+	fWelcome->SetText("Welcome to the XMPP network!\n"
+		"We have chosen a server for you, but you can select another if you "
+		"want to. The server name will be part of your XMPP identifier, so you "
+		"may want to pick one with a short and catchy name.");
 	fWelcome->SetExplicitMinSize(BSize(charSize * 30, charSize * 7));
 	fWelcome->MakeEditable(false);
 	fWelcome->MakeSelectable(false);
@@ -155,7 +155,7 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	BGroupView* card2 = new BGroupView(B_VERTICAL);
 	AddChild(card2);
 
-	fWaitingMessage = new BStringView("wait", "Please wait, connecting to server…");
+	fWaitingMessage = new BStringView("wait", "Please wait, connecting to server" B_UTF8_ELLIPSIS);
 	// TODO add a BarberPole or throbber something
 
 	BLayoutBuilder::Group<>(card2)
@@ -182,7 +182,7 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	fPostalAddress = new BTextControl("Postal address", "", NULL);
 	fCity = new BTextControl("City", "", NULL);
 	fState = new BTextControl("State", "", NULL);
-	fZip = new BTextControl("ZIP Code", "", NULL);
+	fZip = new BTextControl("ZIP code", "", NULL);
 	fPhoneNumber = new BTextControl("Phone number", "", NULL);
 	fUrl = new BTextControl("Homepage", "", NULL);
 	fDate = new BTextControl("Date", "", NULL);
@@ -325,13 +325,13 @@ RegisterAccountWindow::MessageReceived(BMessage* message)
 				case kConnect:
 				{
 					// TODO request registration fields here instead of in GlooxHandler
-					fWaitingMessage->SetText("Setting up secure connection…");
+					fWaitingMessage->SetText("Setting up secure connection" B_UTF8_ELLIPSIS);
 					break;
 				}
 				case kTLSConnect:
 				{
 					// TODO confirm TLS certificate, when gloox handler supports that
-					fWaitingMessage->SetText("Getting registration form from server…");
+					fWaitingMessage->SetText("Getting registration form from server" B_UTF8_ELLIPSIS);
 					break;
 				}
 				case kDisconnect:
