@@ -49,12 +49,12 @@ static const char* sXMPPHelpText = "Please enter a JID of the form username@serv
 static const char* sIRCHelpText  = "Please enter the user's IRC nickname and server (e.g., haikulover%irc.oftc.net).";
 
 AddBuddyWindow::AddBuddyWindow(BRect rect)
-	: BWindow(rect, "Add a Buddy", B_TITLED_WINDOW,
+	: BWindow(rect, "Add a buddy", B_TITLED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	fNickName = new BTextControl("nickName", "Nickname:", "", NULL);
 
-	fServiceSelection = new BOptionPopUp("Service Selection", "Online service",
+	fServiceSelection = new BOptionPopUp("Service Selection", "Online service:",
 		new BMessage(kOptionChanged));
 	fServiceSelection->AddOption("XMPP", kXMPPSelected);
 	fServiceSelection->AddOption("IRC", kIRCSelected);
@@ -73,7 +73,7 @@ AddBuddyWindow::AddBuddyWindow(BRect rect)
 	kOkButton->MakeDefault(true);
 	kOkButton->SetTarget(this);
 
-	kOkButton->SetLabel("Add Buddy");
+	kOkButton->SetLabel("Add buddy");
 
 	// add GUI components to BView
 	SetLayout(new BGridLayout());
@@ -172,7 +172,7 @@ void AddBuddyWindow::AddNewUser() {
 	JRoster::Instance()->Lock();
 	if (JRoster::Instance()->FindUser(JRoster::COMPLETE_HANDLE, fHandle->Text())) {
 		sprintf(buffer, "%s already exists in your buddy list.  Please choose another so you won't get confused.", fHandle->Text());
-		ModalAlertFactory::Alert(buffer, "Good Idea!");
+		ModalAlertFactory::Alert(buffer, "OK");
 		fHandle->MakeFocus(true);
 		fHandle->MarkAsInvalid(true);
 

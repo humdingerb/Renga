@@ -58,9 +58,9 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 
 	_surrounding = new BBox(rect, NULL);
 	if (_type == gloox::Message::Groupchat) {
-		_surrounding->SetLabel("Select Group Chat Properties");
+		_surrounding->SetLabel("Select group chat properties");
 	} else {
-		_surrounding->SetLabel("Select a User");
+		_surrounding->SetLabel("Select a user");
 	}
 
 	rect.OffsetTo(B_ORIGIN);
@@ -69,7 +69,7 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 
 	// chat service
 	_chat_services_selection = new BPopUpMenu("Jabber");
-	_chat_services = new BMenuField(rect, "chat_services", "Online Service: ", _chat_services_selection);
+	_chat_services = new BMenuField(rect, "chat_services", "Online service: ", _chat_services_selection);
 	_chat_services->SetDivider(_chat_services->Divider() - 33);
 	BMenuItem *default_item = new BMenuItem("Jabber", new BMessage(AGENT_MENU_CHANGED_TO_JABBER));
 	_chat_services_selection->AddItem(default_item);
@@ -88,7 +88,7 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 	}
 
 	if (_type == gloox::Message::Groupchat) {
-		_handle = new BTextControl(rect, "handle", "Room Name: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
+		_handle = new BTextControl(rect, "handle", "Room name: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
 	} else {
 		_handle = new BTextControl(rect, "handle", "Jabber ID: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
 	}
@@ -122,7 +122,7 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 	rect.OffsetBy(135.0, 24.0);
 	rect.right = rect.left + 65;
 
-	BButton *cancel = new BButton(rect, "cancel", "Nevermind", new BMessage(JAB_CANCEL));
+	BButton *cancel = new BButton(rect, "cancel", "Cancel", new BMessage(JAB_CANCEL));
 	cancel->SetTarget(this);
 
 	// ok button
@@ -132,14 +132,14 @@ SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
 	BButton *ok = new BButton(rect, "ok", "", new BMessage(JAB_OK));
 
 	if (_type == gloox::Message::Normal) {
-		SetTitle("Send New Message");
-		ok->SetLabel("Send Message");
+		SetTitle("Send new message");
+		ok->SetLabel("Send message");
 	} else if (_type == gloox::Message::Chat) {
-		SetTitle("Start New Chat");
-		ok->SetLabel("Start Chat");
+		SetTitle("Start new chat");
+		ok->SetLabel("Start chat");
 	} else if (_type == gloox::Message::Groupchat) {
-		SetTitle("Start New Group Chat");
-		ok->SetLabel("Start Chat");
+		SetTitle("Start new group chat");
+		ok->SetLabel("Start chat");
 	}
 
 	ok->MakeDefault(true);
@@ -221,8 +221,8 @@ bool SendTalkWindow::ValidateGroupRoom() {
 	char buffer[4096];
 
 	if (!strcmp(_handle->Text(), "")) {
-		sprintf(buffer, "Please specify the group's roomname.");
-		ModalAlertFactory::Alert(buffer, "Oops!");
+		sprintf(buffer, "Please specify the group's room name.");
+		ModalAlertFactory::Alert(buffer, "OK");
 		_handle->MakeFocus(true);
 
 		return false;
@@ -230,7 +230,7 @@ bool SendTalkWindow::ValidateGroupRoom() {
 
 	if (!strcmp(_name->Text(), "")) {
 		sprintf(buffer, "Please specify your handle.");
-		ModalAlertFactory::Alert(buffer, "Oops!");
+		ModalAlertFactory::Alert(buffer, "OK");
 		_handle->MakeFocus(true);
 
 		return false;
@@ -244,7 +244,7 @@ string SendTalkWindow::ValidateUser() {
 
 	if (!strcmp(_handle->Text(), "")) {
 		sprintf(buffer, "Please specify a user's handle.");
-		ModalAlertFactory::Alert(buffer, "Oops!");
+		ModalAlertFactory::Alert(buffer, "OK");
 		_handle->MakeFocus(true);
 
 		return "";

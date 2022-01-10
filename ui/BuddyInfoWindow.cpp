@@ -19,7 +19,7 @@
 #include "../jabber/Messages.h"
 
 BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
-	: BWindow(BRect(0, 0, 0, 0), "Buddy Information", B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 0, 0), "Buddy information", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 	, fJID(querying_user->Handle().c_str())
 {
@@ -44,7 +44,7 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	}
 
 	if (!querying_user->MoreExactOnlineStatus().empty()) {
-		status_label = new BStringView(NULL, "Personalized Status:");
+		status_label = new BStringView(NULL, "Personalized status:");
 		status_name  = new BStringView(NULL, querying_user->MoreExactOnlineStatus().c_str());
 
 		surrounding->GridLayout()->AddView(status_label, 0, 1);
@@ -52,16 +52,16 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	}
 
 	if (!querying_user->ExactOnlineStatus().empty()) {
-		realstatus_label = new BStringView(NULL, "Official Status:");
+		realstatus_label = new BStringView(NULL, "Official status:");
 
 		if (querying_user->ExactOnlineStatus() == "xa") {
-			realstatus_name  = new BStringView(NULL, "Extended Away");
+			realstatus_name  = new BStringView(NULL, "Extended away");
 		} else if (querying_user->ExactOnlineStatus() == "away") {
 			realstatus_name  = new BStringView(NULL, "Away");
 		} else if (querying_user->ExactOnlineStatus() == "chat") {
-			realstatus_name  = new BStringView(NULL, "Available for Chat");
+			realstatus_name  = new BStringView(NULL, "Available for chat");
 		} else if (querying_user->ExactOnlineStatus() == "dnd") {
-			realstatus_name  = new BStringView(NULL, "Do Not Disturb");
+			realstatus_name  = new BStringView(NULL, "Do not disturb");
 		}
 
 		surrounding->GridLayout()->AddView(realstatus_label, 0, 2);

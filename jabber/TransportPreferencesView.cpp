@@ -40,7 +40,7 @@ void TransportPreferencesView::AttachedToWindow() {
 	// box frame
 	rect.InsetBy(5.0, 5.0);
 	_surrounding = new BBox(rect, NULL, B_FOLLOW_ALL);
-	_surrounding->SetLabel("External Chat Systems");
+	_surrounding->SetLabel("External chat systems");
 
 	rect = _surrounding->Bounds();
 
@@ -52,7 +52,7 @@ void TransportPreferencesView::AttachedToWindow() {
 	// transport selection
 	_agent_entries = new BPopUpMenu("<select a service>");
 
-	_agent_list = new BMenuField(rect, "agent_registrations", "Online Service: ", _agent_entries);
+	_agent_list = new BMenuField(rect, "agent_registrations", "Online service: ", _agent_entries);
 
 	// username/password fields
 	rect.OffsetBy(0.0, 35.0);
@@ -96,7 +96,7 @@ void TransportPreferencesView::AttachedToWindow() {
 
 	rect.OffsetBy(0.0, 23.0);
 
-	_unregister = new BButton(rect, "register", "UnRegister", new BMessage(UNREGISTER_TRANSPORT));
+	_unregister = new BButton(rect, "register", "Unregister", new BMessage(UNREGISTER_TRANSPORT));
 	_unregister->SetTarget(this);
 	_unregister->SetEnabled(false);
 
@@ -124,7 +124,7 @@ void TransportPreferencesView::AttachedToWindow() {
 	enter_note->MakeEditable(false);
 	enter_note->MakeSelectable(false);
 	enter_note->SetText("Note: Transports serve as the means by which XMPP "
-		"communicates with external chat systems such as IRC.  They "
+		"communicates with external chat systems such as IRC. They "
 		"are add-on components of the XMPP server you are logged on and "
 		"not part of Renga.");
 
@@ -145,12 +145,12 @@ void TransportPreferencesView::MessageReceived(BMessage *msg) {
 		case REGISTER_TRANSPORT: {
 			if (agents->GetAgentByService(_curr_transport)) {
 				if (strlen(_username->Text()) == 0) {
-					ModalAlertFactory::Alert("You must enter a username.", "Doh!");
+					ModalAlertFactory::Alert("You must enter a username.", "OK");
 					break;
 				}
 
 				if (strlen(_password->Text()) == 0) {
-					ModalAlertFactory::Alert("You must enter a password.", "Doh!");
+					ModalAlertFactory::Alert("You must enter a password.", "OK");
 					break;
 				}
 

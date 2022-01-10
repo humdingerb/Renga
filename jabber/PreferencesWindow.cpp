@@ -35,7 +35,7 @@ PreferencesWindow *PreferencesWindow::Instance() {
 }
 
 PreferencesWindow::PreferencesWindow()
-	: BWindow(BRect(0, 0, 0, 0), "User Preferences", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE) {
+	: BWindow(BRect(0, 0, 0, 0), "User settings", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE) {
 
 	// add self to message family
 	MessageRepeater::Instance()->AddTarget(this);
@@ -97,14 +97,14 @@ PreferencesWindow::PreferencesWindow()
 	rect.OffsetBy(235.0, _tab_strip->Bounds().Height() + 20.0);
 	rect.right = rect.left + 92;
 
-	_cancel = new BButton(rect, "cancel", "Ignore Changes", new BMessage(JAB_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	_cancel = new BButton(rect, "cancel", "Cancel", new BMessage(JAB_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	_cancel->SetTarget(this);
 
 	// ok button
 	rect.OffsetBy(100.0, 0.0);
 	rect.right = rect.left + 92;
 
-	_ok = new BButton(rect, "ok", "Save Changes", new BMessage(JAB_OK),  B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	_ok = new BButton(rect, "ok", "OK", new BMessage(JAB_OK),  B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	_ok->MakeDefault(true);
 	_ok->SetTarget(this);
 

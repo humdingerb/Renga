@@ -31,7 +31,7 @@ BlabberSettings::BlabberSettings(const char *filename)
        SetDefaultTagsValue();
 	} else if (status == FileXMLReader::FILE_CORRUPTED) {
 		// back up their settings
-		ModalAlertFactory::Alert("We regret to inform you that your settings file has been corrupted.  It has been replaced with a fresh copy.", "Oh, darn!");
+		ModalAlertFactory::Alert("We regret to inform you that your settings file has been corrupted. It has been replaced with a fresh copy.", "Oh, darn!");
 		SetDefaultTagsValue();
 	}
 }

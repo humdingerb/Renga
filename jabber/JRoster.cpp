@@ -159,7 +159,7 @@ JRoster::handleItemSubscribed(const gloox::JID&)
 			sprintf(buffer, "Your subscription request was accepted by %s!", asker);
 		}
 		
-		ModalAlertFactory::Alert(buffer, "Hooray!");
+		ModalAlertFactory::Alert(buffer, "OK");
 #endif
 }
 
@@ -321,8 +321,8 @@ JRoster::handleSubscriptionRequest(const gloox::JID& JID, const string& reason)
 	// TODO this uses a synchrnous alert so the gloox thread will be blocked (no other message can
 	// be sent or received) until the alert is answered by the user. Instead we should use
 	// asynchronous mode
-	answer = ModalAlertFactory::Alert(message.String(), "No, I prefer privacy.",
-		"Yes, grant them my presence!");
+	answer = ModalAlertFactory::Alert(message.String(), "No, I prefer privacy",
+		"Yes, grant them my presence");
 
 	// send back the response
 	if (answer == 1) {
@@ -342,7 +342,7 @@ JRoster::handleUnsubscriptionRequest(const gloox::JID&, const string&)
 	printf("%s\n", __PRETTY_FUNCTION__);
 #if 0
 		sprintf(buffer, "%s no longer wishes to know your online status.", asker);
-		ModalAlertFactory::NonModalAlert(buffer, "I feel so unloved.");
+		ModalAlertFactory::NonModalAlert(buffer, "I feel so unloved");
 #endif
 	return false;
 }

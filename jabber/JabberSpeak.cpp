@@ -156,7 +156,7 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 						sprintf(buffer, "You were refused registration information from an unidentifying Jabber service for the following reason:\n\n%s", entity->Child("error")->Data());
 					}
 
-					ModalAlertFactory::Alert(buffer, "Oh, well.", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+					ModalAlertFactory::Alert(buffer, "Oh, well", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
 
 				// for errors on registration
@@ -168,7 +168,7 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 						sprintf(buffer, "Your registration attempt was refused by an unidentifying Jabber service for the following reason:\n\n%s", entity->Child("error")->Data());
 					}
 
-					ModalAlertFactory::Alert(buffer, "Oh, well.", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+					ModalAlertFactory::Alert(buffer, "Oh, well", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
 
 				// for errors on unregistration
@@ -180,7 +180,7 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 						sprintf(buffer, "You were refused unregistration information from an unidentifying Jabber service for the following reason:\n\n%s", entity->Child("error")->Data());
 					}
 
-					ModalAlertFactory::Alert(buffer, "Oh, well.", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+					ModalAlertFactory::Alert(buffer, "Oh, well", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
 			}
 		}
@@ -208,7 +208,7 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 						sprintf(buffer, "Your registration attempt with an unidentifying Jabber service has been accepted.");
 					}
 
-					ModalAlertFactory::Alert(buffer, "Yeah!", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+					ModalAlertFactory::Alert(buffer, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
 			}
 		}
@@ -696,7 +696,7 @@ JabberSpeak::handleVCard(const gloox::JID& jid, const gloox::VCard* vcard)
 	if (!vcard->tz().empty())
 		message.AddString("Timezone", vcard->tz().c_str());
 	if (!vcard->sortstring().empty())
-		message.AddString("Sort String", vcard->sortstring().c_str());
+		message.AddString("Sort string", vcard->sortstring().c_str());
 	if (!vcard->org().name.empty())
 		message.AddString("Organization", vcard->org().name.c_str());
 	for (std::string unit: vcard->org().units)
