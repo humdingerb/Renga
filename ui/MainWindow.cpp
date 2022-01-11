@@ -153,7 +153,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		case JAB_LOGGED_IN: {
 			// we just logged in
 			BString statusText;
-			statusText.SetToFormat(B_TRANSLATE("Connected as %s"), JabberSpeak::Instance()->CurrentLogin());
+			statusText.SetToFormat(B_TRANSLATE("Connected as %s"), JabberSpeak::Instance()->CurrentLogin().c_str());
 			_status_view->SetMessage(statusText.String());
 
 			// save these settings
