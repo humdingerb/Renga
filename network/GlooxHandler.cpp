@@ -13,6 +13,7 @@
 
 #include "support/LogHandler.h"
 
+#include <Catalog.h>
 #include <GridView.h>
 #include <LayoutBuilder.h>
 #include <String.h>
@@ -20,6 +21,9 @@
 #include <TextView.h>
 
 #include <gloox/dataformitem.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "GlooxHandler"
 
 
 GlooxHandler::GlooxHandler(gloox::Client* client)
@@ -171,7 +175,7 @@ void GlooxHandler::handleDataForm(const gloox::JID& from, const gloox::DataForm&
 
 	if (hasRequiredFields) {
 		BLayoutBuilder::Grid<>(registrationForm).Add(
-			new BStringView("footer", "* required fields"), 0, line++);
+			new BStringView("footer", B_TRANSLATE("* required fields")), 0, line++);
 	}
 #if 1
 	// FIXME need to handle nested items if there are some

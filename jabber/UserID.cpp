@@ -6,12 +6,18 @@
 
 #include <cstring>
 
+#include <Catalog.h>
+
 #include "Agent.h"
 #include "AgentList.h"
 #include "JabberSpeak.h"
 
 #include <gloox/rosteritem.h>
 #include <gloox/rostermanager.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "UserID"
+
 
 UserID::UserID(gloox::JID handle) {
 	// initialize values
@@ -166,20 +172,21 @@ std::string UserID::WhyNotValidJabberHandle(std::string jidCandidate)
 	}
 
 	if (jid.username().size() == 0 || jid.server().size() == 0) {
-		return "Jabber ID must be of the form username@server[/resource].";
+		return B_TRANSLATE("Jabber ID must be of the form username@server[/resource].");
 	}
 
 	// verify length
 	if (jid.username().size() > 255) {
-		return "Jabber ID username part must not be longer than 255 characters.";
+		return B_TRANSLATE("Jabber ID username part must not be longer than 255 characters.");
 	}
 
 	// verify ASCII charactership of abbreviated username
 	if (jid.username().find_first_of(":@<>'\"&") != std::string::npos) {
-		return "Jabber ID username part must not contain any of the following characters in the handle: @<>:'\"&";
+		return B_TRANSLATE("Jabber ID username part must not contain any of the following "
+			"characters in the handle: @<>:'\"&");
 	}
 
-	return "Jabber ID could not be parsed for an unkonwn reason";
+	return B_TRANSLATE("Jabber ID could not be parsed for an unkonwn reason");
 }
 
 void UserID::SetHandle(gloox::JID handle)

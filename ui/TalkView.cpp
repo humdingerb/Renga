@@ -9,6 +9,7 @@
 
 #include <Box.h>
 #include <be_apps/NetPositive/NetPositive.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
 #include <GridView.h>
 #include <GroupLayout.h>
@@ -39,6 +40,9 @@
 #include "gloox/rostermanager.h"
 
 #define NOTIFICATION_CHAR "√"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TalkView"
 
 
 TalkView::TalkView(const gloox::JID *user, string group_room,
@@ -126,11 +130,11 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 
 	if (!IsGroupChat()) {
 		// identify the user
-		sprintf(buffer, "your identity is %s", _group_username.c_str());
+		sprintf(buffer, B_TRANSLATE("Your identity is %s"), _group_username.c_str());
 		_status_view->SetMessage(buffer);
 	} else if (!uid || uid->UserType() == UserID::JABBER) {
 		// identify the user
-		sprintf(buffer, "your identity is %s", JabberSpeak::Instance()->CurrentLogin().c_str());
+		sprintf(buffer, B_TRANSLATE("your identity is %s"), JabberSpeak::Instance()->CurrentLogin().c_str());
 		_status_view->SetMessage(buffer);
 	} else {
 		user_representation = uid->FriendlyName();
@@ -153,7 +157,7 @@ TalkView::TalkView(const gloox::JID *user, string group_room,
 	message.resize(128);
 	time_t now = time(NULL);
 	struct tm *time_struct = localtime(&now);
-	strftime(&message[0], message.size()-1, "Session started  %e %b %y [%R:%S]", time_struct);
+	strftime(&message[0], message.size()-1, B_TRANSLATE("Session started %e %b %y [%R:%S]"), time_struct);
 	AddToTalk("", message.c_str(), OTHER);
 
 	TalkManager::Instance()->StartWatchingAll(this);
@@ -165,7 +169,7 @@ TalkView::~TalkView() {
 	message.resize(128);
 	time_t now = time(NULL);
 	struct tm *time_struct = localtime(&now);
-	strftime(&message[0], message.size()-1, "Session finished %e %b %y [%R:%S]\n---", time_struct);
+	strftime(&message[0], message.size()-1, B_TRANSLATE("Session finished %e %b %y [%R:%S]\n---"), time_struct);
 	AddToTalk("", message.c_str(), OTHER);
 
 	if (IsGroupChat())
@@ -264,10 +268,10 @@ void TalkView::MessageReceived(BMessage *msg) {
 				char buffer[2048];
 
 				if (_current_status == UserID::ONLINE && new_status == UserID::OFFLINE) {
-					sprintf(buffer, "This user is now offline.");
+					sprintf(buffer, B_TRANSLATE("This user is now offline."));
 					AddToTalk("", buffer, OTHER);
 				} else if (_current_status == UserID::OFFLINE && new_status == UserID::ONLINE) {
-					sprintf(buffer, "This user is now online.");
+					sprintf(buffer, B_TRANSLATE("This user is now online."));
 					AddToTalk("", buffer, OTHER);
 				}
 			}

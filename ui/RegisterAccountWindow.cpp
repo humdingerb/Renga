@@ -15,6 +15,7 @@
 #include "PictureView.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <Country.h>
 #include <private/netservices/Geolocation.h>
 #include <LayoutBuilder.h>
@@ -24,6 +25,9 @@
 #include <TextView.h>
 
 #include <random>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RegisterAccountWindow"
 
 
 using BPrivate::Network::BGeolocation;
@@ -69,7 +73,7 @@ static const ServerInfo kServerInfos[] = {
 
 
 RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unused)))
-	: BWindow(BRect(0, 0, 100, 100), "Create an XMPP account", B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 100, 100), B_TRANSLATE("Create an XMPP account"), B_TITLED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_RESIZABLE)
 {
 	fLayout = new BCardLayout();
@@ -83,12 +87,12 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	BGroupView* card0 = new BGroupView(B_VERTICAL);
 	AddChild(card0);
 	BTextView* agree = new BTextView("agree");
-	agree->SetText("In order to find a nearby server, the application will now "
+	agree->SetText(B_TRANSLATE("In order to find a nearby server, the application will now "
 		"attempt to geolocalize you. A list of wifi networks within reach of "
 		"your computer will be sent to Mozilla Location Services.\n"
 		"The resulting estimated latitude and longitude will be sent to Geonames "
 		"to deduce the country you are in.\n\n"
-		"If you don't want this to happen, you will have to pick a server yourself.");
+		"If you don't want this to happen, you will have to pick a server yourself."));
 	float charSize = agree->StringWidth("W");
 	agree->SetExplicitMinSize(BSize(charSize * 30, charSize * 7));
 	agree->MakeEditable(false);
@@ -96,8 +100,8 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	agree->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	// TODO add hyperlinks to MLS and Geonames
 	
-	BButton* yes = new BButton("yes", "Geolocate", new BMessage(kGeolocalize));
-	BButton* no = new BButton("no", "Set manually", new BMessage(kShowServerList));
+	BButton* yes = new BButton("yes", B_TRANSLATE("Geolocate"), new BMessage(kGeolocalize));
+	BButton* no = new BButton("no", B_TRANSLATE("Set manually"), new BMessage(kShowServerList));
 
 	BLayoutBuilder::Group<>(card0)
 		.SetInsets(B_USE_WINDOW_INSETS)
@@ -115,10 +119,10 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	AddChild(card1);
 
 	fWelcome = new BTextView("welcome");
-	fWelcome->SetText("Welcome to the XMPP network!\n"
+	fWelcome->SetText(B_TRANSLATE("Welcome to the XMPP network!\n"
 		"We have chosen a server for you, but you can select another if you "
 		"want to. The server name will be part of your XMPP identifier, so you "
-		"may want to pick one with a short and catchy name.");
+		"may want to pick one with a short and catchy name."));
 	fWelcome->SetExplicitMinSize(BSize(charSize * 30, charSize * 7));
 	fWelcome->MakeEditable(false);
 	fWelcome->MakeSelectable(false);
@@ -135,7 +139,7 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 		fServerList->AddItem(new BStringItem(i.hostname));
 	}
 
-	BButton* next = new BButton("Next", "Next", new BMessage(kGetUserInfo));
+	BButton* next = new BButton("Next", B_TRANSLATE("Next"), new BMessage(kGetUserInfo));
 
 	BLayoutBuilder::Group<>(card1)
 		.SetInsets(B_USE_WINDOW_INSETS)
@@ -155,7 +159,8 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 	BGroupView* card2 = new BGroupView(B_VERTICAL);
 	AddChild(card2);
 
-	fWaitingMessage = new BStringView("wait", "Please wait, connecting to server" B_UTF8_ELLIPSIS);
+	fWaitingMessage = new BStringView("wait",
+		B_TRANSLATE("Please wait, connecting to server" B_UTF8_ELLIPSIS));
 	// TODO add a BarberPole or throbber something
 
 	BLayoutBuilder::Group<>(card2)
@@ -173,25 +178,25 @@ RegisterAccountWindow::RegisterAccountWindow(BHandler* target __attribute__((unu
 
 #if 0
 	// TODO Create all well-known fields and hide them by default
-	fUsername = new BTextControl("Username", "", NULL); // TODO show @host
-	fNickname = new BTextControl("Nickname", "", NULL);
-	fPassword = new BTextControl("Password", "", NULL); // TODO hide typing
-	fFirstName = new BTextControl("First name", "", NULL);
-	fLastName = new BTextControl("Last name", "", NULL);
-	fEmail = new BTextControl("E-mail address", "", NULL);
-	fPostalAddress = new BTextControl("Postal address", "", NULL);
-	fCity = new BTextControl("City", "", NULL);
-	fState = new BTextControl("State", "", NULL);
-	fZip = new BTextControl("ZIP code", "", NULL);
-	fPhoneNumber = new BTextControl("Phone number", "", NULL);
-	fUrl = new BTextControl("Homepage", "", NULL);
-	fDate = new BTextControl("Date", "", NULL);
-	fMisc = new BTextControl("Misc.", "", NULL);
-	fExtra = new BTextControl("Extra", "", NULL);
+	fUsername = new BTextControl(B_TRANSLATE("Username"), "", NULL); // TODO show @host
+	fNickname = new BTextControl(B_TRANSLATE("Nickname"), "", NULL);
+	fPassword = new BTextControl(B_TRANSLATE("Password"), "", NULL); // TODO hide typing
+	fFirstName = new BTextControl(B_TRANSLATE("First name"), "", NULL);
+	fLastName = new BTextControl(B_TRANSLATE("Last name"), "", NULL);
+	fEmail = new BTextControl(B_TRANSLATE("E-mail address"), "", NULL);
+	fPostalAddress = new BTextControl(B_TRANSLATE("Postal address"), "", NULL);
+	fCity = new BTextControl(B_TRANSLATE("City"), "", NULL);
+	fState = new BTextControl(B_TRANSLATE("State"), "", NULL);
+	fZip = new BTextControl(B_TRANSLATE("ZIP code"), "", NULL);
+	fPhoneNumber = new BTextControl(B_TRANSLATE("Phone number"), "", NULL);
+	fUrl = new BTextControl(B_TRANSLATE("Homepage"), "", NULL);
+	fDate = new BTextControl(B_TRANSLATE("Date"), "", NULL);
+	fMisc = new BTextControl(B_TRANSLATE("Misc."), "", NULL);
+	fExtra = new BTextControl(B_TRANSLATE("Extra"), "", NULL);
 #endif
 
-	BButton* back = new BButton("Previous", "Previous", new BMessage(kShowServerList));
-	BButton* create = new BButton("create", "Register", new BMessage(kCreateAccount));
+	BButton* back = new BButton("Previous", B_TRANSLATE("Previous"), new BMessage(kShowServerList));
+	BButton* create = new BButton("create", B_TRANSLATE("Register"), new BMessage(kCreateAccount));
 
 	BLayoutBuilder::Group<>(card3)
 		.SetInsets(B_USE_WINDOW_SPACING)
@@ -325,13 +330,13 @@ RegisterAccountWindow::MessageReceived(BMessage* message)
 				case kConnect:
 				{
 					// TODO request registration fields here instead of in GlooxHandler
-					fWaitingMessage->SetText("Setting up secure connection" B_UTF8_ELLIPSIS);
+					fWaitingMessage->SetText(B_TRANSLATE("Setting up secure connection" B_UTF8_ELLIPSIS));
 					break;
 				}
 				case kTLSConnect:
 				{
 					// TODO confirm TLS certificate, when gloox handler supports that
-					fWaitingMessage->SetText("Getting registration form from server" B_UTF8_ELLIPSIS);
+					fWaitingMessage->SetText(B_TRANSLATE("Getting registration form from server" B_UTF8_ELLIPSIS));
 					break;
 				}
 				case kDisconnect:
@@ -460,7 +465,7 @@ void RegisterAccountWindow::handleRegistrationResult(const gloox::JID&, gloox::R
 							bool valid = (!required) || !BString(control->Text()).IsEmpty();
 							control->MarkAsInvalid(!valid);
 							if (!valid)
-								control->SetToolTip("This field is required.");
+								control->SetToolTip(B_TRANSLATE("This field is required."));
 							else
 								control->SetToolTip((const char*)NULL);
 						}
@@ -479,7 +484,7 @@ void RegisterAccountWindow::handleRegistrationResult(const gloox::JID&, gloox::R
 				BTextControl* c = dynamic_cast<BTextControl*>(v);
 				if (c) {
 					c->MarkAsInvalid(true);
-					c->SetToolTip("This username is already registered. Pick another one.");
+					c->SetToolTip(B_TRANSLATE("This username is already registered. Pick another one."));
 				} else {
 					fprintf(stderr, "username not found\n");
 				}
@@ -491,8 +496,8 @@ void RegisterAccountWindow::handleRegistrationResult(const gloox::JID&, gloox::R
 
 		case gloox::RegistrationNotAllowed:
 		{
-			fWelcome->SetText("The server currently does not allow registration.\n"
-				"Try another one.");
+			fWelcome->SetText(B_TRANSLATE("The server currently does not allow registration.\n"
+				"Try another one."));
 			fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
 			fLayout->SetVisibleItem(1);
 			break;
@@ -501,8 +506,8 @@ void RegisterAccountWindow::handleRegistrationResult(const gloox::JID&, gloox::R
 		case gloox::RegistrationUnknownError:
 		{
 			// Unknown error, better try another server that works more sanely.
-			fWelcome->SetText("The server did not accept our registration request.\n"
-				"Try another one.");
+			fWelcome->SetText(B_TRANSLATE("The server did not accept our registration request.\n"
+				"Try another one."));
 			fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
 			fLayout->SetVisibleItem(1);
 			break;
@@ -572,15 +577,15 @@ void RegisterAccountWindow::onDisconnect(gloox::ConnectionError error,
 			switch (streamError) {
 				case gloox::ConnStreamClosed:
 				{
-					fWelcome->SetText("The server closed the connection unexpectedly.\n");
+					fWelcome->SetText(B_TRANSLATE("The server closed the connection unexpectedly.\n"));
 					fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
 					break;
 				}
 				default:
 				{
 					BString message;
-					message.SetToFormat("Could not understand the reply from the server.\n"
-							"Stream error %d", streamError);
+					message.SetToFormat(B_TRANSLATE("Could not understand the reply from the server.\n"
+							"Stream error %d"), streamError);
 					fWelcome->SetText(message);
 					break;
 				}
@@ -588,28 +593,28 @@ void RegisterAccountWindow::onDisconnect(gloox::ConnectionError error,
 			break;
 		}
 		case gloox::ConnStreamClosed:
-			fWelcome->SetText("The server closed the connection unexpectedly. "
-				"Maybe your internet access is too slow to use XMPP reliably.");
+			fWelcome->SetText(B_TRANSLATE("The server closed the connection unexpectedly. "
+				"Maybe your internet access is too slow to use XMPP reliably."));
 			break;
 		case gloox::ConnStreamVersionError:
-			fWelcome->SetText("The server stream version is not compatible. "
-				"Try another server.");
+			fWelcome->SetText(B_TRANSLATE("The server stream version is not compatible. "
+				"Try another server."));
 			fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
 			break;
 		case gloox::ConnConnectionRefused:
-			fWelcome->SetText("Could not connect to the server.\nCheck you are "
-				"online, then try another one.");
+			fWelcome->SetText(B_TRANSLATE("Could not connect to the server.\nCheck you are "
+				"online, then try another one."));
 			// Do not disable the selected server, allow to retry when online
 			break;
 		case gloox::ConnTlsFailed:
-			fWelcome->SetText("Failed to setup a secure TLS communication channel. "
-				"Try another server.");
+			fWelcome->SetText(B_TRANSLATE("Failed to setup a secure TLS communication channel. "
+				"Try another server."));
 			fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
 			break;
 		default:
 			BString message;
-			message.SetToFormat("Could not connect to the server (error code: %d). "
-				"Try another one.", error);
+			message.SetToFormat(B_TRANSLATE("Could not connect to the server (error code: %d). "
+				"Try another one."), error);
 			fWelcome->SetText(message);
 			fServerList->ItemAt(fServerList->CurrentSelection())->SetEnabled(false);
 			break;

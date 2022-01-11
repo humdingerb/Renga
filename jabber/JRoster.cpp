@@ -5,12 +5,17 @@
 #include <kernel/OS.h>
 
 #include <gloox/rostermanager.h>
+#include <Catalog.h>
 
 #include "JabberSpeak.h"
 #include "JRoster.h"
 #include "Messages.h"
 #include "MessageRepeater.h"
 #include "ui/ModalAlertFactory.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "JRoster"
+
 
 JRoster *JRoster::_instance = NULL;
 
@@ -156,7 +161,7 @@ JRoster::handleItemSubscribed(const gloox::JID&)
 		if (entity->Child("status")) {
 			sprintf(buffer, "[%s]\n\n%s", asker, entity->Child("status")->Data());
 		} else {
-			sprintf(buffer, "Your subscription request was accepted by %s!", asker);
+			sprintf(buffer, B_TRANSLATE("Your subscription request was accepted by %s!"), asker);
 		}
 		
 		ModalAlertFactory::Alert(buffer, "OK");
@@ -308,11 +313,11 @@ JRoster::handleSubscriptionRequest(const gloox::JID& JID, const string& reason)
 {
 	BString message;
 	if (reason.empty())
-		message.SetToFormat("%s would like to subscribe to your presence so they may know if "
-			"you're online or not. Would you like to allow it?", JID.bare().c_str());
+		message.SetToFormat(B_TRANSLATE("%s would like to subscribe to your presence so they may "
+			"know if you're online or not. Would you like to allow it?"), JID.bare().c_str());
 	else
-		message.SetToFormat("%s would like to subscribe to your presence so they may know if "
-			"you're online or not. Would you like to allow it?\nThey write:\n%s",
+		message.SetToFormat(B_TRANSLATE("%s would like to subscribe to your presence so they may "
+			"know if you're online or not. Would you like to allow it?\nThey write:\n%s"),
 			JID.bare().c_str(), reason.c_str());
 
 	gloox::Client* client = JabberSpeak::Instance()->GlooxClient();
@@ -321,8 +326,8 @@ JRoster::handleSubscriptionRequest(const gloox::JID& JID, const string& reason)
 	// TODO this uses a synchrnous alert so the gloox thread will be blocked (no other message can
 	// be sent or received) until the alert is answered by the user. Instead we should use
 	// asynchronous mode
-	answer = ModalAlertFactory::Alert(message.String(), "No, I prefer privacy",
-		"Yes, grant them my presence");
+	answer = ModalAlertFactory::Alert(message.String(), B_TRANSLATE("No, I prefer privacy"),
+		B_TRANSLATE("Yes, grant them my presence"));
 
 	// send back the response
 	if (answer == 1) {
@@ -341,8 +346,8 @@ JRoster::handleUnsubscriptionRequest(const gloox::JID&, const string&)
 {
 	printf("%s\n", __PRETTY_FUNCTION__);
 #if 0
-		sprintf(buffer, "%s no longer wishes to know your online status.", asker);
-		ModalAlertFactory::NonModalAlert(buffer, "I feel so unloved");
+		sprintf(buffer, B_TRANSLATE("%s no longer wishes to know your online status."), asker);
+		ModalAlertFactory::NonModalAlert(buffer, B_TRANSLATE("I feel so unloved"));
 #endif
 	return false;
 }

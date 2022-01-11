@@ -32,10 +32,15 @@
 
 #include <stdlib.h>
 
-#include <Path.h>
-#include <FindDirectory.h>
 #include <AppFileInfo.h>
+#include <Catalog.h>
+#include <FindDirectory.h>
 #include <File.h>
+#include <Path.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "JabberSpeak"
+
 
 JabberSpeak *JabberSpeak::_instance = NULL;
 
@@ -151,36 +156,48 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 				if (intent == REGISTER) {
 					if (entity->Attribute("from") && AgentList::Instance()->GetAgentByID(entity->Attribute("from"))) {
 						const char *agent_name = AgentList::Instance()->GetAgentByID(entity->Attribute("from"))->Name().c_str();
-						sprintf(buffer, "You were refused registration information from the %s for the following reason:\n\n%s", agent_name, entity->Child("error")->Data());
+						sprintf(buffer, B_TRANSLATE("You were refused registration information "
+							"from the %s for the following reason:\n\n%s"),
+							agent_name, entity->Child("error")->Data());
 					} else {
-						sprintf(buffer, "You were refused registration information from an unidentifying Jabber service for the following reason:\n\n%s", entity->Child("error")->Data());
+						sprintf(buffer, B_TRANSLATE("You were refused registration information "
+							"from an unidentifying Jabber service for the following reason:\n\n%s"),
+							entity->Child("error")->Data());
 					}
 
-					ModalAlertFactory::Alert(buffer, "Oh, well", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+					ModalAlertFactory::Alert(buffer, B_TRANSLATE("Oh, well"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
 
 				// for errors on registration
 				if (intent == SEND_REGISTER) {
 					if (entity->Attribute("from") && AgentList::Instance()->GetAgentByID(entity->Attribute("from"))) {
 						const char *agent_name = AgentList::Instance()->GetAgentByID(entity->Attribute("from"))->Name().c_str();
-						sprintf(buffer, "Your registration attempt was refused by the %s for the following reason:\n\n%s", agent_name, entity->Child("error")->Data());
+						sprintf(buffer, B_TRANSLATE("Your registration attempt was refused by the "
+							"%s for the following reason:\n\n%s"),
+							agent_name, entity->Child("error")->Data());
 					} else {
-						sprintf(buffer, "Your registration attempt was refused by an unidentifying Jabber service for the following reason:\n\n%s", entity->Child("error")->Data());
+						sprintf(buffer, B_TRANSLATE("Your registration attempt was refused by an "
+							"unidentifying Jabber service for the following reason:\n\n%s"),
+							entity->Child("error")->Data());
 					}
 
-					ModalAlertFactory::Alert(buffer, "Oh, well", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+					ModalAlertFactory::Alert(buffer, B_TRANSLATE("Oh, well"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
 
 				// for errors on unregistration
 				if (intent == UNREGISTER) {
 					if (entity->Attribute("from") && AgentList::Instance()->GetAgentByID(entity->Attribute("from"))) {
 						const char *agent_name = AgentList::Instance()->GetAgentByID(entity->Attribute("from"))->Name().c_str();
-						sprintf(buffer, "You were refused unregistration information from the %s for the following reason:\n\n%s", agent_name, entity->Child("error")->Data());
+						sprintf(buffer, B_TRANSLATE("You were refused unregistration information "
+							"from the %s for the following reason:\n\n%s"),
+							agent_name, entity->Child("error")->Data());
 					} else {
-						sprintf(buffer, "You were refused unregistration information from an unidentifying Jabber service for the following reason:\n\n%s", entity->Child("error")->Data());
+						sprintf(buffer, B_TRANSLATE("You were refused unregistration information "
+							"from an unidentifying Jabber service for the following reason:\n\n%s"),
+							entity->Child("error")->Data());
 					}
 
-					ModalAlertFactory::Alert(buffer, "Oh, well", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+					ModalAlertFactory::Alert(buffer, B_TRANSLATE("Oh, well"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
 			}
 		}
@@ -201,14 +218,15 @@ void JabberSpeak::OnTag(XMLEntity *entity) {
 				if (intent == SEND_REGISTER) {
 					if (entity->Attribute("from") && AgentList::Instance()->GetAgentByID(entity->Attribute("from"))) {
 						const char *agent_name = AgentList::Instance()->GetAgentByID(entity->Attribute("from"))->Name().c_str();
-						sprintf(buffer, "Your registration attempt with the %s has been accepted.", agent_name);
+						sprintf(buffer, B_TRANSLATE("Your registration attempt with the %s has been accepted."), agent_name);
 
 						AgentList::Instance()->GetAgentByID(entity->Attribute("from"))->SetRegisteredFlag(true);			
 					} else {
-						sprintf(buffer, "Your registration attempt with an unidentifying Jabber service has been accepted.");
+						sprintf(buffer, B_TRANSLATE("Your registration attempt with an "
+							"unidentifying Jabber service has been accepted."));
 					}
 
-					ModalAlertFactory::Alert(buffer, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+					ModalAlertFactory::Alert(buffer, B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 				}
 			}
 		}
