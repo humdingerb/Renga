@@ -7,27 +7,46 @@ add_definitions('-g')
 add_definitions('-Wall' '-Wextra' '-Werror' '-Wno-multichar')
 add_compile_options(-fdiagnostics-color=always)
 
+set(LOCALIZED_SOURCES
+	# TODO review all these files for usefulness and relevance
+	${CMAKE_SOURCE_DIR}/jabber/BlabberSettings.cpp
+	${CMAKE_SOURCE_DIR}/jabber/CustomStatusWindow.cpp
+	${CMAKE_SOURCE_DIR}/jabber/JRoster.cpp
+	${CMAKE_SOURCE_DIR}/jabber/JabberSpeak.cpp
+	${CMAKE_SOURCE_DIR}/jabber/RosterView.cpp
+	${CMAKE_SOURCE_DIR}/jabber/TalkManager.cpp
+	${CMAKE_SOURCE_DIR}/jabber/UserID.cpp
+
+	# "Modern" XMPP classes using gloox cleanly and directly
+	${CMAKE_SOURCE_DIR}/network/GlooxHandler.cpp
+
+	# "Modern" UI classes using gloox types and StartWatching/SendNotices
+	${CMAKE_SOURCE_DIR}/ui/AboutWindow.cpp
+	${CMAKE_SOURCE_DIR}/ui/AddBuddyWindow.cpp
+	${CMAKE_SOURCE_DIR}/ui/BuddyInfoWindow.cpp
+	${CMAKE_SOURCE_DIR}/ui/ChangeNameWindow.cpp
+	${CMAKE_SOURCE_DIR}/ui/MainWindow.cpp
+	${CMAKE_SOURCE_DIR}/ui/RegisterAccountWindow.cpp
+	${CMAKE_SOURCE_DIR}/ui/TalkView.cpp
+)
+
+
 add_executable(Renga
+	${LOCALIZED_SOURCES}
+
 	# TODO review all these files for usefulness and relevance
 	 jabber/Agent.cpp
-	 jabber/UserID.cpp
 	 jabber/ChatTextView.cpp
-	 jabber/CustomStatusWindow.cpp
 	 jabber/LoginPreferencesView.cpp
 	 jabber/PreferencesWindow.cpp
 	 jabber/RosterItem.cpp
-	 jabber/RosterView.cpp
 	 jabber/SendTalkWindow.cpp
 	 jabber/SoundPreferencesView.cpp
 	 jabber/TalkListItem.cpp
-	 jabber/TalkManager.cpp
 	 jabber/TransportItem.cpp
 	 jabber/TransportPreferencesView.cpp
 	 jabber/BlabberApp.cpp
 	 jabber/AgentList.cpp
-	 jabber/BlabberSettings.cpp
-	 jabber/JabberSpeak.cpp
-	 jabber/JRoster.cpp
 	 jabber/SoundSystem.cpp
 	 jabber/GenericFunctions.cpp
 	 jabber/FileItem.cpp
@@ -45,28 +64,20 @@ add_executable(Renga
 	# "Modern" XMPP classes using gloox cleanly and directly
 	network/BobStore.cpp
 	network/BookmarkManager.cpp
-	network/GlooxHandler.cpp
 
 	# Misc. support stuff
 	support/AppLocation.cpp
 	support/main.cpp
 
 	# "Modern" UI classes using gloox types and StartWatching/SendNotices
-	ui/AboutWindow.cpp
-	ui/AddBuddyWindow.cpp
 	ui/BookmarkItem.cpp
-	ui/BuddyInfoWindow.cpp
-	ui/ChangeNameWindow.cpp
 	ui/EditingFilter.cpp
 	ui/HVIFUtil.cpp
-	ui/MainWindow.cpp
 	ui/ModalAlertFactory.cpp
 	ui/PeopleListItem.cpp
 	ui/PictureView.cpp
-	ui/RegisterAccountWindow.cpp
 	ui/RosterSuperitem.cpp
 	ui/RotateChatFilter.cpp
-	ui/TalkView.cpp
 )
 
 set_property(TARGET Renga PROPERTY CXX_STANDARD 14)
@@ -99,6 +110,13 @@ add_custom_command(TARGET Renga POST_BUILD
 		-a VICN:12:work        ${CMAKE_SOURCE_DIR}/resources/icons/work.hvif
 	COMMAND mimeset -f ${CMAKE_BINARY_DIR}/Renga
 	DEPENDS jabber/Resource.rdef
+)
+
+add_custom_target(en.catkeys
+	COMMAND ${CMAKE_C_COMPILER} -E -P -I ${CMAKE_SOURCE_DIR} -DB_COLLECTING_CATKEYS
+		${LOCALIZED_SOURCES} > en.catkeys.pre
+	COMMAND collectcatkeys -s "application/x-vnd.Haiku-Jabber" -w -o en.catkeys en.catkeys.pre
+	DEPENDS ${LOCALIZED_SOURCES}
 )
 
 install(TARGETS Renga RUNTIME DESTINATION apps/)
