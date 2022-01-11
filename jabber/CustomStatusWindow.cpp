@@ -9,6 +9,7 @@
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
 #include <StringView.h>
 
@@ -21,6 +22,10 @@
 #include "GenericFunctions.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CustomStatusWindow"
+
 
 CustomStatusWindow *CustomStatusWindow::_instance = NULL;
 
@@ -39,23 +44,23 @@ CustomStatusWindow *CustomStatusWindow::Instance() {
 
 
 CustomStatusWindow::CustomStatusWindow(BRect frame)
-	: BWindow(frame, "Create a custom status",
+	: BWindow(frame, B_TRANSLATE("Create a custom status"),
 		B_TITLED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS |
 		B_NOT_ZOOMABLE |
 		B_NOT_RESIZABLE)
 	{
 
-	_chat = new BRadioButton("status", "Chat", NULL);
+	_chat = new BRadioButton("status", B_TRANSLATE("Chat"), NULL);
 
-	_away = new BRadioButton("status", "Away", NULL);
+	_away = new BRadioButton("status", B_TRANSLATE("Away"), NULL);
 
-	_xa = new BRadioButton("status", "Extended away", NULL);
+	_xa = new BRadioButton("status", B_TRANSLATE("Extended away"), NULL);
 
-	_dnd = new BRadioButton("status", "Do not disturb", NULL);
+	_dnd = new BRadioButton("status", B_TRANSLATE("Do not disturb"), NULL);
 
 
-	BStringView *query = new BStringView(NULL, "Please provide your detailed status:");
+	BStringView *query = new BStringView(NULL, B_TRANSLATE("Please provide your detailed status:"));
 
 	// handle
 	_handle = new BTextControl(NULL, NULL, "", NULL);
@@ -64,13 +69,13 @@ CustomStatusWindow::CustomStatusWindow(BRect frame)
 	if (BlabberSettings::Instance()->Data("last-custom-more-exact-status")) {
 		_handle->SetText(BlabberSettings::Instance()->Data("last-custom-more-exact-status"));
 	} else {
-		_handle->SetText("I'm at my computer.");
+		_handle->SetText(B_TRANSLATE("I'm at my computer."));
 	}
 
-	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(JAB_CANCEL));
+	BButton *cancel = new BButton("cancel", B_TRANSLATE("Cancel"), new BMessage(JAB_CANCEL));
 	cancel->SetTarget(this);
 
-	BButton *ok = new BButton("ok", "OK", new BMessage(JAB_OK));
+	BButton *ok = new BButton("ok", B_TRANSLATE("OK"), new BMessage(JAB_OK));
 
 	ok->MakeDefault(true);
 	ok->SetTarget(this);

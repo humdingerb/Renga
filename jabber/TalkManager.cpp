@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <stdexcept>
 
+#include <Catalog.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Notification.h>
@@ -26,6 +27,10 @@
 #include "Messages.h"
 #include "SoundSystem.h"
 #include "TalkManager.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TalkManager"
+
 
 TalkManager *TalkManager::_instance = NULL;
 
@@ -465,7 +470,7 @@ TalkManager::handleMUCMessage(gloox::MUCRoom *room,
 		window->LockLooper();
 
 		if (group_username.empty()) {
-			window->AddToTalk("System:", msg.body(), TalkView::OTHER);
+			window->AddToTalk(B_TRANSLATE("System:"), msg.body(), TalkView::OTHER);
 		} else {
 			bool highlight;
 			// Highlight messages when they mention the nickname
@@ -514,7 +519,7 @@ TalkManager::handleMUCSubject(gloox::MUCRoom *room,
 {
 	TalkView* window = fGroupMap.at(room);
 	BString topic;
-	topic.SetToFormat("set topic to %s\n", subject.c_str());
+	topic.SetToFormat(B_TRANSLATE("Set topic to %s\n"), subject.c_str());
 
 	// FIXME just send a BMessage to the view and let it handle this
 	window->LockLooper();

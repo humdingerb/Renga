@@ -5,6 +5,7 @@
 #include "BuddyInfoWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <GroupView.h>
 #include <private/shared/IconView.h>
 #include <LayoutBuilder.h>
@@ -18,10 +19,14 @@
 #include "../jabber/JabberSpeak.h"
 #include "../jabber/Messages.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BuddyInfoWindow"
+
+
 BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
-	: BWindow(BRect(0, 0, 0, 0), "Buddy information", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
-	, fJID(querying_user->Handle().c_str())
+	: BWindow(BRect(0, 0, 0, 0), B_TRANSLATE("Buddy information"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fJID(querying_user->Handle().c_str())
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	BGroupView* full_view = new BGroupView(B_HORIZONTAL);
@@ -36,15 +41,15 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	BStringView *status_label, *status_name;
 	BStringView *realstatus_label = NULL, *realstatus_name = NULL;
 
-	friendly_label = new BStringView(NULL, "Nickname:");
+	friendly_label = new BStringView(NULL, B_TRANSLATE("Nickname:"));
 	if (querying_user->FriendlyName().empty()) {
-		friendly_name  = new BStringView(NULL, "<unknown>");
+		friendly_name  = new BStringView(NULL, B_TRANSLATE("<unknown>"));
 	} else {
 		friendly_name  = new BStringView(NULL, querying_user->FriendlyName().c_str());
 	}
 
 	if (!querying_user->MoreExactOnlineStatus().empty()) {
-		status_label = new BStringView(NULL, "Personalized status:");
+		status_label = new BStringView(NULL, B_TRANSLATE("Personalized status:"));
 		status_name  = new BStringView(NULL, querying_user->MoreExactOnlineStatus().c_str());
 
 		surrounding->GridLayout()->AddView(status_label, 0, 1);
@@ -52,16 +57,16 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	}
 
 	if (!querying_user->ExactOnlineStatus().empty()) {
-		realstatus_label = new BStringView(NULL, "Official status:");
+		realstatus_label = new BStringView(NULL, B_TRANSLATE("Official status:"));
 
 		if (querying_user->ExactOnlineStatus() == "xa") {
-			realstatus_name  = new BStringView(NULL, "Extended away");
+			realstatus_name  = new BStringView(NULL, B_TRANSLATE("Extended away"));
 		} else if (querying_user->ExactOnlineStatus() == "away") {
-			realstatus_name  = new BStringView(NULL, "Away");
+			realstatus_name  = new BStringView(NULL, B_TRANSLATE("Away"));
 		} else if (querying_user->ExactOnlineStatus() == "chat") {
-			realstatus_name  = new BStringView(NULL, "Available for chat");
+			realstatus_name  = new BStringView(NULL, B_TRANSLATE("Available for chat"));
 		} else if (querying_user->ExactOnlineStatus() == "dnd") {
-			realstatus_name  = new BStringView(NULL, "Do not disturb");
+			realstatus_name  = new BStringView(NULL, B_TRANSLATE("Do not disturb"));
 		}
 
 		surrounding->GridLayout()->AddView(realstatus_label, 0, 2);
@@ -69,15 +74,15 @@ BuddyInfoWindow::BuddyInfoWindow(UserID *querying_user)
 	}
 
 	if (querying_user->UserType() == UserID::JABBER) {
-		jabberid_label = new BStringView(NULL, "Jabber ID:");
+		jabberid_label = new BStringView(NULL, B_TRANSLATE("Jabber ID:"));
 		jabberid_name  = new BStringView(NULL, querying_user->Handle().c_str());
 	} else {
-		jabberid_label = new BStringView(NULL, "Jabber ID:");
+		jabberid_label = new BStringView(NULL, B_TRANSLATE("Jabber ID:"));
 		jabberid_name  = new BStringView(NULL, querying_user->JabberUsername().c_str());
 	}
 
 	// OK button
-	BButton *ok = new BButton("ok", "OK", new BMessage(B_QUIT_REQUESTED));
+	BButton *ok = new BButton("ok", B_TRANSLATE("OK"), new BMessage(B_QUIT_REQUESTED));
 
 	ok->MakeDefault(true);
 	ok->SetTarget(this);
@@ -141,18 +146,18 @@ BuddyInfoWindow::MessageReceived(BMessage* message)
 				switch (classification)
 				{
 					case gloox::VCard::ClassPublic:
-						fDetails->AddView(new BStringView(NULL, "Classification:"), 0, line);
-						fDetails->AddView(new BStringView(NULL, "Public"), 1, line);
+						fDetails->AddView(new BStringView(NULL, B_TRANSLATE("Classification:")), 0, line);
+						fDetails->AddView(new BStringView(NULL, B_TRANSLATE("Public")), 1, line);
 						line++;
 						break;
 					case gloox::VCard::ClassPrivate:
-						fDetails->AddView(new BStringView(NULL, "Classification:"), 0, line);
-						fDetails->AddView(new BStringView(NULL, "Private"), 1, line);
+						fDetails->AddView(new BStringView(NULL, B_TRANSLATE("Classification:")), 0, line);
+						fDetails->AddView(new BStringView(NULL, B_TRANSLATE("Private")), 1, line);
 						line++;
 						break;
 					case gloox::VCard::ClassConfidential:
-						fDetails->AddView(new BStringView(NULL, "Classification:"), 0, line);
-						fDetails->AddView(new BStringView(NULL, "Confidential"), 1, line);
+						fDetails->AddView(new BStringView(NULL, B_TRANSLATE("Classification:")), 0, line);
+						fDetails->AddView(new BStringView(NULL, B_TRANSLATE("Confidential")), 1, line);
 						line++;
 						break;
 					default:
@@ -241,7 +246,7 @@ BuddyInfoWindow::MessageReceived(BMessage* message)
 									}
 								}
 
-								builder.Add(new BStringView(NULL, "Address"));
+								builder.Add(new BStringView(NULL, B_TRANSLATE("Address")));
 								builder.AddGlue();
 								fDetails->AddView(title, 0, line);
 							} else {

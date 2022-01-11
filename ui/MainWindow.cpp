@@ -29,6 +29,7 @@
 
 #include <Application.h>
 #include <CardLayout.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
@@ -45,6 +46,8 @@
 #include <cstdio>
 #include <stdlib.h>
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MainWindow"
 
 enum {
 	kCreateAccount = 'crea'
@@ -134,7 +137,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_CONNECT: {
-			_status_view->SetMessage("connecting");
+			_status_view->SetMessage(B_TRANSLATE("Connecting" B_UTF8_ELLIPSIS));
 			JabberSpeak::Instance()->SendConnect("", "", "", true);
 
 			break;
@@ -142,14 +145,16 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_RECONNECTING: {
 			// we are connecting
-			_status_view->SetMessage("reconnecting");
+			_status_view->SetMessage(B_TRANSLATE("Reconnecting" B_UTF8_ELLIPSIS));
 
 			break;
 		}
 
 		case JAB_LOGGED_IN: {
 			// we just logged in
-			_status_view->SetMessage("connected as " + JabberSpeak::Instance()->CurrentLogin());
+			BString statusText;
+			statusText.SetToFormat(B_TRANSLATE("Connected as %s"), JabberSpeak::Instance()->CurrentLogin());
+			_status_view->SetMessage(statusText.String());
 
 			// save these settings
 			BlabberSettings::Instance()->SetData("last-realname", _login_realname->Text());
@@ -163,7 +168,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_DISCONNECT: {
 			JabberSpeak::Instance()->SendDisconnect();
-			_status_view->SetMessage("disconnecting");
+			_status_view->SetMessage(B_TRANSLATE("Disconnecting"));
 			JabberSpeak::Instance()->Reset();
 
 			break;
@@ -670,21 +675,21 @@ void BlabberMainWindow::MenusBeginning() {
 	// EDIT menu
 	if (RosterItem *item = _roster->CurrentItemSelection()) {
 		// if a  item is selected
-		sprintf(buffer, "Edit %s", item->GetUserID()->FriendlyName().c_str());
+		sprintf(buffer, B_TRANSLATE("Edit %s"), item->GetUserID()->FriendlyName().c_str());
 		_change_buddy_item->SetLabel(buffer);
 		_change_buddy_item->SetEnabled(true);
 
-		sprintf(buffer, "Remove %s", item->GetUserID()->FriendlyName().c_str());
+		sprintf(buffer, B_TRANSLATE("Remove %s"), item->GetUserID()->FriendlyName().c_str());
 		_remove_buddy_item->SetLabel(buffer);
 		_remove_buddy_item->SetEnabled(true);
 
 		_user_info_item->SetEnabled(true);
 	} else {
-		sprintf(buffer, "Edit buddy");
+		sprintf(buffer, B_TRANSLATE("Edit buddy"));
 		_change_buddy_item->SetLabel(buffer);
 		_change_buddy_item->SetEnabled(false);
 
-		sprintf(buffer, "Remove buddy");
+		sprintf(buffer, B_TRANSLATE("Remove buddy"));
 		_remove_buddy_item->SetLabel(buffer);
 		_remove_buddy_item->SetEnabled(false);
 
@@ -710,7 +715,7 @@ bool BlabberMainWindow::QuitRequested() {
 }
 
 BlabberMainWindow::BlabberMainWindow(BRect frame)
-	: BWindow(frame, "Renga", B_DOCUMENT_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS)
+	: BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Renga"), B_DOCUMENT_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS)
 {
 
 	// editing filter for taksing
@@ -731,15 +736,17 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	BMenuBar* menubar = new BMenuBar("menubar");
 
 	// FILE MENU
-	BMenu* file_menu = new BMenu("App");
+	BMenu* file_menu = new BMenu(B_TRANSLATE("App"));
 
-		_disconnect_item = new BMenuItem("Log out", new BMessage(JAB_DISCONNECT));
+		_disconnect_item = new BMenuItem(B_TRANSLATE("Log out"), new BMessage(JAB_DISCONNECT));
 
-		_about_item      = new BMenuItem("About Renga" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED));
+		_about_item = new BMenuItem(B_TRANSLATE("About Renga" B_UTF8_ELLIPSIS),
+			new BMessage(B_ABOUT_REQUESTED));
 
-		_quit_item = new BMenuItem("Quit", new BMessage(JAB_QUIT));
+		_quit_item = new BMenuItem(B_TRANSLATE("Quit"), new BMessage(JAB_QUIT));
 		_quit_item->SetShortcut('Q', 0);
-		_preferences_item = new BMenuItem("Settings" B_UTF8_ELLIPSIS, new BMessage(JAB_PREFERENCES));
+		_preferences_item = new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
+			new BMessage(JAB_PREFERENCES));
 		_preferences_item->SetShortcut(',', 0);
 
 	file_menu->AddItem(_preferences_item);
@@ -750,18 +757,22 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	file_menu->SetTargetForItems(MessageRepeater::Instance());
 
 	// EDIT MENU
-	BMenu* edit_menu = new BMenu("Buddy");
+	BMenu* edit_menu = new BMenu(B_TRANSLATE("Buddy"));
 
-		_add_buddy_item = new BMenuItem("Add new buddy", new BMessage(JAB_OPEN_ADD_BUDDY_WINDOW));
+		_add_buddy_item = new BMenuItem(B_TRANSLATE("Add new buddy"),
+			new BMessage(JAB_OPEN_ADD_BUDDY_WINDOW));
 		_add_buddy_item->SetShortcut('N', 0);
 
-		_change_buddy_item = new BMenuItem("Edit buddy", new BMessage(JAB_OPEN_EDIT_BUDDY_WINDOW));
+		_change_buddy_item = new BMenuItem(B_TRANSLATE("Edit buddy"),
+			new BMessage(JAB_OPEN_EDIT_BUDDY_WINDOW));
 		_change_buddy_item->SetShortcut('E', 0);
 
-		_remove_buddy_item = new BMenuItem("Remove buddy", new BMessage(JAB_REMOVE_BUDDY));
+		_remove_buddy_item = new BMenuItem(B_TRANSLATE("Remove buddy"),
+			new BMessage(JAB_REMOVE_BUDDY));
 		_remove_buddy_item->SetShortcut('T', 0);
 
-		_user_info_item = new BMenuItem("Get buddy info", new BMessage(JAB_USER_INFO));
+		_user_info_item = new BMenuItem(B_TRANSLATE("Get buddy info"),
+			new BMessage(JAB_USER_INFO));
 		_user_info_item->SetShortcut('G', 0);
 
 	edit_menu->AddItem(_add_buddy_item);
@@ -774,16 +785,26 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	// STATUS MENU
 	BMenu* status_menu = new BMenu("Status");
 
-		_chat_item = new BMenuItem("I'm available for chat", new BMessage(BLAB_AVAILABLE_FOR_CHAT));
-		_away_item = new BMenuItem("I will be away temporarily", new BMessage(BLAB_AWAY_TEMPORARILY));
-		_dnd_item = new BMenuItem("Do not disturb me", new BMessage(BLAB_DO_NOT_DISTURB));
-		_xa_item = new BMenuItem("I will be away for an extended time period", new BMessage(BLAB_AWAY_EXTENDED));
-		_school_item = new BMenuItem("Off to school", new BMessage(BLAB_SCHOOL));
-		_work_item = new BMenuItem("Busy at work", new BMessage(BLAB_WORK));
-		_lunch_item = new BMenuItem("Lunch", new BMessage(BLAB_LUNCH));
-		_dinner_item = new BMenuItem("Dinner", new BMessage(BLAB_DINNER));
-		_sleep_item = new BMenuItem("Sleeping", new BMessage(BLAB_SLEEP));
-		_custom_item = new BMenuItem("Custom" B_UTF8_ELLIPSIS, new BMessage(BLAB_CUSTOM_STATUS));
+		_chat_item = new BMenuItem(B_TRANSLATE("I'm available for chat"),
+			new BMessage(BLAB_AVAILABLE_FOR_CHAT));
+		_away_item = new BMenuItem(B_TRANSLATE("I will be away temporarily"),
+			new BMessage(BLAB_AWAY_TEMPORARILY));
+		_dnd_item = new BMenuItem(B_TRANSLATE("Do not disturb me"),
+			new BMessage(BLAB_DO_NOT_DISTURB));
+		_xa_item = new BMenuItem(B_TRANSLATE("I will be away for an extended time period"),
+			new BMessage(BLAB_AWAY_EXTENDED));
+		_school_item = new BMenuItem(B_TRANSLATE("Off to school"),
+			new BMessage(BLAB_SCHOOL));
+		_work_item = new BMenuItem(B_TRANSLATE("Busy at work"),
+			new BMessage(BLAB_WORK));
+		_lunch_item = new BMenuItem(B_TRANSLATE("Lunch"),
+			new BMessage(BLAB_LUNCH));
+		_dinner_item = new BMenuItem(B_TRANSLATE("Dinner"),
+			new BMessage(BLAB_DINNER));
+		_sleep_item = new BMenuItem(B_TRANSLATE("Sleeping"),
+			new BMessage(BLAB_SLEEP));
+		_custom_item = new BMenuItem(B_TRANSLATE("Custom" B_UTF8_ELLIPSIS),
+			new BMessage(BLAB_CUSTOM_STATUS));
 
 	status_menu->AddItem(_chat_item);
 	status_menu->AddSeparatorItem();
@@ -805,20 +826,25 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_chat_item->SetMarked(true);
 
 	// TALK MENU
-	BMenu* talk_menu = new BMenu("Talk");
+	BMenu* talk_menu = new BMenu(B_TRANSLATE("Talk"));
 
-		BMenuItem* rotate_chat_forward_item = new BMenuItem("Rotate chat forward", new BMessage(JAB_ROTATE_CHAT_FORWARD));
+		BMenuItem* rotate_chat_forward_item = new BMenuItem(B_TRANSLATE("Rotate chat forward"),
+			new BMessage(JAB_ROTATE_CHAT_FORWARD));
 		rotate_chat_forward_item->SetShortcut(B_UP_ARROW, B_SHIFT_KEY);
 
-		BMenuItem* rotate_chat_backward_item = new BMenuItem("Rotate chat backward", new BMessage(JAB_ROTATE_CHAT_BACKWARD));
+		BMenuItem* rotate_chat_backward_item = new BMenuItem(B_TRANSLATE("Rotate chat backward"),
+			new BMessage(JAB_ROTATE_CHAT_BACKWARD));
 		rotate_chat_backward_item->SetShortcut(B_DOWN_ARROW, B_SHIFT_KEY);
 
-		_send_message_item = new BMenuItem("Send message" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_NEW_MESSAGE));
+		_send_message_item = new BMenuItem(B_TRANSLATE("Send message" B_UTF8_ELLIPSIS),
+			new BMessage(JAB_OPEN_NEW_MESSAGE));
 		_send_message_item->SetShortcut('M', 0);
 
-		_send_chat_item = new BMenuItem("Start chat" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_NEW_CHAT));
+		_send_chat_item = new BMenuItem(B_TRANSLATE("Start chat" B_UTF8_ELLIPSIS),
+			new BMessage(JAB_OPEN_NEW_CHAT));
 
-		_send_groupchat_item = new BMenuItem("Start group chat" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_NEW_GROUP_CHAT));
+		_send_groupchat_item = new BMenuItem(B_TRANSLATE("Start group chat" B_UTF8_ELLIPSIS),
+			new BMessage(JAB_OPEN_NEW_GROUP_CHAT));
 
 	talk_menu->AddItem(rotate_chat_forward_item);
 	talk_menu->AddItem(rotate_chat_backward_item);
@@ -829,10 +855,11 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	talk_menu->SetTargetForItems(this);
 
 	// HELP MENU
-	BMenu* help_menu = new BMenu("Help");
+	BMenu* help_menu = new BMenu(B_TRANSLATE("Help"));
 
-	BMenuItem* user_guide_item = new BMenuItem("Renga manual", new BMessage(JAB_USER_GUIDE));
-	BMenuItem* faq_item = new BMenuItem("Renga FAQ", new BMessage(JAB_FAQ));
+	BMenuItem* user_guide_item = new BMenuItem(B_TRANSLATE("Renga manual"),
+		new BMessage(JAB_USER_GUIDE));
+	BMenuItem* faq_item = new BMenuItem(B_TRANSLATE("Renga FAQ"), new BMessage(JAB_FAQ));
 
 	help_menu->AddItem(user_guide_item);
 	help_menu->AddItem(faq_item);
@@ -850,7 +877,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 
 	// tabbed view
 	// roster view
-	_roster          = new RosterView();
+	_roster = new RosterView();
 	BScrollView* roster_scroller = new BScrollView(NULL, _roster, 0, false, true,
 		B_NO_BORDER);
 	_roster->TargetedByScrollView(roster_scroller);
@@ -879,25 +906,25 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	_login_bulb = new PictureView("bulb-normal");
 
 	// username/password controls
-	_login_realname = new BTextControl(NULL, "Nickname: ", NULL, NULL);
+	_login_realname = new BTextControl(NULL, B_TRANSLATE("Nickname:"), NULL, NULL);
 
-	_login_username = new BTextControl(NULL, "Jabber ID: ", NULL, NULL);
+	_login_username = new BTextControl(NULL, B_TRANSLATE("Jabber ID:"), NULL, NULL);
 
-	_login_password = new BTextControl(NULL, "Password: ", NULL, NULL);
+	_login_password = new BTextControl(NULL, B_TRANSLATE("Password:"), NULL, NULL);
 	_login_password->TextView()->HideTyping(true);
 
 	BMessage* createAccount = new BMessage(kCreateAccount);
-	_login_new_account = new BButton("create", "Create a new account",
+	_login_new_account = new BButton("create", B_TRANSLATE("Create a new account"),
 		createAccount);
 
-	_login_auto_login = new BCheckBox(NULL, "Auto-login", NULL);
+	_login_auto_login = new BCheckBox(NULL, B_TRANSLATE("Auto-login"), NULL);
 
 	// login button
-	_login_login = new BButton("login", "Login", new BMessage(JAB_LOGIN));
+	_login_login = new BButton("login", B_TRANSLATE("Login"), new BMessage(JAB_LOGIN));
 	_login_login->MakeDefault(false);
 	_login_login->SetTarget(this);
 
-	BStringView* appName = new BStringView("app name", "Renga");
+	BStringView* appName = new BStringView("app name", B_TRANSLATE_SYSTEM_NAME("Renga"));
 	BFont bigfont(be_plain_font);
 	bigfont.SetSize(bigfont.Size() * 3);
 	appName->SetFont(&bigfont);
@@ -909,7 +936,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 			.AddGrid()
 				.Add(_login_bulb, 0, 0, 1, 4)
 				.Add(appName, 1, 1)
-				.Add(new BStringView("", "XMPP client for Haiku"), 1, 2)
+				.Add(new BStringView("", B_TRANSLATE("An XMPP client for Haiku")), 1, 2)
 			.End()
 			.Add(_login_new_account)
 			.AddGlue()
@@ -941,13 +968,13 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	if(BlabberSettings::Instance()->Data("last-realname")) {
 		_login_realname->SetText(BlabberSettings::Instance()->Data("last-realname"));
 	} else {
-		_login_realname->SetText("Me");
+		_login_realname->SetText(B_TRANSLATE_COMMENT("Me","Self-referencial 'me'"));
 	}
 
 	if (BlabberSettings::Instance()->Data("last-login")) {
 		_login_username->SetText(BlabberSettings::Instance()->Data("last-login"));
 	} else {
-		_login_username->SetText("newuser@jabber.org");
+		_login_username->SetText(B_TRANSLATE("newuser@jabber.org"));
 	}
 
 	_login_password->SetText(BlabberSettings::Instance()->Data("last-password"));
@@ -971,7 +998,9 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 bool BlabberMainWindow::ValidateLogin() {
 	// existance of username
 	if (!strcmp(_login_username->Text(), "")) {
-		ModalAlertFactory::Alert("Wait, you haven't specified your Jabber ID yet.\n(e.g. haikuFan@jabber.org)", "OK", NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
+		ModalAlertFactory::Alert(B_TRANSLATE("Wait, you haven't specified your Jabber ID yet.\n"
+			"(e.g. haikuFan@jabber.org)"), B_TRANSLATE("OK"),
+			NULL, NULL, B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_username->MakeFocus(true);
 
 		return false;
@@ -981,9 +1010,12 @@ bool BlabberMainWindow::ValidateLogin() {
 	std::string validate = UserID::WhyNotValidJabberHandle(_login_username->Text());
 	if (validate.size()) {
 		BString buffer;
-		buffer.SetToFormat("The Jabber ID you specified must not be yours, because it's invalid for the following reason:\n\n%s\n\nIf you can't remember it, it's OK to create a new one by checking the \"Create a new Jabber account!\" box.", validate.c_str());
+		buffer.SetToFormat(B_TRANSLATE("The Jabber ID you specified must not be yours, because "
+			"it's invalid for the following reason:\n\n%s\n\n"
+			"If you can't remember it, it's OK to create a new one by checking the "
+			"\"Create a new Jabber account!\" box."), validate.c_str());
 
-		ModalAlertFactory::Alert(buffer, "OK", NULL, NULL,
+		ModalAlertFactory::Alert(buffer, B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_username->MakeFocus(true);
 
@@ -995,10 +1027,10 @@ bool BlabberMainWindow::ValidateLogin() {
 	// check existance of password
 	if (!strcmp(_login_password->Text(), "")) {
 		char buffer[1024];
-		sprintf(buffer, "You must specify a password so I can make sure it's you, %s.",
+		sprintf(buffer, B_TRANSLATE("You must specify a password so I can make sure it's you, %s."),
 			username.username().c_str());
 
-		ModalAlertFactory::Alert(buffer, "OK", NULL, NULL,
+		ModalAlertFactory::Alert(buffer, B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_FROM_LABEL, B_STOP_ALERT);
 		_login_password->MakeFocus(true);
 
@@ -1024,13 +1056,13 @@ void BlabberMainWindow::ShowLogin() {
 	if(BlabberSettings::Instance()->Data("last-realname")) {
 		_login_realname->SetText(BlabberSettings::Instance()->Data("last-realname"));
 	} else {
-		_login_realname->SetText("Me");
+		_login_realname->SetText(B_TRANSLATE_COMMENT("Me","Self-referencial 'me'"));
 	}
 
 	if (BlabberSettings::Instance()->Data("last-login")) {
 		_login_username->SetText(BlabberSettings::Instance()->Data("last-login"));
 	} else {
-		_login_username->SetText("newuser@jabber.org");
+		_login_username->SetText(B_TRANSLATE("newuser@jabber.org"));
 	}
 
 	_login_password->SetText(BlabberSettings::Instance()->Data("last-password"));
@@ -1050,7 +1082,7 @@ void BlabberMainWindow::SetCustomStatus(string status) {
 	char buffer[2048];
 
 	// create menued status message
-	sprintf(buffer, "[Custom] %s", status.c_str());
+	sprintf(buffer, B_TRANSLATE("[Custom] %s"), status.c_str());
 
 	_custom_item->SetMarked(true);
 	_custom_item->SetLabel(buffer);

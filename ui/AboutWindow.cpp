@@ -3,6 +3,10 @@
 //////////////////////////////////////////////////
 
 #include "AboutWindow.h"
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AboutWindow"
 
 
 AboutWindow *AboutWindow::_instance = NULL;
@@ -17,7 +21,7 @@ AboutWindow *AboutWindow::Instance() {
 }
 
 AboutWindow::AboutWindow()
-	: BAboutWindow("Renga", "application/x-vnd.Haiku-Jabber") {
+	: BAboutWindow(B_TRANSLATE_SYSTEM_NAME("Renga"), "application/x-vnd.Haiku-Jabber") {
 	// draw credits
 	PopulateCredits();
 }
@@ -25,9 +29,9 @@ AboutWindow::AboutWindow()
 AboutWindow::~AboutWindow() {
 	_instance = NULL;
 }
-	
+
 void AboutWindow::PopulateCredits() {
-	AddDescription("XMPP instant messaging client");
+	AddDescription(B_TRANSLATE("An XMPP instant messaging client"));
 	const char * authors[] = {
 		"Pascal Abresch",
 		"Andrea Anzani",
@@ -49,8 +53,8 @@ void AboutWindow::PopulateCredits() {
 		"jabber.org",
 		NULL
 	};
-	AddText("Graphics", graphics);
-	AddExtraInfo("Based on Jabber for BeOS by John Blanco");
-	AddExtraInfo("Powered by Gloox by Jakob Schröter");
+	AddText(B_TRANSLATE("Graphics"), graphics);
+	AddExtraInfo(B_TRANSLATE("Based on Jabber for BeOS by John Blanco"));
+	AddExtraInfo(B_TRANSLATE("Powered by Gloox by Jakob Schröter"));
 }
 

@@ -13,11 +13,16 @@
 
 #include <Button.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
 #include <StringView.h>
 
 #include <cstdio>
 #include <string.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AddBuddyWindow"
+
 
 const int kXMPPSelected = 0;
 const int kIRCSelected = 1;
@@ -45,35 +50,35 @@ AddBuddyWindow::~AddBuddyWindow() {
 }
 
 
-static const char* sXMPPHelpText = "Please enter a JID of the form username@server (e.g., beoslover@jabber.org).";
-static const char* sIRCHelpText  = "Please enter the user's IRC nickname and server (e.g., haikulover%irc.oftc.net).";
+static const char* sXMPPHelpText = B_TRANSLATE_MARK(
+	"Please enter a JID of the form username@server (e.g., beoslover@jabber.org).");
+static const char* sIRCHelpText  = B_TRANSLATE_MARK(
+	"Please enter the user's IRC nickname and server (e.g., haikulover%irc.oftc.net).");
 
 AddBuddyWindow::AddBuddyWindow(BRect rect)
-	: BWindow(rect, "Add a buddy", B_TITLED_WINDOW,
+	: BWindow(rect, B_TRANSLATE("Add a buddy"), B_TITLED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
-	fNickName = new BTextControl("nickName", "Nickname:", "", NULL);
+	fNickName = new BTextControl("nickName", B_TRANSLATE("Nickname:"), "", NULL);
 
-	fServiceSelection = new BOptionPopUp("Service Selection", "Online service:",
+	fServiceSelection = new BOptionPopUp("Service Selection", B_TRANSLATE("Online service:"),
 		new BMessage(kOptionChanged));
-	fServiceSelection->AddOption("XMPP", kXMPPSelected);
-	fServiceSelection->AddOption("IRC", kIRCSelected);
+	fServiceSelection->AddOption(B_TRANSLATE("XMPP"), kXMPPSelected);
+	fServiceSelection->AddOption(B_TRANSLATE("IRC"), kIRCSelected);
 
-	fHandle = new BTextControl("userID", "XMPP ID:", "", NULL);
+	fHandle = new BTextControl("userID", B_TRANSLATE("XMPP ID:"), "", NULL);
 
 	fHelpText = new BStringView("helpText", sXMPPHelpText);
 	fHelpText->SetExplicitMinSize(BSize(fHelpText->StringWidth(sXMPPHelpText) + 24,
 		B_SIZE_UNSET));
 
-	BButton *kCancelButton = new BButton("Cancel", new BMessage(JAB_CANCEL));
+	BButton *kCancelButton = new BButton(B_TRANSLATE("Cancel"), new BMessage(JAB_CANCEL));
 	kCancelButton->SetTarget(this);
 
 
-	BButton *kOkButton = new BButton("ok", new BMessage(JAB_OK));
+	BButton *kOkButton = new BButton(B_TRANSLATE("Add buddy"), new BMessage(JAB_OK));
 	kOkButton->MakeDefault(true);
 	kOkButton->SetTarget(this);
-
-	kOkButton->SetLabel("Add buddy");
 
 	// add GUI components to BView
 	SetLayout(new BGridLayout());
@@ -111,12 +116,12 @@ void AddBuddyWindow::MessageReceived(BMessage *msg) {
 			switch (fServiceSelection->SelectedOption()) {
 				case kXMPPSelected: {
 					fHelpText->SetText(sXMPPHelpText);
-					fHandle->SetLabel("XMPP ID:");
+					fHandle->SetLabel(B_TRANSLATE("XMPP ID:"));
 					break;
 				}
 				case kIRCSelected: {
 					fHelpText->SetText(sIRCHelpText);
-					fHandle->SetLabel("IRC handle:");
+					fHandle->SetLabel(B_TRANSLATE("IRC handle:"));
 					break;
 				}
 			}
@@ -160,8 +165,10 @@ void AddBuddyWindow::AddNewUser() {
 	std::string validate = UserID::WhyNotValidJabberHandle(username);
 
 	if (fServiceSelection->SelectedOption() == kXMPPSelected && validate.size()) {
-		sprintf(buffer, "%s is not a valid XMPP ID for the following reason:\n\n%s\n\nPlease correct it.", fHandle->Text(), validate.c_str());
-		ModalAlertFactory::Alert(buffer, "Hmm, better check that...");
+		sprintf(buffer, B_TRANSLATE(
+			"%s is not a valid XMPP ID for the following reason:\n\n%s\n\n"
+			"Please correct it."), fHandle->Text(), validate.c_str());
+		ModalAlertFactory::Alert(buffer, B_TRANSLATE("OK"));
 		fHandle->MakeFocus(true);
 		fHandle->MarkAsInvalid(true);
 
@@ -171,8 +178,10 @@ void AddBuddyWindow::AddNewUser() {
 	// make sure it's not a duplicate of one already existing (unless itself)
 	JRoster::Instance()->Lock();
 	if (JRoster::Instance()->FindUser(JRoster::COMPLETE_HANDLE, fHandle->Text())) {
-		sprintf(buffer, "%s already exists in your buddy list.  Please choose another so you won't get confused.", fHandle->Text());
-		ModalAlertFactory::Alert(buffer, "OK");
+		sprintf(buffer, B_TRANSLATE(
+			"%s already exists in your buddy list.\n\n"
+			"Please choose another so you won't get confused."), fHandle->Text());
+		ModalAlertFactory::Alert(buffer, B_TRANSLATE("OK"));
 		fHandle->MakeFocus(true);
 		fHandle->MarkAsInvalid(true);
 

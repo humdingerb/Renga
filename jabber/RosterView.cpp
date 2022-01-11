@@ -6,6 +6,7 @@
 
 #include <cstdio>
 
+#include <Catalog.h>
 #include <MenuItem.h>
 #include <TranslationUtils.h>
 
@@ -18,6 +19,10 @@
 #include "TalkManager.h"
 
 #include <strings.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RosterView"
+
 
 RosterView::RosterView()
 	: BOutlineListView(NULL, B_SINGLE_SELECTION_LIST) {
@@ -54,16 +59,16 @@ void RosterView::AttachedToWindow() {
 	// popup menu
 	_popup = new BPopUpMenu(NULL, false, false);
 
-		_chat_item         = new BMenuItem("Chat" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_CHAT));
-		_message_item      = new BMenuItem("Send message" B_UTF8_ELLIPSIS, new BMessage(JAB_OPEN_MESSAGE));
-		_change_user_item  = new BMenuItem("Edit buddy", new BMessage(JAB_OPEN_EDIT_BUDDY_WINDOW));
-		_remove_user_item  = new BMenuItem("Remove buddy", new BMessage(JAB_REMOVE_BUDDY));
-		_user_info_item    = new BMenuItem("Get buddy info", new BMessage(JAB_USER_INFO));
+		_chat_item         = new BMenuItem(B_TRANSLATE("Chat" B_UTF8_ELLIPSIS), new BMessage(JAB_OPEN_CHAT));
+		_message_item      = new BMenuItem(B_TRANSLATE("Send message" B_UTF8_ELLIPSIS), new BMessage(JAB_OPEN_MESSAGE));
+		_change_user_item  = new BMenuItem(B_TRANSLATE("Edit buddy"), new BMessage(JAB_OPEN_EDIT_BUDDY_WINDOW));
+		_remove_user_item  = new BMenuItem(B_TRANSLATE("Remove buddy"), new BMessage(JAB_REMOVE_BUDDY));
+		_user_info_item    = new BMenuItem(B_TRANSLATE("Get buddy info"), new BMessage(JAB_USER_INFO));
 
-		_presence          = new BMenu("Presence");
+		_presence          = new BMenu(B_TRANSLATE("Presence"));
 
-			_subscribe_presence   = new BMenuItem("Subscribe", new BMessage(JAB_SUBSCRIBE_PRESENCE));
-			_unsubscribe_presence = new BMenuItem("Unsubscribe", new BMessage(JAB_UNSUBSCRIBE_PRESENCE));
+			_subscribe_presence   = new BMenuItem(B_TRANSLATE("Subscribe"), new BMessage(JAB_SUBSCRIBE_PRESENCE));
+			_unsubscribe_presence = new BMenuItem(B_TRANSLATE("Unsubscribe"), new BMessage(JAB_UNSUBSCRIBE_PRESENCE));
 
 			_presence->AddItem(_subscribe_presence);
 			_presence->AddItem(_unsubscribe_presence);
@@ -79,12 +84,12 @@ void RosterView::AttachedToWindow() {
 	_popup->AddItem(_presence);
 
 	// create top level lists
-	AddItem(_online  = new RosterSuperitem("Online"));
-	AddItem(_unaccepted = new RosterSuperitem("Pending presence"));
-	AddItem(_unknown = new RosterSuperitem("No presence"));
-	AddItem(_offline = new RosterSuperitem("Offline"));
-	AddItem(_transports = new RosterSuperitem("Live transports"));
-	AddItem(_bookmarks = new RosterSuperitem("Group chats"));
+	AddItem(_online  = new RosterSuperitem(B_TRANSLATE("Online")));
+	AddItem(_unaccepted = new RosterSuperitem(B_TRANSLATE("Pending presence")));
+	AddItem(_unknown = new RosterSuperitem(B_TRANSLATE("No presence")));
+	AddItem(_offline = new RosterSuperitem(B_TRANSLATE("Offline")));
+	AddItem(_transports = new RosterSuperitem(B_TRANSLATE("Live transports")));
+	AddItem(_bookmarks = new RosterSuperitem(B_TRANSLATE("Group chats")));
 
 	// make maps (BUGBUG better way to do two-way map?)
 	_item_to_status_map[_offline] = UserID::OFFLINE;
@@ -401,11 +406,11 @@ void RosterView::UpdatePopUpMenu() {
 		_chat_item->SetEnabled(true);
 		_message_item->SetEnabled(true);
 
-		sprintf(buffer, "Edit %s", item->GetUserID()->FriendlyName().c_str());
+		sprintf(buffer, B_TRANSLATE("Edit %s"), item->GetUserID()->FriendlyName().c_str());
 		_change_user_item->SetLabel(buffer);
 		_change_user_item->SetEnabled(true);
 
-		sprintf(buffer, "Remove %s", item->GetUserID()->FriendlyName().c_str());
+		sprintf(buffer, B_TRANSLATE("Remove %s"), item->GetUserID()->FriendlyName().c_str());
 		_remove_user_item->SetLabel(buffer);
 		_remove_user_item->SetEnabled(true);
 
@@ -425,11 +430,11 @@ void RosterView::UpdatePopUpMenu() {
 		_chat_item->SetEnabled(true);
 		_message_item->SetEnabled(false);
 
-		sprintf(buffer, "Edit %s", bookmark->Text());
+		sprintf(buffer, B_TRANSLATE("Edit %s"), bookmark->Text());
 		_change_user_item->SetLabel(buffer);
 		_change_user_item->SetEnabled(true);
 
-		sprintf(buffer, "Remove %s", bookmark->Text());
+		sprintf(buffer, B_TRANSLATE("Remove %s"), bookmark->Text());
 		_remove_user_item->SetLabel(buffer);
 		_remove_user_item->SetEnabled(true);
 
@@ -441,11 +446,11 @@ void RosterView::UpdatePopUpMenu() {
 		_chat_item->SetEnabled(false);
 		_message_item->SetEnabled(false);
 
-		sprintf(buffer, "Edit buddy");
+		sprintf(buffer, B_TRANSLATE("Edit buddy"));
 		_change_user_item->SetLabel(buffer);
 		_change_user_item->SetEnabled(false);
 
-		sprintf(buffer, "Remove buddy");
+		sprintf(buffer, B_TRANSLATE("Remove buddy"));
 		_remove_user_item->SetLabel(buffer);
 		_remove_user_item->SetEnabled(false);
 

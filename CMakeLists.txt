@@ -82,7 +82,7 @@ if(NOT expat)
 endif()
 
 target_link_libraries(Renga
-	be expat game gloox shared tracker translation
+	be expat game gloox localestub shared tracker translation
 )
 
 add_custom_command(TARGET Renga POST_BUILD
