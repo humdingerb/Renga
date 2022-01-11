@@ -525,7 +525,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_SCHOOL: {
-			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, "Off to School");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, B_TRANSLATE("Off to School"));
 			_school_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "school");
@@ -535,7 +535,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_WORK: {
-			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, "Busy at Work");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, B_TRANSLATE("Busy at work"));
 			_work_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "work");
@@ -545,7 +545,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_LUNCH: {
-			JabberSpeak::Instance()->SendPresence(gloox::Presence::Away, "Lunch");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::Away, B_TRANSLATE("Lunch"));
 			_lunch_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "lunch");
@@ -555,7 +555,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_DINNER: {
-			JabberSpeak::Instance()->SendPresence(gloox::Presence::Away, "Dinner");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::Away, B_TRANSLATE("Dinner"));
 			_dinner_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "dinner");
@@ -565,7 +565,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case BLAB_SLEEP: {
-			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, "Sleeping");
+			JabberSpeak::Instance()->SendPresence(gloox::Presence::XA, B_TRANSLATE("Sleeping"));
 			_sleep_item->SetMarked(true);
 			BlabberSettings::Instance()->SetTag("last-used-custom-status", false);
 			BlabberSettings::Instance()->SetData("last-custom-exact-status", "sleep");
@@ -783,7 +783,7 @@ BlabberMainWindow::BlabberMainWindow(BRect frame)
 	edit_menu->SetTargetForItems(this);
 
 	// STATUS MENU
-	BMenu* status_menu = new BMenu("Status");
+	BMenu* status_menu = new BMenu(B_TRANSLATE("Status"));
 
 		_chat_item = new BMenuItem(B_TRANSLATE("I'm available for chat"),
 			new BMessage(BLAB_AVAILABLE_FOR_CHAT));
