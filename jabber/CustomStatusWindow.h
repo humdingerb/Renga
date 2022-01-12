@@ -22,7 +22,7 @@
 
 class CustomStatusWindow : public BWindow {
 public:
-	static CustomStatusWindow  *Instance();
+	static CustomStatusWindow  *Instance(BRect frame);
 
 public:
 
@@ -36,9 +36,7 @@ private:
 	static CustomStatusWindow *_instance;
 
 private:
-	BBox                      *_surrounding;
 	BTextControl              *_handle;
-	BView                     *_full_view;
 
 	BRadioButton              *_chat;
 	BRadioButton              *_away;

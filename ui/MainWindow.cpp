@@ -576,8 +576,8 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case BLAB_CUSTOM_STATUS:
 		{
-			CustomStatusWindow::Instance()->Show();
-			CustomStatusWindow::Instance()->Activate();
+			CustomStatusWindow::Instance(Frame())->Show();
+			CustomStatusWindow::Instance(Frame())->Activate();
 			break;
 		}
 
