@@ -9,7 +9,7 @@
 
 class AddBuddyWindow : public BWindow {
 public:
-	static AddBuddyWindow	*Instance();
+	static AddBuddyWindow	*Instance(BRect frame);
 							~AddBuddyWindow();
 
 	void					MessageReceived(BMessage *msg);
@@ -18,7 +18,7 @@ public:
 	void					AddNewUser();
 
 protected:
-							AddBuddyWindow(BRect rect);
+							AddBuddyWindow(BRect frame);
 
 private:
 	static AddBuddyWindow	*fInstance;

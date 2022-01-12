@@ -29,17 +29,9 @@ const int kIRCSelected = 1;
 
 AddBuddyWindow *AddBuddyWindow::fInstance = NULL;
 
-AddBuddyWindow *AddBuddyWindow::Instance() {
-	if (fInstance == NULL) {
-		float main_window_width  = 440;
-		float main_window_height = 165;
-
-		// create window frame position
-		BRect frame(GenericFunctions::CenteredFrame(main_window_width, main_window_height));
-
-		// create window singleton
+AddBuddyWindow *AddBuddyWindow::Instance(BRect frame) {
+	if (fInstance == NULL)
 		fInstance = new AddBuddyWindow(frame);
-	}
 
 	return fInstance;
 }
@@ -55,9 +47,10 @@ static const char* sXMPPHelpText = B_TRANSLATE_MARK(
 static const char* sIRCHelpText  = B_TRANSLATE_MARK(
 	"Please enter the user's IRC nickname and server (e.g., haikulover%irc.oftc.net).");
 
-AddBuddyWindow::AddBuddyWindow(BRect rect)
-	: BWindow(rect, B_TRANSLATE("Add a buddy"), B_TITLED_WINDOW,
-		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
+
+AddBuddyWindow::AddBuddyWindow(BRect frame)
+	: BWindow(BRect(), B_TRANSLATE("Add a buddy"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	fNickName = new BTextControl("nickName", B_TRANSLATE("Nickname:"), "", NULL);
 
@@ -69,32 +62,35 @@ AddBuddyWindow::AddBuddyWindow(BRect rect)
 	fHandle = new BTextControl("userID", B_TRANSLATE("XMPP ID:"), "", NULL);
 
 	fHelpText = new BStringView("helpText", sXMPPHelpText);
-	fHelpText->SetExplicitMinSize(BSize(fHelpText->StringWidth(sXMPPHelpText) + 24,
-		B_SIZE_UNSET));
 
 	BButton *kCancelButton = new BButton(B_TRANSLATE("Cancel"), new BMessage(JAB_CANCEL));
 	kCancelButton->SetTarget(this);
-
 
 	BButton *kOkButton = new BButton(B_TRANSLATE("Add buddy"), new BMessage(JAB_OK));
 	kOkButton->MakeDefault(true);
 	kOkButton->SetTarget(this);
 
-	// add GUI components to BView
-	SetLayout(new BGridLayout());
-	BLayoutBuilder::Grid<>(this)
-		.SetInsets(B_USE_WINDOW_SPACING)
-		.AddTextControl(fNickName, 0, 0)
-		.Add(fServiceSelection, 0, 1)
-		.AddTextControl(fHandle, 0, 2)
-		.Add(fHelpText, 0, 3, 2, 1)
-		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING, 0, 4, 2, 1)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.AddGrid()
+			.SetInsets(B_USE_WINDOW_INSETS, B_USE_WINDOW_INSETS, B_USE_WINDOW_INSETS, 0)
+			.Add(fNickName->CreateLabelLayoutItem(), 0, 0)
+			.Add(fNickName->CreateTextViewLayoutItem(), 1, 0)
+			.Add(fServiceSelection, 0, 1, 2, 1)
+			.Add(fHandle->CreateLabelLayoutItem(), 0, 2)
+			.Add(fHandle->CreateTextViewLayoutItem(), 1, 2)
+			.Add(fHelpText, 1, 3)
+		.End()
+		.AddStrut(B_USE_BIG_SPACING)
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_INSETS, 0, B_USE_WINDOW_INSETS, B_USE_WINDOW_INSETS)
 			.AddGlue()
 			.Add(kCancelButton)
 			.Add(kOkButton)
+			.AddGlue()
 		.End()
 	.End();
 
+	CenterIn(frame);
 	fNickName->MakeFocus(true);
 }
 

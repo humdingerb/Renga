@@ -427,7 +427,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 
 		case JAB_OPEN_ADD_BUDDY_WINDOW: {
 			// open buddy window
-			AddBuddyWindow::Instance()->Show();
+			AddBuddyWindow::Instance(Frame())->Show();
 			break;
 		}
 
