@@ -1,13 +1,18 @@
-//////////////////////////////////////////////////
-// Blabber [SendTalkWindow.cpp]
-//////////////////////////////////////////////////
+/*
+ * Copyright 2001-2022, Distributed under terms of the MIT license.
+ *
+ * Authors:
+ *	John Blanco
+ *	Adrien Destugues <pulkomandy@pulkomandy.tk>
+ *	Pascal Abresch
+ *	Humdinger <humdingerb@gmail.com>
+ */
 
 #include "CustomStatusWindow.h"
 
 #include <cstdio>
 
 #include <Application.h>
-#include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <LayoutBuilder.h>
@@ -19,7 +24,6 @@
 #include "ui/MainWindow.h"
 
 #include "BlabberSettings.h"
-#include "GenericFunctions.h"
 #include "JabberSpeak.h"
 #include "Messages.h"
 
@@ -29,22 +33,16 @@
 
 CustomStatusWindow *CustomStatusWindow::_instance = NULL;
 
-CustomStatusWindow *CustomStatusWindow::Instance() {
-	if (_instance == NULL) {
-		float main_window_width  = 410;
-		float main_window_height = 100;
-
-		BRect frame(GenericFunctions::CenteredFrame(main_window_width, main_window_height));
-
+CustomStatusWindow *CustomStatusWindow::Instance(BRect frame) {
+	if (_instance == NULL)
 		_instance = new CustomStatusWindow(frame);
-	}
 
 	return _instance;
 }
 
 
 CustomStatusWindow::CustomStatusWindow(BRect frame)
-	: BWindow(frame, B_TRANSLATE("Create a custom status"),
+	: BWindow(BRect(), B_TRANSLATE("Create a custom status"),
 		B_TITLED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS |
 		B_NOT_ZOOMABLE |
@@ -52,15 +50,13 @@ CustomStatusWindow::CustomStatusWindow(BRect frame)
 	{
 
 	_chat = new BRadioButton("status", B_TRANSLATE("Chat"), NULL);
-
 	_away = new BRadioButton("status", B_TRANSLATE("Away"), NULL);
-
 	_xa = new BRadioButton("status", B_TRANSLATE("Extended away"), NULL);
-
 	_dnd = new BRadioButton("status", B_TRANSLATE("Do not disturb"), NULL);
 
-
-	BStringView *query = new BStringView(NULL, B_TRANSLATE("Please provide your detailed status:"));
+	BStringView *query = new BStringView(NULL, B_TRANSLATE(
+		"Please choose a status category on the left\n"
+		"and enter a detailed status text below:"));
 
 	// handle
 	_handle = new BTextControl(NULL, NULL, "", NULL);
@@ -80,25 +76,28 @@ CustomStatusWindow::CustomStatusWindow(BRect frame)
 	ok->MakeDefault(true);
 	ok->SetTarget(this);
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	BLayoutBuilder::Group<>(this)
-		.SetInsets(B_USE_WINDOW_SPACING)
-		.AddGroup(B_VERTICAL, B_USE_HALF_ITEM_SPACING, 0)
-			.Add(_chat)
-			.Add(_away)
-			.Add(_xa)
-			.Add(_dnd)
-		.End()
-		.AddGroup(B_VERTICAL, B_USE_ITEM_SPACING, 2)
-			.Add(query)
-			.Add(_handle)
-				.AddGroup(B_HORIZONTAL, B_USE_ITEM_SPACING, 0)
-				.AddGlue()
-				.Add(cancel)
-				.Add(ok)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_WINDOW_INSETS)
+		.AddGroup(B_HORIZONTAL)
+			.AddGroup(B_VERTICAL, 0)
+				.Add(_chat)
+				.Add(_away)
+				.Add(_xa)
+				.Add(_dnd)
+			.End()
+			.AddStrut(B_USE_BIG_SPACING)
+			.AddGroup(B_VERTICAL)
+				.Add(query)
+				.Add(_handle)
 			.End()
 		.End()
-	.End();
+		.AddStrut(B_USE_BIG_SPACING)
+		.AddGroup(B_HORIZONTAL, B_USE_ITEM_SPACING)
+			.AddGlue()
+			.Add(cancel)
+			.Add(ok)
+			.AddGlue()
+		.End();
 
 	// set defaults
 	string exact_status;
@@ -121,7 +120,7 @@ CustomStatusWindow::CustomStatusWindow(BRect frame)
 		_chat->SetValue(1);
 	}
 
-	// focus
+	CenterIn(frame);
 	_handle->MakeFocus(true);
 }
 
