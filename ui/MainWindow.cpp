@@ -399,12 +399,12 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_OPEN_NEW_CHAT: {
-			(new SendTalkWindow(gloox::Message::Chat))->Show();
+			(new SendTalkWindow(Frame(), gloox::Message::Chat))->Show();
 			break;
 		}
 
 		case JAB_OPEN_NEW_GROUP_CHAT: {
-			(new SendTalkWindow(gloox::Message::Groupchat))->Show();
+			(new SendTalkWindow(Frame(), gloox::Message::Groupchat))->Show();
 			break;
 		}
 
@@ -421,7 +421,7 @@ void BlabberMainWindow::MessageReceived(BMessage *msg) {
 		}
 
 		case JAB_OPEN_NEW_MESSAGE: {
-			(new SendTalkWindow(gloox::Message::Normal))->Show();
+			(new SendTalkWindow(Frame(), gloox::Message::Normal))->Show();
 			break;
 		}
 

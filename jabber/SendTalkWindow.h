@@ -18,22 +18,20 @@
 
 class SendTalkWindow : public BWindow {
 public:
-	                         SendTalkWindow(gloox::Message::MessageType type);
+	                         SendTalkWindow(BRect frame, gloox::Message::MessageType type);
 	                        ~SendTalkWindow();
 
 	void                     MessageReceived(BMessage *msg);
 
 	bool                     ValidateGroupRoom();
 	std::string              ValidateUser();
-	
-private: 
-	BBox                   *_surrounding;
+
+private:
 	gloox::Message::MessageType _type;
 	BMenuField             *_chat_services;
 	BPopUpMenu             *_chat_services_selection;
 	BTextControl           *_handle;
 	BTextControl           *_name;
-	BView                  *_full_view;
 };
 
 #endif

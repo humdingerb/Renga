@@ -1,167 +1,126 @@
-//////////////////////////////////////////////////
-// Blabber [SendTalkWindow.cpp]
-//////////////////////////////////////////////////
+/*
+ * Copyright 2001-2022, Distributed under terms of the MIT license.
+ *
+ * Authors:
+ *	John Blanco
+ *	Adrien Destugues <pulkomandy@pulkomandy.tk>
+ *	Humdinger <humdingerb@gmail.com>
+ */
 
 #include "SendTalkWindow.h"
 
 #include <cstdio>
 
 #include <Button.h>
-#include <StringView.h>
+#include <Catalog.h>
+#include <LayoutBuilder.h>
 
 #include "support/AppLocation.h"
 
 #include "ui/ModalAlertFactory.h"
-#include "ui/PictureView.h"
 
 #include "Agent.h"
 #include "AgentList.h"
 #include "BlabberSettings.h"
-#include "GenericFunctions.h"
+#include <Catalog.h>
 #include "JabberSpeak.h"
 #include "Messages.h"
 #include "TalkManager.h"
 #include "UserID.h"
 
-SendTalkWindow::SendTalkWindow(gloox::Message::MessageType type)
-	: BWindow(BRect(0, 0, 0, 0), NULL, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE) {
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SendTalkWindow"
+
+
+SendTalkWindow::SendTalkWindow(BRect frame, gloox::Message::MessageType type)
+	: BWindow(BRect(), NULL, B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+{
 	_type = type;
 
-	// determine window size
-	BRect rect;
+	if (_type == gloox::Message::Groupchat)
+		_handle = new BTextControl(B_TRANSLATE("Room name:"), NULL, NULL);
+	else
+		_handle = new BTextControl(B_TRANSLATE("Jabber ID:"), NULL, NULL);
 
-	float login_window_width  = 410;
-	float login_window_height = 100;
-
-	// create window frame position
-	rect = GenericFunctions::CenteredFrame(login_window_width, login_window_height);
-
-	// set it
-	ResizeTo(rect.Width(), rect.Height());
-	MoveTo(rect.LeftTop());
-
-	// encompassing view
-	rect = Bounds();
-	rect.OffsetTo(B_ORIGIN);
-
-	_full_view = new BView(rect, "main-full", B_FOLLOW_ALL, B_WILL_DRAW);
-	_full_view->SetViewColor(216, 216, 216, 255);
-
-	rect = Bounds();
-
-	// lightbulb
-	PictureView *picture = new PictureView("bulb-normal");
-
-	// query
-	rect.left = 80.0;
-	rect.InsetBy(5.0, 5.0);
-
-	_surrounding = new BBox(rect, NULL);
-	if (_type == gloox::Message::Groupchat) {
-		_surrounding->SetLabel("Select group chat properties");
-	} else {
-		_surrounding->SetLabel("Select a user");
-	}
-
-	rect.OffsetTo(B_ORIGIN);
-	rect.InsetBy(6.0, 12.0);
-	rect.bottom = rect.top + 18;
-
-	// chat service
-	_chat_services_selection = new BPopUpMenu("Jabber");
-	_chat_services = new BMenuField(rect, "chat_services", "Online service: ", _chat_services_selection);
-	_chat_services->SetDivider(_chat_services->Divider() - 33);
-	BMenuItem *default_item = new BMenuItem("Jabber", new BMessage(AGENT_MENU_CHANGED_TO_JABBER));
-	_chat_services_selection->AddItem(default_item);
-	default_item->SetMarked(true);
+	_handle->TextView()->SetExplicitMinSize(BSize(be_plain_font->StringWidth(
+		"VeryLongNamedSomebody@jabberadoodle.org"), B_SIZE_UNSET));
 
 	if (_type == gloox::Message::Groupchat) {
-		rect.OffsetBy(0.0, 1.0);
-	}
-
-	_name = new BTextControl(rect, "name", "Username: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
-
-	rect.OffsetBy(0.0, 24.0);
-
-	if (_type == gloox::Message::Groupchat) {
-		rect.OffsetBy(0.0, -1.0);
-	}
-
-	if (_type == gloox::Message::Groupchat) {
-		_handle = new BTextControl(rect, "handle", "Room name: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
-	} else {
-		_handle = new BTextControl(rect, "handle", "Jabber ID: ", NULL, NULL, B_FOLLOW_ALL_SIDES);
-	}
-
-	_name->SetDivider(_handle->Divider() - 35);
-	_handle->SetDivider(_handle->Divider() - 35);
-
-	if (_type == gloox::Message::Groupchat) {
-		if (BlabberSettings::Instance()->Data("last-group-username")) {
-			_name->SetText(BlabberSettings::Instance()->Data("last-group-username"));
-		} else {
-			_name->SetText(BlabberSettings::Instance()->Data("channel-name"));
-		}
-	}
-
-	if (_type == gloox::Message::Groupchat) {
-		if (BlabberSettings::Instance()->Data("last-group-joined")) {
+		if (BlabberSettings::Instance()->Data("last-group-joined"))
 			_handle->SetText(BlabberSettings::Instance()->Data("last-group-joined"));
-		} else {
+		else
 			_handle->SetText("be-speak@jabber.org");
-		}
 	} else {
-		if (BlabberSettings::Instance()->Data("last-talk-sent-to")) {
+		if (BlabberSettings::Instance()->Data("last-talk-sent-to"))
 			_handle->SetText(BlabberSettings::Instance()->Data("last-talk-sent-to"));
-		} else {
+		else
 			_handle->SetText("somebody@jabber.org");
-		}
 	}
 
-	// cancel button
-	rect.OffsetBy(135.0, 24.0);
-	rect.right = rect.left + 65;
-
-	BButton *cancel = new BButton(rect, "cancel", "Cancel", new BMessage(JAB_CANCEL));
+	BButton *cancel = new BButton("cancel", B_TRANSLATE("Cancel"), new BMessage(JAB_CANCEL));
 	cancel->SetTarget(this);
 
-	// ok button
-	rect.OffsetBy(75.0, 0.0);
-	rect.right = rect.left + 92;
-
-	BButton *ok = new BButton(rect, "ok", "", new BMessage(JAB_OK));
+	BButton *ok = new BButton("ok", "", new BMessage(JAB_OK));
 
 	if (_type == gloox::Message::Normal) {
-		SetTitle("Send new message");
-		ok->SetLabel("Send message");
+		SetTitle(B_TRANSLATE("Send new message"));
+		ok->SetLabel(B_TRANSLATE("Send message"));
 	} else if (_type == gloox::Message::Chat) {
-		SetTitle("Start new chat");
-		ok->SetLabel("Start chat");
+		SetTitle(B_TRANSLATE("Start new chat"));
+		ok->SetLabel(B_TRANSLATE("Start chat"));
 	} else if (_type == gloox::Message::Groupchat) {
-		SetTitle("Start new group chat");
-		ok->SetLabel("Start chat");
+		SetTitle(B_TRANSLATE("Start new group chat"));
+		ok->SetLabel(B_TRANSLATE("Start group chat"));
 	}
 
 	ok->MakeDefault(true);
 	ok->SetTarget(this);
 
-	_full_view->AddChild(picture);
+	BGridLayout* layout;
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.AddGrid()
+			.SetInsets(B_USE_WINDOW_INSETS, B_USE_WINDOW_INSETS, B_USE_WINDOW_INSETS, 0)
+			.GetLayout(&layout)
+			.Add(_handle->CreateLabelLayoutItem(), 0, 1)
+			.Add(_handle->CreateTextViewLayoutItem(), 1, 1)
+		.End()
+		.AddStrut(B_USE_BIG_SPACING)
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_INSETS, 0, B_USE_WINDOW_INSETS, B_USE_WINDOW_INSETS)
+			.AddGlue()
+			.Add(cancel)
+			.Add(ok)
+			.AddGlue()
+		.End()
+	.End();
 
 	if (_type == gloox::Message::Groupchat) {
-		_surrounding->AddChild(_name);
+		_name = new BTextControl(B_TRANSLATE("Username:"), NULL, NULL);
+		if (BlabberSettings::Instance()->Data("last-group-username"))
+			_name->SetText(BlabberSettings::Instance()->Data("last-group-username"));
+		else
+			_name->SetText(BlabberSettings::Instance()->Data("channel-name"));
+
+		BLayoutBuilder::Grid<>(layout)
+			.Add(_name->CreateLabelLayoutItem(), 0, 0)
+			.Add(_name->CreateTextViewLayoutItem(), 1, 0);
 	} else {
-		_surrounding->AddChild(_chat_services);
+		_chat_services_selection = new BPopUpMenu("Jabber");
+		_chat_services = new BMenuField("chat_services", B_TRANSLATE("Online service: "),
+			_chat_services_selection);
+
+		BMenuItem *default_item = new BMenuItem("Jabber", new BMessage(AGENT_MENU_CHANGED_TO_JABBER));
+		_chat_services_selection->AddItem(default_item);
+		default_item->SetMarked(true);
+
+		BLayoutBuilder::Grid<>(layout)
+			.Add(_chat_services->CreateLabelLayoutItem(), 0, 0)
+			.Add(_chat_services->CreateMenuBarLayoutItem(), 1, 0);
 	}
 
-	_surrounding->AddChild(_handle);
-	_surrounding->AddChild(cancel);
-	_surrounding->AddChild(ok);
-	_full_view->AddChild(_surrounding);
-
-	AddChild(_full_view);
-
-	// focus
 	_handle->MakeFocus(true);
+	CenterIn(frame);
 }
 
 SendTalkWindow::~SendTalkWindow() {
