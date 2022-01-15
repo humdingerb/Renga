@@ -32,6 +32,8 @@ AddBuddyWindow *AddBuddyWindow::fInstance = NULL;
 AddBuddyWindow *AddBuddyWindow::Instance(BRect frame) {
 	if (fInstance == NULL)
 		fInstance = new AddBuddyWindow(frame);
+	else if (!fInstance->IsActive())
+		fInstance->Activate();
 
 	return fInstance;
 }

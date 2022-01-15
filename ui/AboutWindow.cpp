@@ -15,7 +15,8 @@ AboutWindow *AboutWindow::Instance() {
 	if (_instance == NULL) {
 		// create window singleton
 		_instance = new AboutWindow();
-	}
+	} else if (!_instance->IsActive())
+		_instance->Activate();
 
 	return _instance;
 }

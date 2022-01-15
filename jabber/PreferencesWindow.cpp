@@ -27,9 +27,10 @@
 PreferencesWindow *PreferencesWindow::_instance = NULL;
 
 PreferencesWindow *PreferencesWindow::Instance() {
-	if (_instance == NULL) {
+	if (_instance == NULL)
 		_instance = new PreferencesWindow();
-	}
+	else if (!_instance->IsActive())
+		_instance->Activate();
 
 	return _instance;
 }
